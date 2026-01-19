@@ -1,30 +1,64 @@
 [global]
+# Display
 monitor = 1
+origin = top-right
+offset = (15, 25)
+width = 300
+height = 100
+gap_size = 5
+notification_limit = 5
+
+# Appearance
+font = "Mononoki Nerd Font 11"
 frame_width = 1
 frame_color = "#b4befe"
-separator_color= frame
-highlight = "#74c7ec"
+separator_color = frame
+corner_radius = 5
+corners = top-left,bottom
+progress_bar_corner_radius = 5
+progress_bar_corners = top-left,bottom-right
+
+# Colors
 background = "#1e1e2e"
 foreground = "#cdd6f4"
-corner_radius = 5
-progress_bar_corner_radius = 5
-corners = top-left,bottom
-progress_bar_corners = top-left,bottom-right
-offset = (15, 25)
-gap_size = 5
+highlight = "#b4befe,#a6e3a1"
+
+# Timing
+timeout = 5
+idle_threshold = 120
+
+# Icons
+max_icon_size = 64
+icon_path = /usr/share/icons/Papirus-Dark/48x48/apps:/usr/share/icons/Papirus-Dark/48x48/status:/usr/share/icons/hicolor/48x48/apps
+enable_recursive_icon_lookup = true
+
+# Behavior
+show_indicators = yes
+sticky_history = yes
+history_length = 20
+
+# Mouse actions
+mouse_left_click = close_current
+mouse_right_click = close_all
+mouse_middle_click = do_action
+
+# Format
 format = "<b>󰁕 %a</b>\n%s\n<i>%b</i>"
 
 [urgency_low]
+timeout = 3
 foreground = "#a6e3a1"
 frame_color = "#a6e3a1"
 default_icon = "~/.config/dunst/icons/bell-badge-low.svg"
 
 [urgency_normal]
-foreground = "#74c7ec"
-frame_color = "#74c7ec"
+timeout = 5
+foreground = "#b4befe"
+frame_color = "#b4befe"
 default_icon = "~/.config/dunst/icons/bell-badge.svg"
 
 [urgency_critical]
+timeout = 0
 foreground = "#f38ba8"
 frame_color = "#f38ba8"
 default_icon = "~/.config/dunst/icons/alert-decagram.svg"

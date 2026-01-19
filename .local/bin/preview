@@ -1,0 +1,42 @@
+#!/bin/bash
+
+[ "$1" = "" ] && exit 1
+
+# Check if argument is a shell function (not a file)
+if [[ ! -e "$1" ]]; then
+  func_def=$(zsh -c "source ~/.config/zsh/functions.zsh 2>/dev/null; whence -f '$1'" 2>/dev/null)
+  if [[ -n "$func_def" ]]; then
+    echo "$func_def" | /bin/bat --color=always --paging=never -l zsh --style=plain
+    exit 0
+  fi
+fi
+
+handle_image() {
+  dim=${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}
+  if [[ $dim = x ]]; then
+    dim=$(stty size </dev/tty | awk '{print $2 "x" $1}')
+  fi
+
+  kitty icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="$dim@0x0" "$2" | sed '$d' | sed $'$s/$/\e[m/'
+}
+
+handle_text() {
+  case "$2" in
+  *.md) /bin/glow --style=auto "$2" ;;
+  *.htm | *.html) /bin/lynx --dump "$2" ;;
+  *.pdf) /bin/pdftotext "$2" ;;
+  *) /bin/bat --color=always --paging=never --number --italic-text=never --tabs=2 --wrap=never "$2" ;;
+  esac
+}
+
+mime="$(file --brief --mime-type "$1")"
+case "$mime" in
+text/*) handle_text "$mime" "$1" ;;
+inode/directory) /bin/eza --all --long --icons --color=always "$1" ;;
+inode/symlink) printf "Symbolic link to: \e[34m%s\e[0m." "$(readlink "$1")" ;;
+application/json) /bin/jq --color-output <"$1" ;;
+image/*) handle_image "$mime" "$1" ;;
+application/x-executable | application/x-pie-executable | application/x-sharedlib) /bin/readelf --wide --demangle=auto --all "$1" ;;
+application/zip) /bin/unzip -l "$1" ;;
+*) printf "%s" "$mime"; exit 1 ;;
+esac

@@ -1,0 +1,10 @@
+#!/bin/bash
+# Read cached update count for starship prompt
+# Cache is updated by systemd timer or manually
+
+cache_file="$HOME/.cache/checkupdates-count"
+
+if [[ -s "$cache_file" ]]; then
+    count=$(cat "$cache_file")
+    [[ "$count" -gt 0 ]] && echo "$count"
+fi

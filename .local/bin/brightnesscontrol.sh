@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Check for required dependencies
+if ! command -v brightnessctl &>/dev/null; then
+  echo "Error: brightnessctl is not installed" >&2
+  notify-send "Brightness Control" "brightnessctl is not installed" -u critical 2>/dev/null
+  exit 1
+fi
+
 print_usage() {
   cat <<EOF
 Usage: $(basename "${0}") <action> [step] 
@@ -21,7 +28,7 @@ EOF
 
 send_notification() {
   local delta=$1
-  brightness=$(brightnessctl info | grep -oP "(?<=\()\d+(?=%)" | cat)
+  brightness=$(brightnessctl info | grep -oP "(?<=\()\d+(?=%)")
   brightness_level=$((brightness / 15 + 1))
   ico="$HOME/.config/dunst/icons/brightness-${brightness_level:-4}.svg"
   notify-send -a "brightnesscontrol.sh" -r 1 -t 800 -h int:value:"${brightness}" -i "${ico}" "Brightness" "${brightness} (${delta})"
@@ -37,7 +44,7 @@ case $1 in
 i | -i)
   brightness=$(get_brightness)
 
-  if [[ brightness -ge 100 ]]; then
+  if [[ $brightness -ge 100 ]]; then
     # do nothing
     delta="..."
   else
@@ -53,7 +60,7 @@ i | -i)
 d | -d)
   brightness=$(get_brightness)
 
-  if [[ brightness -le 1 ]]; then
+  if [[ $brightness -le 1 ]]; then
     # do nothing
     delta="..."
   else

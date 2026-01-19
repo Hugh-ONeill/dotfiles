@@ -1,0 +1,417 @@
+/* Global Styling */
+* {
+  font-family: "Mononoki Nerd Font";
+  font-weight: bold;
+  font-size: 12px;
+  min-height: 10px;
+}
+
+@import "theme.css";
+
+/* Main Background */
+window#waybar {
+  background: @main-bg;
+}
+
+/* Drop Shadow */
+window#waybar > box {
+  margin: 2px 2px 2px 2px;
+}
+
+/* Tooltip Styling */
+tooltip {
+  color: @main-fg;
+  background: @main-bg;
+  border: solid;
+  border-width: 1.5px;
+  border-radius: 7px;
+  border-color: @main-br;
+}
+
+/* Workspace Button */
+#workspaces button {
+  color: @module-fg;
+  border-radius: 8px;
+  box-shadow: none;
+  margin-top: 2px;
+  margin-right: 0px;
+  margin-bottom: 2px;
+  margin-left: 0px;
+  padding: 0px;
+  padding-right: 2px;
+  padding-left: 2px;
+  animation: ws_normal 20s ease-in-out 1;
+}
+
+/* Active Workspace Button */
+#workspaces button.active {
+  color: @active-fg;
+  background: @active-bg;
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.6);
+  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 1);
+  margin-right: 2px;
+  margin-left: 2px;
+  padding-right: 6px;
+  padding-left: 6px;
+  animation: ws_active 20s ease-in-out 1;
+  transition: all 0.4s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+/* Hover Effect for Workspace Buttons */
+#workspaces button:hover {
+  color: @hover-fg;
+  background: @hover-bg;
+  box-shadow: none;
+  animation: ws_hover 20s ease-in-out 1;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+/* General Module Styling */
+#custom-ws,
+#workspaces,
+#window,
+#custom-fans,
+#custom-gpu,
+#custom-temp,
+#memory,
+#cpu,
+#clock,
+#custom-pomodoro,
+#bluetooth,
+#custom-wifi,
+#custom-media,
+#pulseaudio,
+#backlight,
+#custom-battery,
+#custom-power {
+  opacity: 1;
+  color: @module-fg;
+}
+
+/* General Left Arrow Styling */
+#custom-left1,
+#custom-left2,
+#custom-left3,
+#custom-left4,
+#custom-left5,
+#custom-left6,
+#custom-left7,
+#custom-left8,
+#custom-left9,
+#custom-left10 {
+  font-size: 13pt;
+}
+
+/* General Right Arrow Styling */
+#custom-right1,
+#custom-right2,
+#custom-right3,
+#custom-right4,
+#custom-right5,
+#custom-right6,
+#custom-right7 {
+  font-size: 13pt;
+}
+
+/* Window Icon */
+#custom-ws {
+  background: @main-bg;
+}
+
+/* Workspaces */
+#custom-left1 {
+  color: @workspaces;
+  background: @main-bg;
+}
+
+#workspaces {
+  background: @workspaces;
+}
+
+#custom-right1 {
+  color: @workspaces;
+  background: @main-bg;
+}
+
+/* Temperature */
+#custom-left2 {
+  color: @module1-bg;
+  background: @main-bg;
+  border-radius: 10px;
+}
+
+#custom-fans {
+  background: @module1-bg;
+}
+
+#custom-temp {
+  background: @module2-bg;
+}
+
+#custom-left9 {
+  color: @module2-bg;
+  background: @module1-bg;
+  font-size: 13pt;
+}
+
+/* Memory */
+#custom-left3 {
+  color: @module3-bg;
+  background: @module2-bg;
+}
+
+#custom-gpu {
+  background: @module3-bg;
+}
+
+#memory {
+  background: @module4-bg;
+}
+
+#memory.warning {
+  color: @warning;
+}
+
+#memory.critical {
+  color: @critical;
+}
+
+#custom-left10 {
+  color: @module4-bg;
+  background: @module3-bg;
+  font-size: 13pt;
+}
+
+/* CPU */
+#custom-left4 {
+  color: @module5-bg;
+  background: @module4-bg;
+}
+
+#cpu {
+  background: @module5-bg;
+}
+
+#custom-leftin1 {
+  background: @module5-bg;
+  color: @main-bg;
+  font-size: 13pt;
+}
+
+/* Arch Logo */
+#custom-left5 {
+  color: @idle-bg;
+  background: @main-bg;
+}
+
+#idle_inhibitor {
+  color: @idle-fg;
+  background: @idle-bg;
+  font-size: 13pt;
+}
+
+#custom-right2 {
+  color: @idle-bg;
+  background: @main-bg;
+}
+
+/* Time */
+#custom-rightin1 {
+  background: @module5-bg;
+  color: @main-bg;
+  font-size: 13pt;
+}
+
+#clock.time {
+  background: @module5-bg;
+}
+
+#custom-right3 {
+  color: @module5-bg;
+  background: @module4-bg;
+}
+
+#clock.date {
+  background: @module4-bg;
+}
+
+#custom-pomodoro {
+  background: @module3-bg;
+}
+
+#custom-right4 {
+  color: @module4-bg;
+  background: @module3-bg;
+}
+
+#custom-right6 {
+  color: @module3-bg;
+  background: @module2-bg;
+  font-size: 13pt;
+}
+
+#bluetooth {
+  background: @module2-bg;
+}
+
+#custom-right7 {
+  color: @module2-bg;
+  background: @module1-bg;
+  font-size: 13pt;
+}
+
+#custom-wifi {
+  background: @module1-bg;
+}
+
+#custom-right5 {
+  color: @module1-bg;
+  background: @main-bg;
+}
+
+/* Media Info */
+#custom-media {
+  background-color: @main-bg;
+}
+
+/* PulseAudio */
+#custom-left6 {
+  color: @pulseaudio;
+  background: @main-bg;
+}
+
+#pulseaudio {
+  background: @pulseaudio;
+}
+
+/* Brightness */
+#custom-left7 {
+  color: @backlight;
+  background: @pulseaudio;
+}
+
+#backlight {
+  background: @backlight;
+}
+
+/* Battery */
+#custom-left8 {
+  color: @battery;
+  background: @backlight;
+}
+
+#custom-battery {
+  background: @battery;
+}
+
+#custom-battery.good {
+  color: @good;
+}
+
+#custom-battery.warning {
+  color: @warning;
+}
+
+#custom-battery.critical {
+  color: @critical;
+}
+
+#custom-battery.charging {
+  color: @charging;
+}
+
+/* Power Button */
+#custom-leftin2 {
+  color: @main-bg;
+  background: @battery;
+  font-size: 13pt;
+}
+
+#custom-power {
+  color: @main-bg;
+  background: @power;
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.6);
+  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 1);
+  border-radius: 20px;
+  margin-top: 2px;
+  margin-right: 4px;
+  margin-bottom: 2px;
+  padding-right: 6px;
+  padding-left: 9px;
+}
+
+#custom-power:hover {
+  color: @module4-bg;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+/* Module Hover Effects - Catppuccin Colors */
+#custom-fans:hover {
+  color: @sky;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#custom-temp:hover {
+  color: @peach;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#custom-gpu:hover {
+  color: @teal;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#memory:hover {
+  color: @flamingo;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#cpu:hover {
+  color: @pink;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#clock:hover {
+  color: @lavender;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#custom-pomodoro:hover {
+  color: @maroon;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#bluetooth:hover {
+  color: @blue;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#custom-wifi:hover {
+  color: @sapphire;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#custom-media:hover {
+  color: @green;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#pulseaudio:hover {
+  color: @red;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#backlight:hover {
+  color: @yellow;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#custom-battery:hover {
+  color: @mauve;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#idle_inhibitor:hover {
+  color: @module4-bg;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}

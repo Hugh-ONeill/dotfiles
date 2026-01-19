@@ -1,0 +1,24 @@
+#!/bin/bash
+# Refresh cached update count
+# Run periodically via systemd timer
+
+cache_file="$HOME/.cache/checkupdates-count"
+
+# Count available updates (pacman + AUR if paru/yay available)
+count=0
+
+# Official repos
+if command -v checkupdates &>/dev/null; then
+    count=$(checkupdates 2>/dev/null | wc -l)
+fi
+
+# AUR updates (paru or yay)
+if command -v paru &>/dev/null; then
+    aur_count=$(paru -Qua 2>/dev/null | wc -l)
+    count=$((count + aur_count))
+elif command -v yay &>/dev/null; then
+    aur_count=$(yay -Qua 2>/dev/null | wc -l)
+    count=$((count + aur_count))
+fi
+
+echo "$count" > "$cache_file"

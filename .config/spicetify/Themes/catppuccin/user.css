@@ -1,0 +1,85 @@
+/* Catppuccin theme for Spicetify */
+
+:root {
+  --spice-text: var(--spice-text);
+  --spice-subtext: var(--spice-subtext);
+  --spice-main: var(--spice-main);
+  --spice-sidebar: var(--spice-sidebar);
+  --spice-player: var(--spice-player);
+  --spice-card: var(--spice-card);
+  --spice-shadow: var(--spice-shadow);
+  --spice-selected-row: var(--spice-selected-row);
+  --spice-button: var(--spice-button);
+  --spice-button-active: var(--spice-button-active);
+  --spice-button-disabled: var(--spice-button-disabled);
+  --spice-tab-active: var(--spice-tab-active);
+  --spice-notification: var(--spice-notification);
+  --spice-notification-error: var(--spice-notification-error);
+  --spice-misc: var(--spice-misc);
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Main background */
+.Root__top-container {
+  background-color: var(--spice-main) !important;
+}
+
+/* Sidebar */
+.Root__nav-bar {
+  background-color: var(--spice-sidebar) !important;
+}
+
+/* Now playing bar */
+.Root__now-playing-bar {
+  background-color: var(--spice-player) !important;
+}
+
+/* Cards hover effect */
+.main-card-card:hover {
+  background-color: var(--spice-card) !important;
+}
+
+/* Buttons */
+button.Button-sm-buttonPrimary-isUsingKeyboard-useBrowserDefaultFocusStyle,
+button.Button-sm-buttonPrimary-useBrowserDefaultFocusStyle {
+  background-color: var(--spice-button) !important;
+  color: var(--spice-play-button) !important;
+}
+
+button.Button-sm-buttonPrimary-isUsingKeyboard-useBrowserDefaultFocusStyle:hover,
+button.Button-sm-buttonPrimary-useBrowserDefaultFocusStyle:hover {
+  background-color: var(--spice-button-active) !important;
+  transform: scale(1.02);
+}
+
+/* Progress bar */
+.playback-bar .progress-bar__fg {
+  background-color: var(--spice-progress-fg) !important;
+}
+
+/* Heart/like button when active */
+button[aria-checked="true"] svg {
+  fill: var(--spice-heart) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--spice-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--spice-selected-row);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--spice-misc);
+}

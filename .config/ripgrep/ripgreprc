@@ -1,0 +1,15 @@
+# Catppuccin Mocha colors
+--colors=match:fg:243,139,168
+--colors=match:style:bold
+--colors=path:fg:137,180,250
+--colors=line:fg:166,227,161
+--colors=column:fg:250,179,135
+
+# Smart case sensitivity
+--smart-case
+
+# Follow symlinks
+--follow
+
+# Add file type associations
+--type-add=web:*.{html,css,js,ts,jsx,tsx}

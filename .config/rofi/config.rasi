@@ -1,0 +1,164 @@
+/* vim:ft=css */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Configuration
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+configuration {
+    /* Modi */
+    modi:                        "drun,run,window,ssh,filebrowser";
+    show-icons:                  true;
+    icon-theme:                  "Papirus";
+
+    /* Display names */
+    display-drun:                " Apps";
+    display-run:                 " Run";
+    display-window:              " Windows";
+    display-ssh:                 " SSH";
+    display-filebrowser:         " Files";
+
+    /* DRun settings */
+    drun-display-format:         "{name}";
+    drun-match-fields:           "name,generic,exec,categories,keywords";
+    drun-show-actions:           false;
+
+    /* Window settings */
+    window-format:               "{w} · {c} · {t}";
+    window-thumbnail:            false;
+
+    /* Filebrowser settings */
+    filebrowser {
+        directories-first:       true;
+        sorting-method:          "name";
+    }
+
+    /* Matching */
+    matching:                    "fuzzy";
+    tokenize:                    true;
+    case-sensitive:              false;
+    sort:                        true;
+    sorting-method:              "fzf";
+
+    /* Behavior */
+    terminal:                    "kitty";
+    run-shell-command:           "{terminal} -e {cmd}";
+    scroll-method:               0;
+    click-to-exit:               true;
+    steal-focus:                 false;
+
+    /* History & Cache */
+    disable-history:             false;
+    max-history-size:            25;
+    cache-dir:                   "~/.cache/rofi";
+
+    /* Misc */
+    normalize-match:             true;
+    hover-select:                false;
+    me-select-entry:             "";
+    me-accept-entry:             "MousePrimary";
+
+    /* Timeout */
+    timeout {
+        action:                  "kb-cancel";
+        delay:                   0;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+     * Keybindings
+     * ══════════════════════════════════════════════════════════════════════════ */
+
+    /* Unbind defaults that conflict */
+    kb-row-tab:                  "";
+    kb-element-next:             "";
+    kb-element-prev:             "";
+    kb-primary-paste:            "Control+Shift+v";
+    kb-secondary-paste:          "Control+v";
+    kb-secondary-copy:           "Control+y";
+
+    /* Movement */
+    kb-row-up:                   "Up,Control+k,Control+p";
+    kb-row-down:                 "Down,Control+j,Control+n";
+    kb-row-left:                 "Control+h";
+    kb-row-right:                "Control+l";
+    kb-page-prev:                "Page_Up,Control+u";
+    kb-page-next:                "Page_Down,Control+d";
+    kb-row-first:                "Home,Control+g";
+    kb-row-last:                 "End,Control+Shift+g";
+
+    /* Actions */
+    kb-accept-entry:             "Return,KP_Enter";
+    kb-accept-alt:               "Shift+Return";
+    kb-accept-custom:            "Control+Return";
+    kb-cancel:                   "Escape,Control+c";
+    kb-delete-entry:             "Shift+Delete";
+
+    /* Modi switching */
+    kb-mode-next:                "Tab,Control+Tab";
+    kb-mode-previous:            "Shift+Tab,Control+Shift+Tab";
+    kb-mode-complete:            "";
+
+    /* Text manipulation */
+    kb-clear-line:               "Control+w";
+    kb-move-front:               "Control+a";
+    kb-move-end:                 "Control+e";
+    kb-move-word-back:           "Alt+b,Control+Left";
+    kb-move-word-forward:        "Alt+f,Control+Right";
+    kb-remove-word-back:         "Control+BackSpace,Alt+BackSpace";
+    kb-remove-word-forward:      "Control+Delete,Alt+d";
+    kb-remove-char-back:         "BackSpace";
+    kb-remove-char-forward:      "Delete";
+    kb-remove-to-eol:            "";
+    kb-remove-to-sol:            "";
+
+    /* Selection */
+    kb-select-1:                 "Super+1";
+    kb-select-2:                 "Super+2";
+    kb-select-3:                 "Super+3";
+    kb-select-4:                 "Super+4";
+    kb-select-5:                 "Super+5";
+    kb-select-6:                 "Super+6";
+    kb-select-7:                 "Super+7";
+    kb-select-8:                 "Super+8";
+    kb-select-9:                 "Super+9";
+    kb-select-10:                "Super+0";
+
+    /* Custom actions */
+    kb-custom-1:                 "Alt+1";
+    kb-custom-2:                 "Alt+2";
+    kb-custom-3:                 "Alt+3";
+    kb-custom-4:                 "Alt+4";
+    kb-custom-5:                 "Alt+5";
+    kb-custom-6:                 "Alt+6";
+    kb-custom-7:                 "Alt+7";
+    kb-custom-8:                 "Alt+8";
+    kb-custom-9:                 "Alt+9";
+    kb-custom-10:                "Alt+0";
+    kb-custom-11:                "";
+    kb-custom-12:                "";
+    kb-custom-13:                "";
+    kb-custom-14:                "";
+    kb-custom-15:                "";
+    kb-custom-16:                "";
+    kb-custom-17:                "";
+    kb-custom-18:                "";
+    kb-custom-19:                "";
+
+    /* Toggle */
+    kb-toggle-case-sensitivity:  "Alt+c";
+    kb-toggle-sort:              "Alt+s";
+
+    /* Screenshot (disabled) */
+    kb-screenshot:               "";
+
+    /* Mouse bindings */
+    ml-row-left:                 "ScrollLeft";
+    ml-row-right:                "ScrollRight";
+    ml-row-up:                   "ScrollUp";
+    ml-row-down:                 "ScrollDown";
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Theme
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+@theme "theme"

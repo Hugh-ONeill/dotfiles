@@ -1,0 +1,42 @@
+# Misc Folders
+Code/Cache
+.android
+.cache
+.mozilla
+.npm
+.var
+.vscode
+.java
+.ssh
+.pki
+.nv
+.gnupg
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+Code/Logs
+.node_repl_history
+
+# yarn
+.yarn-integrity
+.yarn/cache
+.yarn/unplugged
+.yarn/build.state.yml
+.pnp.*
+
+# Wine
+.wine
+
+# Zinit
+.zinit
+
+# Rust
+.rustup
+.cargo
+
+# Lua
+.luarocks

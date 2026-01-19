@@ -1,0 +1,87 @@
+#!/bin/bash
+# Split directory path for display in prompts/statuslines
+# Usage: directory-split first|second [path]
+
+part="${1:-first}"
+dir="${2:-$PWD}"
+
+# Directory substitution icons
+icon_documents=$'\U000f0219'  # U+F0219 󰈙
+icon_downloads=$'\uf019'      # U+F019
+icon_music=$'\U000f075a'      # U+F075A 󰝚
+icon_pictures=$'\uf03e'       # U+F03E
+icon_videos=$'\uf03d'         # U+F03D
+icon_games=$'\uf11b'          # U+F11B
+icon_developer=$'\U000f0c8b'  # U+F0C8B 󰲋
+icon_desktop=$'\uf108'        # U+F108
+icon_config=$'\uf013'         # U+F013
+
+# Replace home with ~
+if [[ "$dir" == "$HOME"* ]]; then
+  dir="~${dir#$HOME}"
+fi
+
+# Apply directory substitutions (longer matches first, on full path)
+dir="${dir//Documents\/Music/$icon_music}"
+dir="${dir//Documents\/Pictures/$icon_pictures}"
+dir="${dir//Documents\/Videos/$icon_videos}"
+dir="${dir//Documents\/Games/$icon_games}"
+dir="${dir//Documents/$icon_documents}"
+dir="${dir//Downloads/$icon_downloads}"
+dir="${dir//Developer/$icon_developer}"
+dir="${dir//Desktop/$icon_desktop}"
+dir="${dir//.config/$icon_config}"
+
+# Build array of path components
+IFS='/' read -ra raw_parts <<< "$dir"
+dir_parts=()
+
+if [[ "$dir" == "~"* ]]; then
+  dir_parts+=("~")
+  for p in "${raw_parts[@]:1}"; do
+    [ -n "$p" ] && dir_parts+=("$p")
+  done
+elif [[ "$dir" == "/"* ]]; then
+  dir_parts+=("/")
+  for p in "${raw_parts[@]}"; do
+    [ -n "$p" ] && dir_parts+=("$p")
+  done
+else
+  for p in "${raw_parts[@]}"; do
+    [ -n "$p" ] && dir_parts+=("$p")
+  done
+fi
+
+num=${#dir_parts[@]}
+
+if [ "$part" = "first" ]; then
+  if [ $num -gt 4 ]; then
+    # Long path: first 2 parts + ellipsis
+    echo "${dir_parts[0]}/${dir_parts[1]}/…"
+  elif [ $num -gt 0 ]; then
+    # Short path: first half
+    split=$(( (num + 1) / 2 ))
+    result=""
+    for (( i=0; i<split && i<num; i++ )); do
+      [ -n "$result" ] && result+="/"
+      result+="${dir_parts[$i]}"
+    done
+    echo "$result"
+  fi
+else
+  if [ $num -gt 4 ]; then
+    # Long path: parent + current
+    echo "/${dir_parts[$((num-2))]}/${dir_parts[$((num-1))]}"
+  elif [ $num -gt 1 ]; then
+    # Short path: second half
+    split=$(( (num + 1) / 2 ))
+    result=""
+    for (( i=split; i<num; i++ )); do
+      result+="/${dir_parts[$i]}"
+    done
+    echo "$result"
+  else
+    # Single component: sparkle
+    echo -e "\U0000ec10"
+  fi
+fi

@@ -1,0 +1,3 @@
+#!/bin/bash
+systemd-analyze
+bat /proc/cmdline

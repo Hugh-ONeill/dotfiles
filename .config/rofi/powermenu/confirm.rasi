@@ -1,0 +1,68 @@
+/* vim:ft=css */
+
+@import "../shared/colors.rasi"
+@import "../shared/fonts.rasi"
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Confirmation Dialog
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+* {
+    background-color: transparent;
+    text-color:       @foreground;
+}
+
+window {
+    transparency:     "real";
+    location:         center;
+    anchor:           center;
+    width:            280px;
+    border:           2px solid;
+    border-color:     @lavender;
+    border-radius:    12px;
+    background-color: @background;
+}
+
+mainbox {
+    spacing:  15px;
+    padding:  20px;
+    children: [ "message", "listview" ];
+}
+
+message {
+    padding: 0;
+}
+
+textbox {
+    padding:          12px;
+    border-radius:    8px;
+    background-color: @surface0;
+    horizontal-align: 0.5;
+}
+
+listview {
+    lines:    2;
+    columns:  2;
+    spacing:  10px;
+    scrollbar: false;
+}
+
+element {
+    padding:          12px;
+    border-radius:    8px;
+    cursor:           pointer;
+    horizontal-align: 0.5;
+}
+
+element normal.normal {
+    background-color: @surface0;
+}
+
+element selected.normal {
+    background-color: @green;
+    text-color:       @crust;
+}
+
+element alternate.normal {
+    background-color: @surface0;
+}

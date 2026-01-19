@@ -1,0 +1,110 @@
+/* vim:ft=css */
+
+@import "../shared/colors.rasi"
+@import "../shared/fonts.rasi"
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Window
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+* {
+    background-color: transparent;
+    text-color:       @foreground;
+}
+
+window {
+    transparency:     "real";
+    location:         center;
+    anchor:           center;
+    width:            380px;
+    border:           2px solid;
+    border-color:     @lavender;
+    border-radius:    12px;
+    background-color: @background;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Main Layout
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+mainbox {
+    spacing:  12px;
+    padding:  20px;
+    children: [ "inputbar", "listview" ];
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Input Bar (Month/Year header)
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+inputbar {
+    children: [ "prompt" ];
+}
+
+prompt {
+    padding:          12px 18px;
+    border-radius:    8px;
+    background-color: @teal;
+    text-color:       @crust;
+    horizontal-align: 0.5;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * List View (7-column grid)
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+listview {
+    lines:        8;
+    columns:      7;
+    flow:         horizontal;
+    spacing:      4px;
+    scrollbar:    false;
+    fixed-height: false;
+    dynamic:      true;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Elements
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+element {
+    padding:          10px 2px;
+    border-radius:    6px;
+    cursor:           pointer;
+    horizontal-align: 0.5;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    expand:           true;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+}
+
+element selected.normal {
+    background-color: @teal;
+    text-color:       @crust;
+}
+
+element-text selected {
+    text-color: @crust;
+}
+
+/* Current day highlight */
+element normal.active,
+element alternate.active {
+    background-color: @surface1;
+    text-color:       @teal;
+}
+
+element selected.active {
+    background-color: @teal;
+    text-color:       @crust;
+}
+
+element-text active {
+    text-color: inherit;
+}

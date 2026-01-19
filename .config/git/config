@@ -1,0 +1,26 @@
+[core]
+	pager = delta
+	autocrlf = input
+
+[interactive]
+	diffFilter = delta --color-only
+
+[include]
+	path = "$XDG_DATA_HOME/delta/theme/catppuccin.gitconfig"
+
+[delta]
+	navigate = true    # use n and N to move between diff sections
+	features = catppuccin-mocha
+
+[merge]
+	conflictstyle = diff3
+
+[commit]
+	gpgsign = true
+
+[tag]
+	gpgsign = true
+
+# Machine-specific config (user, credentials, etc.)
+[include]
+	path = config.local

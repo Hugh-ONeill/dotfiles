@@ -1,0 +1,138 @@
+/* vim:ft=css */
+
+@import "../shared/colors.rasi"
+@import "../shared/fonts.rasi"
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Configuration
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+configuration {
+    modi:                "drun,window,filebrowser";
+    show-icons:          true;
+    icon-theme:          "Papirus";
+    display-drun:        " Apps";
+    display-window:      " Windows";
+    display-filebrowser: " Files";
+    drun-display-format: "{name}";
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Window
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+* {
+    background-color: transparent;
+    text-color:       @foreground;
+}
+
+window {
+    transparency:     "real";
+    location:         center;
+    anchor:           center;
+    width:            600px;
+    border:           2px solid;
+    border-color:     @lavender;
+    border-radius:    12px;
+    background-color: @background;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Main Layout
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+mainbox {
+    spacing:  15px;
+    padding:  25px;
+    children: [ "inputbar", "listview", "mode-switcher" ];
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Input Bar
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+inputbar {
+    spacing:  10px;
+    children: [ "prompt", "entry" ];
+}
+
+prompt {
+    padding:          12px 18px;
+    border-radius:    8px;
+    background-color: @mauve;
+    text-color:       @crust;
+}
+
+entry {
+    padding:           12px;
+    border-radius:     8px;
+    background-color:  @surface0;
+    placeholder:       "Search applications...";
+    placeholder-color: @overlay0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * List View
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+listview {
+    lines:        8;
+    columns:      2;
+    spacing:      8px;
+    fixed-height: true;
+    scrollbar:    false;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Elements
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+element {
+    spacing:       12px;
+    padding:       10px 14px;
+    border-radius: 8px;
+    cursor:        pointer;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: @surface0;
+}
+
+element selected.normal {
+    background-color: @mauve;
+    text-color:       @crust;
+}
+
+element-text selected {
+    text-color: @crust;
+}
+
+element-icon {
+    size: 28px;
+}
+
+element-text {
+    vertical-align: 0.5;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Mode Switcher
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+mode-switcher {
+    spacing: 10px;
+}
+
+button {
+    padding:          10px 20px;
+    border-radius:    8px;
+    background-color: @surface0;
+    text-color:       @subtext0;
+    cursor:           pointer;
+}
+
+button selected {
+    background-color: @mauve;
+    text-color:       @crust;
+}

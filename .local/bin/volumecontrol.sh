@@ -2,40 +2,79 @@
 
 print_usage() {
   cat <<EOF
-Usage: $(basename "$0") <action> [step]
+Usage: $(basename "$0") <options>
 
-Actions:
-    i    <i>ncrease volume [+5%]
-    d    <d>ecrease volume [-5%]
-    m    toggle <m>ute
+Options:
+    -o i    <i>ncrease volume [+5%]
+    -o d    <d>ecrease volume [-5%]
+    -o m    toggle <m>ute
+    -s DEV  <s>elect output device (interactive menu)
 
 Optional:
-    step  volume change step [default: 5]
+    -v STEP  volume change step [default: 5]
 
 Examples:
-    $(basename "${0}") i 10    # Increase volume by 10%
-    $(basename "${0}") m       # Toggle mute
+    $(basename "${0}") -o i       # Increase volume by 5%
+    $(basename "${0}") -o i -v 10 # Increase volume by 10%
+    $(basename "${0}") -o m       # Toggle mute
+    $(basename "${0}") -s         # Select output device
 EOF
   exit 1
+}
+
+# Check for required dependencies
+check_dependencies() {
+  local missing=()
+
+  command -v wpctl &>/dev/null || missing+=("wpctl (wireplumber)")
+  command -v notify-send &>/dev/null || missing+=("notify-send (libnotify)")
+
+  if [ ${#missing[@]} -gt 0 ]; then
+    echo "Error: Missing dependencies: ${missing[*]}" >&2
+    notify-send "Volume Control" "Missing dependencies: ${missing[*]}" -u critical 2>/dev/null || true
+    exit 1
+  fi
+}
+
+# Get current volume (0-100)
+get_volume() {
+  wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{printf "%.0f", $2 * 100}'
+}
+
+# Check if muted (returns "true" or "false")
+is_muted() {
+  wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | grep -q '\[MUTED\]' && echo "true" || echo "false"
 }
 
 notify_vol() {
   local vol=$1
   local delta=$2
-  level=$((vol / 34 + 1))
-  muted=""
-  mute=$(pamixer --get-mute | cat)
-  [ "${mute}" = "true" ] && muted=" (Muted)"
-  notify-send -a "volumecontrol.sh" -r 2 -t 800 -h int:value:"${vol}" -i "${icodir}/volume-${level}.svg" "Volume${muted}" "${vol} (${delta})"
+  local level=$((vol / 34 + 1))
+  local muted=""
+  local icon=""
+
+  [ "$(is_muted)" = "true" ] && muted=" (Muted)"
+
+  if [ -f "${icodir}/volume-${level}.svg" ]; then
+    icon="${icodir}/volume-${level}.svg"
+  else
+    icon="audio-volume-high"
+  fi
+
+  notify-send -a "Volume Control" -r 2 -t 1500 -h int:value:"${vol}" -i "${icon}" "Volume${muted}" "${vol}% (${delta})"
 }
 
 notify_mute() {
-  mute=$(pamixer --get-mute | cat)
-  vol=$(pamixer --get-volume)
-  if [ "${mute}" == "true" ]; then
-    notify-send -a "volumecontrol.sh" -r 2 -t 800 -h int:value:"${vol}" -i "${icodir}/muted.svg" "muted" "${vol}"
+  local mute=$(is_muted)
+  local vol=$(get_volume)
+  local icon=""
+
+  if [ "${mute}" = "true" ]; then
+    [ -f "${icodir}/muted.svg" ] && icon="${icodir}/muted.svg" || icon="audio-volume-muted"
+    notify-send -a "Volume Control" -r 2 -t 1500 -h int:value:"${vol}" -i "${icon}" "Muted" "${vol}%"
   else
-    notify-send -a "volumecontrol.sh" -r 2 -t 800 -h int:value:"${vol}" -i "${icodir}/volume-3.svg" "unmuted" "${vol}"
+    [ -f "${icodir}/volume-3.svg" ] && icon="${icodir}/volume-3.svg" || icon="audio-volume-high"
+    notify-send -a "Volume Control" -r 2 -t 1500 -h int:value:"${vol}" -i "${icon}" "Unmuted" "${vol}%"
   fi
 }
 
@@ -46,13 +85,26 @@ change_volume() {
 
   [ "${action}" = "i" ] && sign="+"
 
-  vol=$(pamixer --get-volume)
+  vol=$(get_volume)
 
-  [ "${sign}" = "+" ] && [ "${vol}" = "100" ] && notify_vol 100 "..." && exit 0
-  [ "${sign}" = "-" ] && [ "${vol}" = "0" ] && notify_vol 0 "..." && exit 0
+  # Check bounds
+  if [ "${sign}" = "+" ] && [ "${vol}" -ge 100 ]; then
+    notify_vol 100 "Max"
+    exit 0
+  fi
 
-  wpctl set-volume @DEFAULT_SINK@ "$step%$sign"
-  vol=$(pamixer --get-volume)
+  if [ "${sign}" = "-" ] && [ "${vol}" -le 0 ]; then
+    notify_vol 0 "Min"
+    exit 0
+  fi
+
+  # Change volume (clamp at 100%)
+  wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ "$step%$sign" 2>/dev/null || {
+    notify-send "Volume Control" "Failed to change volume" -u critical
+    exit 1
+  }
+
+  vol=$(get_volume)
 
   [ "${action}" = "d" ] && sign="\-"
 
@@ -60,16 +112,75 @@ change_volume() {
 }
 
 toggle_mute() {
-  wpctl set-mute @DEFAULT_SINK@ toggle
+  wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle 2>/dev/null || {
+    notify-send "Volume Control" "Failed to toggle mute" -u critical
+    exit 1
+  }
   notify_mute
 }
 
+select_output() {
+  # Get list of audio sinks
+  sinks=$(wpctl status | awk '/Sinks:/,/Sources:/' | grep -E '^\s+[│├└].*\.' | sed 's/^[│├└ ]*//g')
+
+  if [ -z "$sinks" ]; then
+    notify-send "Volume Control" "No audio devices found" -u normal
+    exit 0
+  fi
+
+  # Use hyprlauncher, fallback to rofi
+  if command -v hyprlauncher &>/dev/null; then
+    selected=$(echo "$sinks" | hyprlauncher -m)
+  elif command -v rofi &>/dev/null; then
+    selected=$(echo "$sinks" | rofi -dmenu -p "Select Audio Output" -i)
+  else
+    notify-send "Volume Control" "No menu program found" -u normal
+    exit 1
+  fi
+
+  if [ -n "$selected" ]; then
+    # Extract ID from selection
+    id=$(echo "$selected" | grep -oP '^\d+' | head -1)
+    if [ -n "$id" ]; then
+      wpctl set-default "$id" 2>/dev/null && {
+        device_name=$(echo "$selected" | sed 's/^[0-9]*\.\s*//')
+        notify-send "Volume Control" "Switched to: ${device_name}" -t 2000
+      } || {
+        notify-send "Volume Control" "Failed to switch device" -u critical
+      }
+    fi
+  fi
+}
+
+# Check dependencies first
+check_dependencies
+
+# Default values
 step=${VOLUME_STEPS:-5}
 icodir="$HOME/.config/dunst/icons"
+action=""
+operation=""
+
+# Parse arguments
+while getopts "o:sv:h" opt; do
+  case $opt in
+    o) operation="$OPTARG" ;;
+    s) action="select" ;;
+    v) step="$OPTARG" ;;
+    h) print_usage ;;
+    *) print_usage ;;
+  esac
+done
 
 # Execute action
-case $1 in
-i | d) change_volume "$1" "${2:-$step}" ;;
-m) toggle_mute ;;
-*) print_usage ;;
-esac
+if [ "$action" = "select" ]; then
+  select_output
+elif [ -n "$operation" ]; then
+  case $operation in
+    i | d) change_volume "$operation" "$step" ;;
+    m) toggle_mute ;;
+    *) print_usage ;;
+  esac
+else
+  print_usage
+fi

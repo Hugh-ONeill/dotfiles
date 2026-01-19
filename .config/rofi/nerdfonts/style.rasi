@@ -1,0 +1,105 @@
+/* vim:ft=css */
+
+@import "../shared/colors.rasi"
+@import "../shared/fonts.rasi"
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Window
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+* {
+    background-color: transparent;
+    text-color:       @foreground;
+}
+
+window {
+    transparency:     "real";
+    location:         center;
+    anchor:           center;
+    width:            500px;
+    border:           2px solid;
+    border-color:     @lavender;
+    border-radius:    12px;
+    background-color: @background;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Main Layout
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+mainbox {
+    spacing:  15px;
+    padding:  20px;
+    children: [ "inputbar", "listview" ];
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Input Bar
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+inputbar {
+    spacing:  10px;
+    children: [ "prompt", "entry" ];
+}
+
+prompt {
+    padding:          12px 18px;
+    border-radius:    8px;
+    background-color: @flamingo;
+    text-color:       @crust;
+}
+
+entry {
+    padding:           12px;
+    border-radius:     8px;
+    background-color:  @surface0;
+    placeholder:       "Search icons...";
+    placeholder-color: @overlay0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * List View
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+listview {
+    lines:     12;
+    columns:   1;
+    spacing:   4px;
+    scrollbar: true;
+}
+
+scrollbar {
+    width:            4px;
+    border-radius:    4px;
+    handle-width:     4px;
+    handle-color:     @flamingo;
+    background-color: @surface0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Elements
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+element {
+    padding:       10px 14px;
+    border-radius: 6px;
+    cursor:        pointer;
+}
+
+element normal.normal {
+    background-color: transparent;
+}
+
+element alternate.normal {
+    background-color: transparent;
+}
+
+element selected.normal {
+    background-color: @surface0;
+    text-color:       @flamingo;
+}
+
+element-text {
+    vertical-align:   0.5;
+    highlight:        bold underline;
+}
