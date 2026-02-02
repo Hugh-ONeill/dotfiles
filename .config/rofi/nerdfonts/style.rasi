@@ -18,7 +18,7 @@ window {
     anchor:           center;
     width:            500px;
     border:           2px solid;
-    border-color:     @lavender;
+    border-color:     @g7;
     border-radius:    12px;
     background-color: @background;
 }
@@ -45,7 +45,7 @@ inputbar {
 prompt {
     padding:          12px 18px;
     border-radius:    8px;
-    background-color: @flamingo;
+    background-color: @g7;
     text-color:       @crust;
 }
 
@@ -72,7 +72,7 @@ scrollbar {
     width:            4px;
     border-radius:    4px;
     handle-width:     4px;
-    handle-color:     @flamingo;
+    handle-color:     @g7;
     background-color: @surface0;
 }
 
@@ -96,7 +96,7 @@ element alternate.normal {
 
 element selected.normal {
     background-color: @surface0;
-    text-color:       @flamingo;
+    text-color:       @g7;
 }
 
 element-text {

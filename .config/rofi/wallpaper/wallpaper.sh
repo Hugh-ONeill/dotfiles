@@ -22,14 +22,28 @@ mkdir -p "$cache_dir"
 
 generate_thumbs() {
     # Requires ImageMagick for thumbnail generation
-    command -v convert &>/dev/null || return
+    local magick_cmd
+    if command -v magick &>/dev/null; then
+        magick_cmd="magick"
+    elif command -v convert &>/dev/null; then
+        magick_cmd="convert"
+    else
+        return
+    fi
 
     shopt -s nullglob
-    for img in "$wallpaper_dir"/*.{jpg,jpeg,png,webp}; do
+    for img in "$wallpaper_dir"/*.{jpg,jpeg,png,webp,gif}; do
         [[ -f "$img" ]] || continue
         local name=$(basename "$img")
-        local thumb="$cache_dir/$name"
-        [[ -f "$thumb" ]] || convert "$img" -resize 200x200^ -gravity center -extent 200x200 "$thumb" 2>/dev/null &
+        local thumb="$cache_dir/${name%.*}.png"
+        if [[ ! -f "$thumb" ]]; then
+            # For GIFs, extract first frame with [0]
+            if [[ "$img" == *.gif ]]; then
+                $magick_cmd "${img}[0]" -resize 200x200^ -gravity center -extent 200x200 "$thumb" 2>/dev/null &
+            else
+                $magick_cmd "$img" -resize 200x200^ -gravity center -extent 200x200 "$thumb" 2>/dev/null &
+            fi
+        fi
     done
     shopt -u nullglob
     wait
@@ -37,10 +51,10 @@ generate_thumbs() {
 
 get_wallpapers() {
     shopt -s nullglob
-    for img in "$wallpaper_dir"/*.{jpg,jpeg,png,webp}; do
+    for img in "$wallpaper_dir"/*.{jpg,jpeg,png,webp,gif}; do
         [[ -f "$img" ]] || continue
         local name=$(basename "$img")
-        local thumb="$cache_dir/$name"
+        local thumb="$cache_dir/${name%.*}.png"
         if [[ -f "$thumb" ]]; then
             echo -en "$name\x00icon\x1f$thumb\n"
         else
@@ -54,9 +68,20 @@ set_wallpaper() {
     local wallpaper="$1"
     local full_path="$wallpaper_dir/$wallpaper"
 
-    # Try different wallpaper setters (check if daemon is running)
-    if pgrep -x hyprpaper &>/dev/null; then
-        hyprctl hyprpaper preload "$full_path"
+    # Use swww for GIFs (animated support), otherwise try hyprpaper first
+    if [[ "$wallpaper" == *.gif ]]; then
+        # GIFs require swww for animation
+        if ! pgrep -x swww-daemon &>/dev/null; then
+            pkill hyprpaper 2>/dev/null
+            swww-daemon &
+            sleep 0.5
+        fi
+        swww img "$full_path" \
+            --transition-type grow \
+            --transition-pos center \
+            --transition-duration 1 \
+            --transition-fps 60
+    elif pgrep -x hyprpaper &>/dev/null; then
         hyprctl hyprpaper wallpaper ",$full_path"
     elif pgrep -x swww-daemon &>/dev/null; then
         swww img "$full_path" \
@@ -73,13 +98,13 @@ set_wallpaper() {
     fi
 
     # Save current wallpaper
-    ln -sf "$full_path" "$HOME/.current_wallpaper"
+    ln -sf "$full_path" "${XDG_CACHE_HOME:-$HOME/.cache}/current_wallpaper"
     notify-send "Wallpaper" "Set to $wallpaper" 2>/dev/null
 }
 
 random_wallpaper() {
     local wallpaper
-    wallpaper=$(find "$wallpaper_dir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" \) | shuf -n 1)
+    wallpaper=$(find "$wallpaper_dir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" -o -name "*.gif" \) | shuf -n 1)
     [[ -n "$wallpaper" ]] && set_wallpaper "$(basename "$wallpaper")"
 }
 

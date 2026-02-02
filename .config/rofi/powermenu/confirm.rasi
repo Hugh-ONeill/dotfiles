@@ -18,7 +18,7 @@ window {
     anchor:           center;
     width:            280px;
     border:           2px solid;
-    border-color:     @lavender;
+    border-color:     @accent-secondary;
     border-radius:    12px;
     background-color: @background;
 }
@@ -59,7 +59,7 @@ element normal.normal {
 }
 
 element selected.normal {
-    background-color: @green;
+    background-color: @active;
     text-color:       @crust;
 }
 

@@ -15,8 +15,10 @@ export LESS="-Ss~ --ignore-case --LONG-PROMPT --quit-if-one-screen --RAW-CONTROL
 # XDG Path Corrections
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Bat
-export BAT_THEME="Catppuccin Mocha"
+# Trash (used by trash-cli rm alias)
+export XDG_TRASH_DIR="$XDG_DATA_HOME/Trash"
+
+# Bat (theme managed by ~/.config/bat/config via theme-switcher)
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export MANROFFOPT="-c"
 
@@ -61,8 +63,8 @@ export GTK2_RC_FILES="$XDG_CONFIG_HOME/gtk-2.0/gtkrc:$XDG_CONFIG_HOME/gtk-2.0/gt
 # Java
 export _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java
 
-# Lazygit
-export LG_CONFIG_FILE="$XDG_CONFIG_HOME/lazygit/config.yml,$XDG_CONFIG_HOME/lazygit/catppuccin-mocha-yellow.yml"
+# Lazygit (theme managed by symlink via theme-switcher)
+export LG_CONFIG_FILE="$XDG_CONFIG_HOME/lazygit/config.yml"
 
 # Lynx
 export LYNX_CFG="$XDG_CONFIG_HOME/lynx.cfg"
@@ -128,8 +130,7 @@ export _ZO_FZF_OPTS="+m"
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 HISTORY_SUBSTRING_SEARCH_FUZZY=1
 
-# ZSH Autosuggestion
-typeset -g ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='bg=#313244,fg=#CDD6F4,bold'
+# ZSH Autosuggestion (highlight style set in theme's shell-colors.sh)
 typeset -ga ZSH_AUTOSUGGEST_STRATEGY
 ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30

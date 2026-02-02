@@ -1,0 +1,154 @@
+# win98 dircolors - Standard ANSI colors for light background
+
+TERM Eterm
+TERM ansi
+TERM *color*
+TERM con[0-9]*x[0-9]*
+TERM cons25
+TERM console
+TERM cygwin
+TERM *direct*
+TERM dtterm
+TERM gnome
+TERM hurd
+TERM jfbterm
+TERM konsole
+TERM kterm
+TERM linux
+TERM linux-c
+TERM mlterm
+TERM putty
+TERM rxvt*
+TERM screen*
+TERM st
+TERM terminator
+TERM tmux*
+TERM vt100
+TERM xterm*
+TERM alacritty
+TERM kitty
+
+# Basic file types
+FILE 0
+RESET 0
+DIR 1;34
+LINK 0;36
+MULTIHARDLINK 0
+FIFO 33
+SOCK 1;35
+DOOR 1;35
+BLK 1;33
+CHR 1;33
+ORPHAN 0;31
+MISSING 0;31
+SETUID 0;41
+SETGID 0;43
+CAPABILITY 0
+STICKY_OTHER_WRITABLE 0;42
+OTHER_WRITABLE 0;43
+STICKY 0;44
+EXEC 1;32
+
+# Code - blue
+.c 0;34
+.cpp 0;34
+.cc 0;34
+.h 0;34
+.hpp 0;34
+.py 0;34
+.rb 0;34
+.rs 0;34
+.go 0;34
+.js 0;34
+.ts 0;34
+.jsx 0;34
+.tsx 0;34
+.vue 0;34
+.java 0;34
+.kt 0;34
+.scala 0;34
+.cs 0;34
+.fs 0;34
+.hs 0;34
+.ml 0;34
+.lua 0;34
+.php 0;34
+.pl 0;34
+.pm 0;34
+.sh 0;34
+.bash 0;34
+.zsh 0;34
+.fish 0;34
+.vim 0;34
+.el 0;34
+.clj 0;34
+.ex 0;34
+.exs 0;34
+.erl 0;34
+.swift 0;34
+
+# Data - cyan
+.json 0;36
+.yaml 0;36
+.yml 0;36
+.toml 0;36
+.xml 0;36
+.csv 0;36
+.sql 0;36
+.db 0;36
+.sqlite 0;36
+
+# Config - default
+.conf 0
+.config 0
+.cfg 0
+.ini 0
+.txt 0
+.md 0
+.rst 0
+.org 0
+.log 0;90
+
+# Media - magenta
+.jpg 0;35
+.jpeg 0;35
+.png 0;35
+.gif 0;35
+.bmp 0;35
+.svg 0;35
+.webp 0;35
+.ico 0;35
+.mp3 0;35
+.flac 0;35
+.ogg 0;35
+.wav 0;35
+.mp4 0;35
+.mkv 0;35
+.avi 0;35
+.webm 0;35
+.mov 0;35
+
+# Archives - red
+.tar 0;31
+.gz 0;31
+.bz2 0;31
+.xz 0;31
+.zip 0;31
+.7z 0;31
+.rar 0;31
+.deb 0;31
+.rpm 0;31
+
+# Build - yellow
+.o 0;33
+.a 0;33
+.so 0;33
+.dll 0;33
+.class 0;33
+.pyc 0;33
+
+# Ignored - gray
+*~ 0;90
+.git 0;90
+.gitignore 0;90
+.gitmodules 0;90

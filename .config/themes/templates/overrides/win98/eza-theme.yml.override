@@ -1,0 +1,95 @@
+# win98 eza theme - True Windows 98 16-color palette
+colourful: true
+
+filekinds:
+  normal: {foreground: "#000000"}
+  directory: {foreground: "#000080"}
+  symlink: {foreground: "#008080"}
+  pipe: {foreground: "#808080"}
+  block_device: {foreground: "#808000"}
+  char_device: {foreground: "#808000"}
+  socket: {foreground: "#800080"}
+  special: {foreground: "#800080"}
+  executable: {foreground: "#008000"}
+  mount_point: {foreground: "#000080"}
+
+perms:
+  user_read: {foreground: "#000000"}
+  user_write: {foreground: "#800000"}
+  user_execute_file: {foreground: "#008000"}
+  user_execute_other: {foreground: "#008000"}
+  group_read: {foreground: "#808080"}
+  group_write: {foreground: "#800000"}
+  group_execute: {foreground: "#008000"}
+  other_read: {foreground: "#808080"}
+  other_write: {foreground: "#800000"}
+  other_execute: {foreground: "#008000"}
+  special_user_file: {foreground: "#800080"}
+  special_other: {foreground: "#808080"}
+  attribute: {foreground: "#808080"}
+
+size:
+  major: {foreground: "#008000"}
+  minor: {foreground: "#008000"}
+  number_byte: {foreground: "#008000"}
+  number_kilo: {foreground: "#008000"}
+  number_mega: {foreground: "#808000"}
+  number_giga: {foreground: "#800000"}
+  number_huge: {foreground: "#ff0000"}
+  unit_byte: {foreground: "#808080"}
+  unit_kilo: {foreground: "#808080"}
+  unit_mega: {foreground: "#808080"}
+  unit_giga: {foreground: "#808080"}
+  unit_huge: {foreground: "#808080"}
+
+users:
+  user_you: {foreground: "#000080"}
+  user_root: {foreground: "#800000"}
+  user_other: {foreground: "#808080"}
+  group_yours: {foreground: "#008080"}
+  group_other: {foreground: "#808080"}
+  group_root: {foreground: "#800000"}
+
+links:
+  normal: {foreground: "#000080"}
+  multi_link_file: {foreground: "#808000"}
+
+git:
+  new: {foreground: "#008000"}
+  modified: {foreground: "#808000"}
+  deleted: {foreground: "#800000"}
+  renamed: {foreground: "#000080"}
+  typechange: {foreground: "#800080"}
+  ignored: {foreground: "#808080"}
+  conflicted: {foreground: "#ff0000"}
+
+git_repo:
+  branch_main: {foreground: "#008000"}
+  branch_other: {foreground: "#000080"}
+  git_clean: {foreground: "#008000"}
+  git_dirty: {foreground: "#808000"}
+
+punctuation: {foreground: "#808080"}
+date: {foreground: "#000080"}
+inode: {foreground: "#808080"}
+blocks: {foreground: "#808080"}
+header: {foreground: "#000000"}
+octal: {foreground: "#808080"}
+flags: {foreground: "#808080"}
+
+control_char: {foreground: "#ff0000"}
+broken_symlink: {foreground: "#ff0000"}
+broken_path_overlay: {foreground: "#ff0000"}
+
+filetype:
+  image: {foreground: "#800080"}
+  video: {foreground: "#800080"}
+  music: {foreground: "#800080"}
+  lossless: {foreground: "#800080"}
+  crypto: {foreground: "#808000"}
+  document: {foreground: "#000000"}
+  compressed: {foreground: "#800000"}
+  temp: {foreground: "#808080"}
+  compiled: {foreground: "#808000"}
+  build: {foreground: "#008080"}
+  source: {foreground: "#000080"}

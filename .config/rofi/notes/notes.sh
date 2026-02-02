@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # vim:ft=bash
 
+DIR="$(dirname "$0")"
+ROFI="rofi -dmenu -i -p Notes -theme ${DIR}/style.rasi"
 # ══════════════════════════════════════════════════════════════════════════════
-# Hyprlauncher Notes Manager
+# Rofi Notes Manager
 # ══════════════════════════════════════════════════════════════════════════════
 notes_dir="${XDG_DATA_HOME:-$HOME/.local/share}/notes"
 editor="${EDITOR:-nvim}"
@@ -53,14 +55,14 @@ edit_note() {
 delete_note() {
     local note="$1"
     local confirm
-    confirm=$(echo -e "Yes\nNo" | hyprlauncher -m)
+    confirm=$(echo -e "Yes\nNo" | $ROFI)
     [[ "$confirm" == "Yes" ]] && rm -f "$notes_dir/${note}.md"
 }
 
 note_actions() {
     local note="$1"
     local action
-    action=$(echo -e "  Edit\n  Delete\n  Back" | hyprlauncher -m)
+    action=$(echo -e "  Edit\n  Delete\n  Back" | $ROFI)
 
     case "$action" in
         *"Edit")   edit_note "$note" ;;
@@ -79,7 +81,7 @@ main_menu() {
     local options="󰎞  New Note"
     [[ -n "$notes" ]] && options="$options\n$notes"
 
-    echo -e "$options" | hyprlauncher -m
+    echo -e "$options" | $ROFI
 }
 
 chosen=$(main_menu)

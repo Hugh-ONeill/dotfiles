@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # vim:ft=bash
 
+DIR="$(dirname "$0")"
+ROFI="rofi -dmenu -i -p Screenshot -theme ${DIR}/style.rasi"
 # ══════════════════════════════════════════════════════════════════════════════
-# Hyprlauncher Screenshot Menu
+# Rofi Screenshot Menu
 # Requires: hyprshot, tesseract (for OCR), obs-cli or obs (for recording)
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -47,7 +49,7 @@ open='  Open folder'
 # ══════════════════════════════════════════════════════════════════════════════
 
 run_menu() {
-    echo -e "$area\n$fullscreen\n$window\n$ocr\n$record\n$open" | hyprlauncher -m
+    echo -e "$area\n$fullscreen\n$window\n$ocr\n$record\n$open" | $ROFI
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -87,18 +89,15 @@ chosen=$(run_menu)
 case "$chosen" in
     "$area")
         sleep 0.2
-        hyprshot -m region -o "$screenshot_dir" && \
-            notify-send "Screenshot" "Area captured" 2>/dev/null
+        ~/.local/bin/screenshot region
         ;;
     "$fullscreen")
         sleep 0.2
-        hyprshot -m output -o "$screenshot_dir" && \
-            notify-send "Screenshot" "Screen captured" 2>/dev/null
+        ~/.local/bin/screenshot output
         ;;
     "$window")
         sleep 0.2
-        hyprshot -m window -o "$screenshot_dir" && \
-            notify-send "Screenshot" "Window captured" 2>/dev/null
+        ~/.local/bin/screenshot window
         ;;
     "$ocr")
         sleep 0.2

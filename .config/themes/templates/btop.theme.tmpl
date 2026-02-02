@@ -1,0 +1,85 @@
+# ${THEME_NAME} btop theme
+
+# Main background, empty for terminal default, need to be empty if you want transparent background
+theme[main_bg]="${BASE}"
+
+# Main text color
+theme[main_fg]="${TEXT}"
+
+# Title color for boxes
+theme[title]="${TEXT}"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="${ACCENT}"
+
+# Background color of selected item in processes box
+theme[selected_bg]="${SEM_SELECTION}"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="${ACCENT}"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="${SURFACE2}"
+
+# Color of text appearing on top of graphs, i.e uptime and current network graph scaling
+theme[graph_text]="${ACCENT_BRIGHT}"
+
+# Background color of the percentage meters
+theme[meter_bg]="${SURFACE2}"
+
+# Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+theme[proc_misc]="${ACCENT_BRIGHT}"
+
+# CPU, Memory, Network, Proc box outline colors (Rainbow!)
+theme[cpu_box]="${ACCENT_SECONDARY}"
+theme[mem_box]="${SEM_OK}"
+theme[net_box]="${SEM_ERR}"
+theme[proc_box]="${ACCENT}"
+
+# Box divider line and small boxes line color
+theme[div_line]="${SURFACE1}"
+
+# Temperature graph color (OK -> Warning -> Error)
+theme[temp_start]="${SEM_OK}"
+theme[temp_mid]="${SEM_WARN}"
+theme[temp_end]="${SEM_ERR}"
+
+# CPU graph colors (Teal -> Lavender) - rainbow spread
+theme[cpu_start]="${ACCENT_TERTIARY}"
+theme[cpu_mid]="${ACCENT_TERTIARY}"
+theme[cpu_end]="${ACCENT_SECONDARY}"
+
+# Mem/Disk free meter (Mauve -> Lavender -> Blue)
+theme[free_start]="${ACCENT_SECONDARY}"
+theme[free_mid]="${ACCENT_SECONDARY}"
+theme[free_end]="${ACCENT}"
+
+# Mem/Disk cached meter (Sapphire -> Lavender)
+theme[cached_start]="${ACCENT_TERTIARY}"
+theme[cached_mid]="${ACCENT}"
+theme[cached_end]="${ACCENT_SECONDARY}"
+
+# Mem/Disk available meter (Peach -> Red)
+theme[available_start]="${ACCENT_BRIGHT}"
+theme[available_mid]="${ACCENT_BRIGHT}"
+theme[available_end]="${SEM_ERR}"
+
+# Mem/Disk used meter (Green -> Sky)
+theme[used_start]="${SEM_OK}"
+theme[used_mid]="${ACCENT_TERTIARY}"
+theme[used_end]="${SEM_INFO}"
+
+# Download graph colors (Peach -> Red)
+theme[download_start]="${ACCENT_BRIGHT}"
+theme[download_mid]="${ACCENT_BRIGHT}"
+theme[download_end]="${SEM_ERR}"
+
+# Upload graph colors (Green -> Sky)
+theme[upload_start]="${SEM_OK}"
+theme[upload_mid]="${ACCENT_TERTIARY}"
+theme[upload_end]="${SEM_INFO}"
+
+# Process box color gradient for threads, mem and cpu usage (Sapphire -> Mauve)
+theme[process_start]="${ACCENT_TERTIARY}"
+theme[process_mid]="${ACCENT_SECONDARY}"
+theme[process_end]="${ACCENT_SECONDARY}"

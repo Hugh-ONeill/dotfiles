@@ -32,8 +32,6 @@ up() {
   cd "$d"
 }
 
-take() { mkdir -p "$1" && cd "$1" }
-
 # ══════════════════════════════════════════════════════════════════════════════
 # File Operations
 # ══════════════════════════════════════════════════════════════════════════════
@@ -140,17 +138,17 @@ fzf_colorize() {
   # Colorize lines from stdin based on membership in lists
   # Usage: command | fzf_colorize <color> <(list)> [<color> <(list)>] ...
   # Example: paru -Slq | fzf_colorize green <(paru -Qqe) yellow <(paru -Qqd) | fzf --ansi
-  # Colors: Named Catppuccin colors (from CATPPUCCIN array), R;G;B for truecolor, or number for 256/ANSI
+  # Colors: Named colors (from THEME_COLORS array), R;G;B for truecolor, or number for 256/ANSI
 
   local -a colors files
   colors=()
   files=()
   while [[ $# -ge 2 ]]; do
-    # Use CATPPUCCIN array if color name exists, otherwise use raw value
-    if [[ -n "${CATPPUCCIN[$1]}" ]]; then
-      colors+=("${CATPPUCCIN[$1]}")
-    elif [[ "$1" == "purple" && -n "${CATPPUCCIN[mauve]}" ]]; then
-      colors+=("${CATPPUCCIN[mauve]}")
+    # Use THEME_COLORS array if color name exists, otherwise use raw value
+    if [[ -n "${THEME_COLORS[$1]}" ]]; then
+      colors+=("${THEME_COLORS[$1]}")
+    elif [[ "$1" == "purple" && -n "${THEME_COLORS[mauve]}" ]]; then
+      colors+=("${THEME_COLORS[mauve]}")
     else
       colors+=("$1")
     fi
@@ -306,10 +304,11 @@ qr() { echo "$1" | curl -s -F-=\<- qrenco.de }
 # ══════════════════════════════════════════════════════════════════════════════
 
 slist() {
-  systemctl list-units --type=service --all | awk 'NR<=1 {print; next}
-    / running / {printf "\033[38;2;166;227;161m%s\033[0m\n", $0; next}
-    / exited / {printf "\033[38;2;249;226;175m%s\033[0m\n", $0; next}
-    / failed / {printf "\033[38;2;243;139;168m%s\033[0m\n", $0; next}
+  systemctl list-units --type=service --all | \
+    C_GREEN="${THEME_COLORS[green]}" C_YELLOW="${THEME_COLORS[yellow]}" C_RED="${THEME_COLORS[red]}" awk 'NR<=1 {print; next}
+    / running / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], $0; next}
+    / exited / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_YELLOW"], $0; next}
+    / failed / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0; next}
     {print}' | fzf --ansi --multi \
     --header="ctrl-s:start | ctrl-t:stop | ctrl-r:restart | ctrl-e:enable | ctrl-d:disable | green=running | yellow=exited | red=failed" \
     --preview="systemctl status {1}" \
@@ -321,17 +320,19 @@ slist() {
 }
 
 sfailed() {
-  systemctl list-units --state=failed | awk 'NR<=1 {print; next}
-    {printf "\033[38;2;243;139;168m%s\033[0m\n", $0}' | fzf --ansi \
+  systemctl list-units --state=failed | \
+    C_RED="${THEME_COLORS[red]}" awk 'NR<=1 {print; next}
+    {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0}' | fzf --ansi \
     --preview="systemctl status {1}; echo '---LOGS---'; journalctl -u {1} --no-pager -n 30"
 }
 
 jfu() {
-  systemctl list-units --type=service --all --no-legend | awk '{
+  systemctl list-units --type=service --all --no-legend | \
+    C_GREEN="${THEME_COLORS[green]}" C_RED="${THEME_COLORS[red]}" awk '{
     name = ($1 ~ /●/) ? $2 : $1
     sub_status = ($1 ~ /●/) ? $5 : $4
-    if (sub_status == "running") printf "\033[38;2;166;227;161m%s\033[0m\n", name
-    else if (sub_status == "failed") printf "\033[38;2;243;139;168m%s\033[0m\n", name
+    if (sub_status == "running") printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], name
+    else if (sub_status == "failed") printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], name
     else print name
   }' | fzf --ansi \
     --preview="journalctl -u {1} --no-pager -n 50" \
@@ -450,12 +451,14 @@ gflog() {
 }
 
 gadd() {
-  git status -s | awk '{
-    if ($1 ~ /M/) printf "\033[38;2;249;226;175m%s\033[0m\n", $0
-    else if ($1 ~ /A/) printf "\033[38;2;166;227;161m%s\033[0m\n", $0
-    else if ($1 ~ /D/) printf "\033[38;2;243;139;168m%s\033[0m\n", $0
-    else if ($1 ~ /R/) printf "\033[38;2;137;180;250m%s\033[0m\n", $0
-    else if ($1 ~ /\?/) printf "\033[38;2;180;190;254m%s\033[0m\n", $0
+  git status -s | \
+    C_YELLOW="${THEME_COLORS[yellow]}" C_GREEN="${THEME_COLORS[green]}" C_RED="${THEME_COLORS[red]}" \
+    C_BLUE="${THEME_COLORS[blue]}" C_LAVENDER="${THEME_COLORS[lavender]}" awk '{
+    if ($1 ~ /M/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_YELLOW"], $0
+    else if ($1 ~ /A/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], $0
+    else if ($1 ~ /D/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0
+    else if ($1 ~ /R/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_BLUE"], $0
+    else if ($1 ~ /\?/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_LAVENDER"], $0
     else print
   }' | fzf --ansi --multi --preview="git diff --color=always {2}" \
     --header="tab:select | enter:stage | yellow=modified | green=added | red=deleted | blue=renamed | lavender=untracked" \
@@ -476,9 +479,10 @@ gstash() {
 # ══════════════════════════════════════════════════════════════════════════════
 
 dps() {
-  docker ps -a | awk 'NR==1 {print; next}
-    /Up / {printf "\033[38;2;166;227;161m%s\033[0m\n", $0; next}
-    /Exited / {printf "\033[38;2;243;139;168m%s\033[0m\n", $0; next}
+  docker ps -a | \
+    C_GREEN="${THEME_COLORS[green]}" C_RED="${THEME_COLORS[red]}" awk 'NR==1 {print; next}
+    /Up / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], $0; next}
+    /Exited / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0; next}
     {print}' | fzf --ansi --multi --header-lines=1 \
     --preview="docker logs --tail 30 {1}" \
     --header="ctrl-s:start | ctrl-t:stop | ctrl-r:rm | ctrl-l:logs | green=running | red=exited" \
@@ -489,8 +493,9 @@ dps() {
 }
 
 dim() {
-  docker images | awk 'NR==1 {print; next}
-    /<none>/ {printf "\033[38;2;243;139;168m%s\033[0m\n", $0; next}
+  docker images | \
+    C_RED="${THEME_COLORS[red]}" awk 'NR==1 {print; next}
+    /<none>/ {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0; next}
     {print}' | fzf --ansi --multi --header-lines=1 \
     --header="ctrl-r:remove | red=dangling" \
     --bind="ctrl-r:execute(docker rmi {+3})+reload(docker images)"

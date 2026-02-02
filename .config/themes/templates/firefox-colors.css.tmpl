@@ -1,0 +1,107 @@
+/* Firefox theme colors - generated from ${THEME_NAME} palette */
+
+:root {
+  /* Toolbar and UI backgrounds */
+  --lwt-accent-color: ${BASE} !important;
+  --lwt-accent-color-inactive: ${MANTLE} !important;
+  --toolbar-bgcolor: ${BASE} !important;
+  --toolbar-color: ${TEXT} !important;
+  --tabs-border-color: ${SURFACE0} !important;
+  --tabpanel-background-color: ${BASE} !important;
+
+  /* Tab colors */
+  --tab-selected-bgcolor: ${SURFACE0} !important;
+  --tab-selected-textcolor: ${TEXT} !important;
+  --lwt-text-color: ${TEXT} !important;
+  --lwt-tab-text: ${TEXT} !important;
+
+  /* Sidebar */
+  --lwt-sidebar-background-color: ${MANTLE} !important;
+  --lwt-sidebar-text-color: ${TEXT} !important;
+
+  /* URL bar */
+  --toolbar-field-background-color: ${SURFACE0} !important;
+  --toolbar-field-color: ${TEXT} !important;
+  --toolbar-field-border-color: ${SURFACE1} !important;
+  --toolbar-field-focus-background-color: ${SURFACE1} !important;
+  --toolbar-field-focus-color: ${TEXT} !important;
+  --toolbar-field-focus-border-color: ${ACCENT} !important;
+  --urlbar-popup-url-color: ${ACCENT} !important;
+
+  /* Popup panels */
+  --arrowpanel-background: ${SURFACE0} !important;
+  --arrowpanel-color: ${TEXT} !important;
+  --arrowpanel-border-color: ${SURFACE1} !important;
+
+  /* Highlights */
+  --lwt-toolbarbutton-hover-background: ${SURFACE1} !important;
+  --lwt-toolbarbutton-active-background: ${SURFACE2} !important;
+
+  /* Accent colors */
+  --focus-outline-color: ${ACCENT} !important;
+  --button-primary-bgcolor: ${ACCENT} !important;
+  --button-primary-hover-bgcolor: ${ACCENT_BRIGHT} !important;
+  --button-primary-active-bgcolor: ${ACCENT} !important;
+  --button-primary-color: ${BASE} !important;
+}
+
+/* Ensure dark scrollbars */
+* {
+  scrollbar-color: ${SURFACE2} ${BASE} !important;
+}
+
+/* Tab bar background */
+#TabsToolbar {
+  background-color: ${MANTLE} !important;
+}
+
+/* Unselected tabs */
+.tabbrowser-tab:not([selected]) {
+  background-color: ${MANTLE} !important;
+  color: ${SUBTEXT0} !important;
+}
+
+/* Selected tab */
+.tabbrowser-tab[selected] {
+  background-color: ${SURFACE0} !important;
+  color: ${TEXT} !important;
+}
+
+/* Tab hover */
+.tabbrowser-tab:not([selected]):hover {
+  background-color: ${SURFACE0} !important;
+}
+
+/* Navigation toolbar */
+#nav-bar {
+  background-color: ${BASE} !important;
+}
+
+/* Context menus */
+menupopup,
+panel,
+#contentAreaContextMenu,
+#tabContextMenu {
+  --panel-background: ${SURFACE0} !important;
+  --panel-color: ${TEXT} !important;
+  --panel-border-color: ${SURFACE1} !important;
+  background-color: ${SURFACE0} !important;
+  color: ${TEXT} !important;
+}
+
+menuitem,
+menu {
+  color: ${TEXT} !important;
+}
+
+menuitem:hover,
+menu:hover,
+menuitem[_moz-menuactive="true"],
+menu[_moz-menuactive="true"] {
+  background-color: ${SURFACE1} !important;
+  color: ${TEXT} !important;
+}
+
+menuseparator {
+  border-color: ${SURFACE1} !important;
+}

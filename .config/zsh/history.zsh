@@ -24,4 +24,3 @@ setopt APPEND_HISTORY            # Append to history file
 setopt HIST_NO_STORE             # Don't store history command
 setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks
 setopt INC_APPEND_HISTORY_TIME   # Add commands immediately with timestamps
-setopt HIST_BEEP                 # Beep on non-existent history

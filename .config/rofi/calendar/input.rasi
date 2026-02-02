@@ -14,7 +14,7 @@ window {
     anchor:           center;
     width:            400px;
     border:           2px solid;
-    border-color:     @lavender;
+    border-color:     @accent-secondary;
     border-radius:    12px;
     background-color: @background;
 }
@@ -33,7 +33,7 @@ inputbar {
 prompt {
     padding:          12px 16px;
     border-radius:    8px;
-    background-color: @teal;
+    background-color: @info;
     text-color:       @crust;
 }
 
@@ -62,7 +62,7 @@ element normal.normal {
 }
 
 element selected.normal {
-    background-color: @teal;
+    background-color: @info;
     text-color:       @crust;
 }
 

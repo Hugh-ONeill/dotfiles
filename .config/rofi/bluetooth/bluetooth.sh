@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # vim:ft=bash
 
+DIR="$(dirname "$0")"
+ROFI="rofi -dmenu -i -p Bluetooth -theme ${DIR}/style.rasi"
 # ══════════════════════════════════════════════════════════════════════════════
-# Hyprlauncher Bluetooth Menu
+# Rofi Bluetooth Menu
 # Requires: bluez-utils (bluetoothctl)
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -19,7 +21,7 @@ connected_devices() {
 }
 
 device_menu() {
-    bluetoothctl devices | cut -d ' ' -f 2- | hyprlauncher -m
+    bluetoothctl devices | cut -d ' ' -f 2- | $ROFI
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -37,7 +39,7 @@ main_menu() {
     local options="$toggle_icon  $toggle_text\n󰂰  Scan Devices\n󰂱  Paired Devices"
     [[ -n "$connected" ]] && options="$options\n󰂳  Disconnect ($connected)"
 
-    echo -e "$options" | hyprlauncher -m
+    echo -e "$options" | $ROFI
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -57,7 +59,7 @@ device_actions() {
     [[ "$is_paired" == "yes" ]] && options="$options\n󰂲  Unpair" || options="$options\n󰂰  Pair"
     [[ "$is_trusted" == "yes" ]] && options="$options\n󰜺  Untrust" || options="$options\n󰄬  Trust"
 
-    local action=$(echo -e "$options" | hyprlauncher -m)
+    local action=$(echo -e "$options" | $ROFI)
 
     case "$action" in
         *"Connect")
@@ -116,7 +118,7 @@ case "$chosen" in
         fi
         ;;
     *"Paired"*)
-        device=$(bluetoothctl devices Paired | cut -d ' ' -f 2- | hyprlauncher -m)
+        device=$(bluetoothctl devices Paired | cut -d ' ' -f 2- | $ROFI)
         if [[ -n "$device" ]]; then
             mac=$(echo "$device" | cut -d ' ' -f 1)
             name=$(echo "$device" | cut -d ' ' -f 2-)

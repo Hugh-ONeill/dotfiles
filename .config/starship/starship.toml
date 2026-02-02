@@ -5,18 +5,18 @@ add_newline = false
 format = """
 [](fg:surface0)\
 [\U000f011b](fg:text bg:surface0)\
-[](fg:surface0 bg:maroon)\
+[](fg:surface0 bg:g0)\
 ${custom.dir_first}\
-[](fg:maroon bg:peach)\
+[](fg:g0 bg:g1)\
 ${custom.dir_second}\
-[](fg:peach bg:yellow)\
+[](fg:g1 bg:g2)\
 $jobs\
-[](fg:yellow bg:green)\
+[](fg:g2 bg:g3)\
 $git_branch\
 $git_status\
-[](fg:green bg:sky)\
+[](fg:g3 bg:g4)\
 $cmd_duration\
-[](fg:sky bg:sapphire)\
+[](fg:g4 bg:g5)\
 $c\
 $rust\
 $golang\
@@ -26,37 +26,25 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[](fg:sapphire bg:blue)\
+[](fg:g5 bg:g6)\
 $status\
-[](fg:blue bg:lavender)\
+[](fg:g6 bg:g7)\
 $docker_context\
-[](fg:lavender bg:mauve)\
+[](fg:g7 bg:g8)\
 ${custom.updates}\
-[](fg:mauve bg:pink)\
+[](fg:g8 bg:g9)\
 ${custom.uptime}\
-[](fg:pink bg:subtext0)\
-[](fg:subtext0)\
+[](fg:g9 bg:text)\
+[](fg:text)\
 $line_break\
 $character
+
 """
 
-palette = 'catppuccin_mocha'
+palette = 'confetti'
 
 [palettes.catppuccin_mocha]
-rosewater = "#f5e0dc"
-flamingo = "#f2cdcd"
-pink = "#f5c2e7"
-mauve = "#cba6f7"
-red = "#f38ba8"
-maroon = "#eba0ac"
-peach = "#fab387"
-yellow = "#f9e2af"
-green = "#a6e3a1"
-teal = "#94e2d5"
-sky = "#89dceb"
-sapphire = "#74c7ec"
-blue = "#89b4fa"
-lavender = "#b4befe"
+# Structural
 text = "#cdd6f4"
 subtext1 = "#bac2de"
 subtext0 = "#a6adc8"
@@ -69,119 +57,412 @@ surface0 = "#313244"
 base = "#1e1e2e"
 mantle = "#181825"
 crust = "#11111b"
+# Gradient
+g0 = "#eba0ac"
+g1 = "#fab387"
+g2 = "#f9e2af"
+g3 = "#a6e3a1"
+g4 = "#89dceb"
+g5 = "#74c7ec"
+g6 = "#89b4fa"
+g7 = "#b4befe"
+g8 = "#cba6f7"
+g9 = "#f5c2e7"
+# Semantic
+sem_ok = "#a6e3a1"
+sem_warn = "#f9e2af"
+sem_err = "#f38ba8"
+sem_info = "#89dceb"
+module_fg = "#181825"
+module_fg_light = "#cdd6f4"
+# Auto-contrast foreground for each gradient
+g0_fg = "#181825"
+g1_fg = "#181825"
+g2_fg = "#181825"
+g3_fg = "#181825"
+g4_fg = "#181825"
+g5_fg = "#181825"
+g6_fg = "#181825"
+g7_fg = "#181825"
+g8_fg = "#181825"
+g9_fg = "#181825"
+
+[palettes.cavelight]
+# Structural
+text = "#f4e8e0"
+subtext1 = "#dcd0c8"
+subtext0 = "#c8b8b0"
+overlay2 = "#5e4e48"
+overlay1 = "#4e3e38"
+overlay0 = "#3e2e28"
+surface2 = "#3c2a20"
+surface1 = "#2c1e16"
+surface0 = "#1c1410"
+base = "#1b0e0b"
+mantle = "#100806"
+crust = "#050201"
+# Gradient
+g0 = "#d06050"
+g1 = "#e09070"
+g2 = "#e0a060"
+g3 = "#d8c078"
+g4 = "#a09868"
+g5 = "#80a090"
+g6 = "#9088b0"
+g7 = "#a080b0"
+g8 = "#b878a8"
+g9 = "#c08090"
+# Semantic
+sem_ok = "#a09868"
+sem_warn = "#d8c078"
+sem_err = "#d06050"
+sem_info = "#80a090"
+module_fg = "#050201"
+module_fg_light = "#f4ebe4"
+# Auto-contrast foreground for each gradient
+g0_fg = "#f4ebe4"
+g1_fg = "#050201"
+g2_fg = "#050201"
+g3_fg = "#050201"
+g4_fg = "#050201"
+g5_fg = "#050201"
+g6_fg = "#050201"
+g7_fg = "#050201"
+g8_fg = "#050201"
+g9_fg = "#050201"
+
+[palettes.chalkboard]
+# Structural
+text = "#eef0f2"
+subtext1 = "#cdd0d4"
+subtext0 = "#a0a4a8"
+overlay2 = "#58595c"
+overlay1 = "#484a4c"
+overlay0 = "#383a3c"
+surface2 = "#343638"
+surface1 = "#252628"
+surface0 = "#17181a"
+base = "#151518"
+mantle = "#0c0c0e"
+crust = "#030304"
+# Gradient
+g0 = "#d8b4ac"
+g1 = "#d8c4ac"
+g2 = "#d8d0ac"
+g3 = "#acd8b4"
+g4 = "#acd8c4"
+g5 = "#acc4d8"
+g6 = "#acacd8"
+g7 = "#b4acd8"
+g8 = "#d8acc4"
+g9 = "#d8acb4"
+# Semantic
+sem_ok = "#acd8b4"
+sem_warn = "#d8d0ac"
+sem_err = "#d8b4ac"
+sem_info = "#acc4d8"
+module_fg = "#050506"
+module_fg_light = "#f0ebe5"
+# Auto-contrast foreground for each gradient
+g0_fg = "#050506"
+g1_fg = "#050506"
+g2_fg = "#050506"
+g3_fg = "#050506"
+g4_fg = "#050506"
+g5_fg = "#050506"
+g6_fg = "#050506"
+g7_fg = "#050506"
+g8_fg = "#050506"
+g9_fg = "#050506"
+
+[palettes.chameleon]
+# Structural
+text = "#dcdcdc"
+subtext1 = "#c2c2c2"
+subtext0 = "#dcdcdc"
+overlay2 = "#707070"
+overlay1 = "#404040"
+overlay0 = "#2c2c2c"
+surface2 = "#222222"
+surface1 = "#181818"
+surface0 = "#0e0e0e"
+base = "#080808"
+mantle = "#040404"
+crust = "#000000"
+# Gradient
+g0 = "#3f3432"
+g1 = "#7a5628"
+g2 = "#595648"
+g3 = "#404a55"
+g4 = "#8894b6"
+g5 = "#6677aa"
+g6 = "#464667"
+g7 = "#5b5b7f"
+g8 = "#662539"
+g9 = "#97415b"
+# Semantic
+sem_ok = "#529932"
+sem_warn = "#7a5628"
+sem_err = "#9d3957"
+sem_info = "#327999"
+module_fg = "#040404"
+module_fg_light = "#dcdcdc"
+# Auto-contrast foreground for each gradient
+g0_fg = "#dcdcdc"
+g1_fg = "#dcdcdc"
+g2_fg = "#dcdcdc"
+g3_fg = "#dcdcdc"
+g4_fg = "#040404"
+g5_fg = "#dcdcdc"
+g6_fg = "#dcdcdc"
+g7_fg = "#dcdcdc"
+g8_fg = "#dcdcdc"
+g9_fg = "#dcdcdc"
+
+[palettes.confetti]
+# Structural
+text = "#f4f0f0"
+subtext1 = "#d8d0d0"
+subtext0 = "#989090"
+overlay2 = "#504444"
+overlay1 = "#3e3636"
+overlay0 = "#322a2a"
+surface2 = "#403838"
+surface1 = "#302828"
+surface0 = "#201818"
+base = "#120e0e"
+mantle = "#100c0c"
+crust = "#0c0808"
+# Gradient
+g0 = "#e8a0c0"
+g1 = "#e8c0a0"
+g2 = "#e8e0a0"
+g3 = "#a0e8b0"
+g4 = "#a0e8d0"
+g5 = "#a0d8e8"
+g6 = "#a0a8e8"
+g7 = "#b0a0e8"
+g8 = "#c8a0e8"
+g9 = "#d8a0d8"
+# Semantic
+sem_ok = "#a0e8b0"
+sem_warn = "#e8e0a0"
+sem_err = "#e8a0c0"
+sem_info = "#a0d8e8"
+module_fg = "#0c0404"
+module_fg_light = "#f0f0f0"
+# Auto-contrast foreground for each gradient
+g0_fg = "#0c0404"
+g1_fg = "#0c0404"
+g2_fg = "#0c0404"
+g3_fg = "#0c0404"
+g4_fg = "#0c0404"
+g5_fg = "#0c0404"
+g6_fg = "#0c0404"
+g7_fg = "#0c0404"
+g8_fg = "#0c0404"
+g9_fg = "#0c0404"
+
+[palettes.cyberpunk]
+# Structural
+text = "#f0faff"
+subtext1 = "#c4d0d8"
+subtext0 = "#848e92"
+overlay2 = "#3c484e"
+overlay1 = "#2c383e"
+overlay0 = "#1c282e"
+surface2 = "#28343c"
+surface1 = "#18242c"
+surface0 = "#10161a"
+base = "#060c10"
+mantle = "#040a0e"
+crust = "#00060a"
+# Gradient
+g0 = "#ffdd40"
+g1 = "#38ffa0"
+g2 = "#00e8ff"
+g3 = "#48b8ff"
+g4 = "#6898ff"
+g5 = "#a078ff"
+g6 = "#c868ff"
+g7 = "#e858e0"
+g8 = "#ff48c8"
+g9 = "#ff68a8"
+# Semantic
+sem_ok = "#38ffa0"
+sem_warn = "#ffdd40"
+sem_err = "#ff68a8"
+sem_info = "#00e8ff"
+module_fg = "#00060a"
+module_fg_light = "#ffffff"
+# Auto-contrast foreground for each gradient
+g0_fg = "#00060a"
+g1_fg = "#00060a"
+g2_fg = "#00060a"
+g3_fg = "#00060a"
+g4_fg = "#00060a"
+g5_fg = "#00060a"
+g6_fg = "#00060a"
+g7_fg = "#00060a"
+g8_fg = "#00060a"
+g9_fg = "#00060a"
+
+[palettes.win98]
+# Structural
+text = "#4a4a5e"
+subtext1 = "#6b6b7d"
+subtext0 = "#9090a0"
+overlay2 = "#ece8f2"
+overlay1 = "#dfdbe6"
+overlay0 = "#cdc9d6"
+surface2 = "#d4d0dc"
+surface1 = "#faf8fc"
+surface0 = "#f0ecf5"
+base = "#e8e4ef"
+mantle = "#b8c4e0"
+crust = "#4a4a5e"
+# Gradient
+g0 = "#f4a5a5"
+g1 = "#f7c4a5"
+g2 = "#f7e8a5"
+g3 = "#a5e8b8"
+g4 = "#a5d4d4"
+g5 = "#a5e8e8"
+g6 = "#a5c8f4"
+g7 = "#a5b8f4"
+g8 = "#c8c4f4"
+g9 = "#d4a5d4"
+# Semantic
+sem_ok = "#4a9060"
+sem_warn = "#b89030"
+sem_err = "#c05050"
+sem_info = "#5070b0"
+module_fg = "#4a4a5e"
+module_fg_light = "#4a4a5e"
+# Auto-contrast foreground for each gradient
+g0_fg = "#4a4a5e"
+g1_fg = "#4a4a5e"
+g2_fg = "#4a4a5e"
+g3_fg = "#4a4a5e"
+g4_fg = "#4a4a5e"
+g5_fg = "#4a4a5e"
+g6_fg = "#4a4a5e"
+g7_fg = "#4a4a5e"
+g8_fg = "#4a4a5e"
+g9_fg = "#4a4a5e"
 
 [custom.dir_first]
 command = "~/.local/bin/directory-split first"
 when = "true"
 shell = ["bash", "--noprofile", "--norc"]
-style = "bg:maroon"
-format = "[[$output ](fg:mantle bg:maroon)]($style)"
+style = "bg:g0"
+format = "[[$output ](fg:g0_fg bg:g0)]($style)"
 
 [custom.dir_second]
 command = "~/.local/bin/directory-split second"
 when = "true"
 shell = ["bash", "--noprofile", "--norc"]
-style = "bg:peach"
-format = "[[$output ](fg:base bg:peach)]($style)"
+style = "bg:g1"
+format = "[[ $output ](fg:g1_fg bg:g1)]($style)"
 
 [jobs]
 symbol = "\uf0ae"
-style = "bg:yellow"
-format = '[[ $symbol $number ](fg:mantle bg:yellow)]($style)'
+style = "bg:g2"
+format = '[[ $symbol $number ](fg:g2_fg bg:g2)]($style)'
 
 [git_branch]
-symbol = ""
-style = "bg:green"
-format = '[[ $symbol $branch ](fg:base bg:green)]($style)'
+symbol = "\ue0a0 "
+style = "bg:g3"
+format = "[[ $symbol$branch ](fg:g3_fg bg:g3)]($style)"
 
 [git_status]
-style = "bg:green"
-format = '[[($all_status$ahead_behind )](fg:base bg:green)]($style)'
+style = "bg:g3"
+format = '[[($all_status$ahead_behind )](fg:g3_fg bg:g3)]($style)'
 
 [cmd_duration]
 min_time = 500
-style = "bg:sky"
-format = '[[ 󱎫 $duration ](fg:mantle bg:sky)]($style)'
+style = "bg:g4"
+format = '[[ 󱎫 $duration ](fg:g4_fg bg:g4)]($style)'
 
 [docker_context]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $context) ](fg:base bg:lavender)]($style)'
+symbol = "\uf308"
+style = "bg:g7"
+format = "[[ $symbol( $context) ](fg:g7_fg bg:g7)]($style)"
 
 [status]
 disabled = false
-symbol = "✘"
+symbol = "\u2718"
 success_symbol = ""
-style = "bg:blue"
-format = '[[ $symbol $status ](fg:mantle bg:blue)]($style)'
+style = "bg:g6"
+format = "[[ $symbol $status ](fg:g6_fg bg:g6)]($style)"
 
 [nodejs]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue718"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [c]
-symbol = " "
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue61e"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [rust]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue7a8"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [golang]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue627"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [php]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue73d"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [java]
-symbol = " "
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue738"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [kotlin]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue634"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [haskell]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue61f"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [python]
-symbol = ""
-style = "bg:lavender"
-format = '[[ $symbol( $version) ](fg:base bg:lavender)]($style)'
+symbol = "\ue73c"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
 
 [custom.updates]
 command = "~/.local/bin/checkupdates-cached"
 when = "test -f ~/.cache/checkupdates-count && test $(cat ~/.cache/checkupdates-count) -gt 0"
 shell = ["bash", "--noprofile", "--norc"]
-style = "bg:mauve"
-format = '[[ 󰏔 $output ](fg:base bg:mauve)]($style)'
+style = "bg:g8"
+format = '[[ 󰏔 $output ](fg:g8_fg bg:g8)]($style)'
 
 [custom.uptime]
 command = "uptime -p | sed -E 's/^up //; s/ hours?/h/g; s/ minutes?/m/g; s/,//g; s/ //g'"
 when = "true"
-symbol = "" 
-style = "bg:pink"
-format = '[[ $symbol $output ](fg:mantle bg:pink)]($style)'
+symbol = "\uf017"
+style = "bg:g9"
+format = "[[ $symbol $output ](fg:g9_fg bg:g9)]($style)"
 
 [line_break]
 disabled = false
 
 [character]
 disabled = false
-success_symbol = '[](bold fg:green)'
-error_symbol = '[](bold fg:red)'
-vimcmd_symbol = '[](bold fg:green)'
-vimcmd_replace_one_symbol = '[](bold fg:mauve)'
-vimcmd_replace_symbol = '[](bold fg:mauve)'
-vimcmd_visual_symbol = '[](bold fg:lavender)'
+success_symbol = '[❯](bold fg:sem_ok)'
+error_symbol = '[❯](bold fg:sem_err)'
+vimcmd_symbol = "[\U0000e62b](bold fg:sem_ok)"
+vimcmd_replace_one_symbol = "[\U0000e62b](bold fg:sem_warn)"
+vimcmd_replace_symbol = "[\U0000e62b](bold fg:sem_warn)"
+vimcmd_visual_symbol = "[\U0000e62b](bold fg:sem_info)"

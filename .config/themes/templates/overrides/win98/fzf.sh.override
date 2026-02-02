@@ -1,0 +1,9 @@
+# win98 FZF Colors - True Windows 98 16-color palette
+
+export FZF_COLORS="\
+--color=fg:#000000,fg+:#ffffff,bg:#c0c0c0,bg+:#000080 \
+--color=hl:#000080,hl+:#ffffff,info:#000080,marker:#008000 \
+--color=prompt:#800000,spinner:#008080,pointer:#800000,header:#000080 \
+--color=gutter:#c0c0c0,border:#808080,separator:#808080,scrollbar:#808080 \
+--color=preview-fg:#000000,preview-bg:#c0c0c0,preview-border:#808080,preview-scrollbar:#808080 \
+--color=preview-label:#008000,label:#000080,query:#000000,disabled:#808080"

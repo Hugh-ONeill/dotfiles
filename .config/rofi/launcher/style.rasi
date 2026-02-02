@@ -8,12 +8,11 @@
  * ══════════════════════════════════════════════════════════════════════════════ */
 
 configuration {
-    modi:                "drun,window,filebrowser";
+    modi:                "drun,window";
     show-icons:          true;
     icon-theme:          "Papirus";
     display-drun:        " Apps";
     display-window:      " Windows";
-    display-filebrowser: " Files";
     drun-display-format: "{name}";
 }
 
@@ -32,7 +31,7 @@ window {
     anchor:           center;
     width:            600px;
     border:           2px solid;
-    border-color:     @lavender;
+    border-color:     @g4;
     border-radius:    12px;
     background-color: @background;
 }
@@ -59,7 +58,7 @@ inputbar {
 prompt {
     padding:          12px 18px;
     border-radius:    8px;
-    background-color: @mauve;
+    background-color: @g4;
     text-color:       @crust;
 }
 
@@ -100,7 +99,7 @@ element alternate.normal {
 }
 
 element selected.normal {
-    background-color: @mauve;
+    background-color: @g4;
     text-color:       @crust;
 }
 
@@ -133,6 +132,6 @@ button {
 }
 
 button selected {
-    background-color: @mauve;
+    background-color: @g4;
     text-color:       @crust;
 }

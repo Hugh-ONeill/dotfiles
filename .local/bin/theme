@@ -1,0 +1,260 @@
+#!/bin/bash
+# Unified theme management command
+set -e
+
+# Load configuration and utilities
+source "$HOME/.config/themes/lib/config.sh"
+source "$HOME/.config/themes/lib/utils.sh"
+
+# Load all app handlers
+for handler in "$APPS_DIR"/*.sh; do
+    [[ -f "$handler" ]] && source "$handler"
+done
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Commands
+# ══════════════════════════════════════════════════════════════════════════════
+
+cmd_help() {
+    cat <<EOF
+${CYAN}${BOLD}theme${NC} - Unified theme management
+
+Usage: theme <command> [args]
+
+Commands:
+  list                List available themes
+  current             Show current theme
+  set <theme>         Apply theme to all apps
+  generate <theme>    Regenerate theme from palette
+  generate-all [--cursors]  Regenerate all themes (--cursors to rebuild cursors)
+  preview <theme>     Preview theme colors
+  validate <theme>    Check if theme is complete
+  edit <theme>        Edit theme palette
+  rofi                Interactive theme picker
+
+Shortcuts:
+  theme <theme>       Same as 'theme set <theme>'
+  theme               Same as 'theme rofi' (if available) or 'theme list'
+EOF
+}
+
+cmd_list() {
+    local current=$(get_current)
+    echo -e "${CYAN}Available themes:${NC}"
+    for theme in $(get_themes); do
+        local indicator=""
+        has_palette "$theme" && indicator=" ${BLUE}[palette]${NC}"
+        if [[ "$theme" == "$current" ]]; then
+            echo -e "  ${GREEN}* $theme${NC} (current)$indicator"
+        else
+            echo -e "    $theme$indicator"
+        fi
+    done
+}
+
+cmd_current() {
+    get_current
+}
+
+cmd_set() {
+    local theme="$1"
+    local theme_dir="$THEMES_DIR/$theme"
+
+    if [[ -z "$theme" ]]; then
+        echo -e "${RED}Error: Please specify a theme${NC}"
+        cmd_help
+        exit 1
+    fi
+
+    if [[ ! -d "$theme_dir" ]]; then
+        echo -e "${RED}Error: Theme '$theme' not found${NC}"
+        echo "Available themes: $(get_themes | tr '\n' ' ')"
+        exit 1
+    fi
+
+    echo -e "${CYAN}Applying theme: ${MAGENTA}$theme${NC}"
+    echo ""
+
+    # Special handling for chameleon - extract colors from current wallpaper
+    if [[ "$theme" == "chameleon" ]]; then
+        local wallpaper=$(swww query 2>/dev/null | grep -oP 'image: \K[^\s]+' | head -1)
+        if [[ -n "$wallpaper" && -f "$wallpaper" ]]; then
+            echo -e "  ${CYAN}Extracting colors from wallpaper...${NC}"
+            "$HOME/.config/themes/palette-extract" "$wallpaper" --generate-theme 2>/dev/null && \
+                echo -e "  ${GREEN}✓${NC} colors extracted from wallpaper"
+        else
+            echo -e "  ${YELLOW}⊘${NC} no wallpaper found, using cached colors"
+        fi
+    fi
+
+    # Ensure current directory exists
+    mkdir -p "$CURRENT_DIR"
+
+    # Get palette path for apps that need it
+    local palette_path=$(get_palette_path "$theme")
+
+    # Apply to all apps
+    apply_kitty "$theme"
+    apply_waybar "$theme" "$palette_path"
+    apply_rofi "$theme"
+    apply_hyprland "$theme"
+    apply_hyprlock "$theme"
+    apply_hyprtoolkit "$theme"
+    apply_lazygit "$theme"
+    apply_gitui "$theme"
+    apply_btop "$theme"
+    apply_ranger "$theme"
+    apply_glow "$theme"
+    apply_youtube_tui "$theme"
+    apply_sptlrx "$theme"
+    apply_claude "$theme"
+    apply_fastfetch "$theme"
+    apply_fzf "$theme"
+    apply_fzf_tab "$theme"
+    apply_shell_colors "$theme"
+    apply_dircolors "$theme"
+    apply_bat "$theme"
+    apply_fsh "$theme"
+    apply_starship "$theme" "$palette_path"
+    apply_dunst "$theme"
+    apply_gtk_qt "$theme"
+    apply_spicetify "$theme"
+    apply_pywal "$theme"
+    apply_stylus "$theme"
+    apply_firefox "$theme"
+
+    # Update palette symlink
+    [[ -f "$PALETTES_DIR/$theme.sh" ]] && ln -sf "$theme.sh" "$PALETTES_DIR/current.sh"
+
+    # Save current theme
+    echo "$theme" > "$CURRENT_THEME_FILE"
+
+    echo ""
+    echo -e "${GREEN}Theme applied!${NC}"
+}
+
+cmd_generate() {
+    local theme="$1"
+    if [[ -z "$theme" ]]; then
+        echo -e "${RED}Error: Please specify a theme${NC}"
+        exit 1
+    fi
+
+    local palette_path=$(get_palette_path "$theme")
+    if [[ -z "$palette_path" ]]; then
+        echo -e "${RED}Error: No palette found for '$theme'${NC}"
+        exit 1
+    fi
+
+    if [[ -x "$THEMES_DIR/generate-theme.sh" ]]; then
+        "$THEMES_DIR/generate-theme.sh" "$theme"
+    else
+        echo -e "${RED}Error: generate-theme.sh not found${NC}"
+        exit 1
+    fi
+}
+
+cmd_generate_all() {
+    local args=()
+    for arg in "$@"; do
+        args+=("$arg")
+    done
+    if [[ -x "$THEMES_DIR/regenerate-all.sh" ]]; then
+        "$THEMES_DIR/regenerate-all.sh" "${args[@]}"
+    else
+        echo -e "${CYAN}Regenerating all themes...${NC}"
+        for palette in "$PALETTES_DIR"/*.json; do
+            [[ -f "$palette" ]] || continue
+            local theme=$(basename "$palette" .json)
+            cmd_generate "$theme"
+        done
+        echo -e "${GREEN}All themes regenerated!${NC}"
+    fi
+}
+
+cmd_preview() {
+    local theme="${1:-$(get_current)}"
+    if [[ -x "$THEMES_DIR/preview-theme.sh" ]]; then
+        "$THEMES_DIR/preview-theme.sh" "$theme"
+    else
+        echo -e "${RED}Error: preview-theme.sh not found${NC}"
+        exit 1
+    fi
+}
+
+cmd_validate() {
+    local theme="$1"
+    [[ -z "$theme" ]] && { echo -e "${RED}Error: Please specify a theme${NC}"; exit 1; }
+
+    local theme_dir="$THEMES_DIR/$theme"
+    [[ ! -d "$theme_dir" ]] && { echo -e "${RED}Error: Theme not found${NC}"; exit 1; }
+
+    echo -e "${CYAN}Validating theme: ${MAGENTA}$theme${NC}\n"
+
+    local required=(kitty.conf waybar.css rofi-colors.rasi hypr-colors.conf shell-colors.sh fzf.sh statusline.sh)
+    local optional=(lazygit.yml gitui.ron btop.theme dunst-colors.conf glow.json ranger.py sptlrx.yaml youtube-tui.yml hyprlock-colors.conf hyprtoolkit.conf fzf-tab-flags.zsh dircolors.db bat.conf)
+
+    local missing=0
+    echo "Required files:"
+    for f in "${required[@]}"; do
+        [[ -f "$theme_dir/$f" ]] && report_ok "$f" || { report_err "$f"; ((missing++)); }
+    done
+
+    echo -e "\nOptional files:"
+    for f in "${optional[@]}"; do
+        [[ -f "$theme_dir/$f" ]] && report_ok "$f" || report_skip "$f"
+    done
+
+    echo -e "\nPalette:"
+    has_palette "$theme" && report_ok "$(get_palette_path "$theme")" || report_skip "No palette found"
+
+    echo ""
+    [[ $missing -eq 0 ]] && echo -e "${GREEN}Theme is complete!${NC}" || echo -e "${YELLOW}Missing $missing required file(s)${NC}"
+}
+
+cmd_edit() {
+    local theme="${1:-$(get_current)}"
+    local palette_path=$(get_palette_path "$theme")
+    [[ -z "$palette_path" ]] && { echo -e "${RED}Error: No palette found${NC}"; exit 1; }
+    ${EDITOR:-nvim} "$palette_path"
+}
+
+cmd_rofi() {
+    local current=$(get_current)
+    local options=""
+    for theme in $(get_themes); do
+        [[ "$theme" == "$current" ]] && options+="$theme (current)\n" || options+="$theme\n"
+    done
+
+    if ! command -v rofi &>/dev/null; then
+        echo -e "${YELLOW}rofi not found, showing list instead${NC}"
+        cmd_list
+        return
+    fi
+
+    local selected=$(echo -e "$options" | rofi -dmenu -p "Theme" -i)
+    [[ -n "$selected" ]] && cmd_set "${selected% (current)}"
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Main
+# ══════════════════════════════════════════════════════════════════════════════
+
+case "${1:-}" in
+    list|ls)        cmd_list ;;
+    current)        cmd_current ;;
+    set|apply)      cmd_set "$2" ;;
+    generate|gen)   cmd_generate "$2" ;;
+    generate-all)   shift; cmd_generate_all "$@" ;;
+    preview|show)   cmd_preview "$2" ;;
+    validate|check) cmd_validate "$2" ;;
+    edit)           cmd_edit "$2" ;;
+    rofi|picker)    cmd_rofi ;;
+    -h|--help|help) cmd_help ;;
+    "")
+        command -v rofi &>/dev/null && cmd_rofi || cmd_list
+        ;;
+    *)
+        [[ -d "$THEMES_DIR/$1" ]] && cmd_set "$1" || { echo -e "${RED}Unknown: $1${NC}"; cmd_help; exit 1; }
+        ;;
+esac

@@ -17,7 +17,7 @@ window {
     anchor:           center;
     width:            700px;
     border:           2px solid;
-    border-color:     @lavender;
+    border-color:     @accent-secondary;
     border-radius:    8px;
     background-color: @background;
     cursor:           "default";
@@ -47,7 +47,7 @@ inputbar {
 prompt {
     padding:          12px 16px;
     border-radius:    6px;
-    background-color: @mauve;
+    background-color: @accent;
     text-color:       @crust;
 }
 
@@ -78,7 +78,7 @@ scrollbar {
     width:            4px;
     border-radius:    4px;
     handle-width:     4px;
-    handle-color:     @mauve;
+    handle-color:     @accent;
     background-color: @surface0;
 }
 
@@ -113,7 +113,7 @@ element alternate.active {
 
 element selected.normal {
     background-color: @surface0;
-    text-color:       @mauve;
+    text-color:       @accent;
 }
 
 element selected.urgent {
@@ -154,7 +154,7 @@ button {
 }
 
 button selected {
-    background-color: @mauve;
+    background-color: @accent;
     text-color:       @crust;
 }
 
@@ -177,6 +177,6 @@ error-message {
     padding:          12px;
     border:           2px solid;
     border-radius:    6px;
-    border-color:     @lavender;
+    border-color:     @accent-secondary;
     background-color: @background;
 }

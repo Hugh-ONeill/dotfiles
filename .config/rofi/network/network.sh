@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # vim:ft=bash
 
+DIR="$(dirname "$0")"
+ROFI="rofi -dmenu -i -p Network -theme ${DIR}/style.rasi"
 # ══════════════════════════════════════════════════════════════════════════════
-# Hyprlauncher Network Manager
+# Rofi Network Manager
 # Requires: NetworkManager (nmcli)
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -87,7 +89,7 @@ disconnect_wifi() {
 
 forget_network() {
     local saved
-    saved=$(get_saved_connections | hyprlauncher -m)
+    saved=$(get_saved_connections | $ROFI)
     [[ -n "$saved" ]] && nmcli connection delete "$saved" && notify "Forgot $saved"
 }
 
@@ -112,7 +114,7 @@ main_menu() {
             echo "─────────────"
             get_wifi_list
         fi
-    } | hyprlauncher -m
+    } | $ROFI
 }
 
 # ══════════════════════════════════════════════════════════════════════════════

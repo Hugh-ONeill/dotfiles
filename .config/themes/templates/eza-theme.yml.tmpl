@@ -1,0 +1,95 @@
+# ${THEME_NAME} eza theme
+colourful: true
+
+filekinds:
+  normal: {foreground: "${TEXT}"}
+  directory: {foreground: "${FT_CODE}"}
+  symlink: {foreground: "${SEM_LINK}"}
+  pipe: {foreground: "${SUBTEXT0}"}
+  block_device: {foreground: "${SEM_WARN}"}
+  char_device: {foreground: "${SEM_WARN}"}
+  socket: {foreground: "${SUBTEXT0}"}
+  special: {foreground: "${ACCENT}"}
+  executable: {foreground: "${FT_EXECUTABLE}"}
+  mount_point: {foreground: "${SEM_INFO}"}
+
+perms:
+  user_read: {foreground: "${TEXT}"}
+  user_write: {foreground: "${SEM_WARN}"}
+  user_execute_file: {foreground: "${SEM_OK}"}
+  user_execute_other: {foreground: "${SEM_OK}"}
+  group_read: {foreground: "${SUBTEXT1}"}
+  group_write: {foreground: "${SEM_WARN}"}
+  group_execute: {foreground: "${SEM_OK}"}
+  other_read: {foreground: "${SUBTEXT0}"}
+  other_write: {foreground: "${SEM_WARN}"}
+  other_execute: {foreground: "${SEM_OK}"}
+  special_user_file: {foreground: "${ACCENT}"}
+  special_other: {foreground: "${SUBTEXT0}"}
+  attribute: {foreground: "${SUBTEXT0}"}
+
+size:
+  major: {foreground: "${SEM_OK}"}
+  minor: {foreground: "${SEM_OK}"}
+  number_byte: {foreground: "${SEM_OK}"}
+  number_kilo: {foreground: "${SEM_OK}"}
+  number_mega: {foreground: "${SEM_WARN}"}
+  number_giga: {foreground: "${SEM_ERR}"}
+  number_huge: {foreground: "${SEM_ERR}"}
+  unit_byte: {foreground: "${SUBTEXT0}"}
+  unit_kilo: {foreground: "${SUBTEXT0}"}
+  unit_mega: {foreground: "${SUBTEXT0}"}
+  unit_giga: {foreground: "${SUBTEXT0}"}
+  unit_huge: {foreground: "${SUBTEXT0}"}
+
+users:
+  user_you: {foreground: "${ACCENT}"}
+  user_root: {foreground: "${SEM_ERR}"}
+  user_other: {foreground: "${SUBTEXT0}"}
+  group_yours: {foreground: "${ACCENT_SECONDARY}"}
+  group_other: {foreground: "${SUBTEXT0}"}
+  group_root: {foreground: "${SEM_ERR}"}
+
+links:
+  normal: {foreground: "${SEM_INFO}"}
+  multi_link_file: {foreground: "${SEM_WARN}"}
+
+git:
+  new: {foreground: "${SEM_OK}"}
+  modified: {foreground: "${SEM_WARN}"}
+  deleted: {foreground: "${SEM_ERR}"}
+  renamed: {foreground: "${SEM_INFO}"}
+  typechange: {foreground: "${ACCENT}"}
+  ignored: {foreground: "${SUBTEXT0}"}
+  conflicted: {foreground: "${SEM_ERR}"}
+
+git_repo:
+  branch_main: {foreground: "${SEM_OK}"}
+  branch_other: {foreground: "${ACCENT}"}
+  git_clean: {foreground: "${SEM_OK}"}
+  git_dirty: {foreground: "${SEM_WARN}"}
+
+punctuation: {foreground: "${SUBTEXT0}"}
+date: {foreground: "${SUBTEXT1}"}
+inode: {foreground: "${SUBTEXT0}"}
+blocks: {foreground: "${SUBTEXT0}"}
+header: {foreground: "${TEXT}"}
+octal: {foreground: "${SUBTEXT1}"}
+flags: {foreground: "${SUBTEXT0}"}
+
+control_char: {foreground: "${SEM_ERR}"}
+broken_symlink: {foreground: "${SEM_ERR}"}
+broken_path_overlay: {foreground: "${SEM_ERR}"}
+
+filetype:
+  image: {foreground: "${FT_MEDIA}"}
+  video: {foreground: "${FT_MEDIA}"}
+  music: {foreground: "${FT_MEDIA}"}
+  lossless: {foreground: "${FT_MEDIA}"}
+  crypto: {foreground: "${SEM_WARN}"}
+  document: {foreground: "${TEXT}"}
+  compressed: {foreground: "${FT_ARCHIVE}"}
+  temp: {foreground: "${FT_IGNORE}"}
+  compiled: {foreground: "${FT_BUILD}"}
+  build: {foreground: "${FT_BUILD}"}
+  source: {foreground: "${FT_CODE}"}

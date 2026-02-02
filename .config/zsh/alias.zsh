@@ -89,6 +89,9 @@ alias glog="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgre
 
 alias dotfiles=dotbare
 alias config=dotfiles
+alias ts=theme
+alias theme-switcher=theme  # backwards compatibility
+alias wp=wallpaper
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Help

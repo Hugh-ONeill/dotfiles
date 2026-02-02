@@ -57,6 +57,17 @@ tooltip {
   transition: all 0.4s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
+/* Visible but not active (on other monitor) */
+#workspaces button.visible:not(.active) {
+  color: @module-fg;
+  background: transparent;
+}
+
+/* Workspace with windows but not focused */
+#workspaces button.occupied:not(.active) {
+  color: @module-fg;
+}
+
 /* Hover Effect for Workspace Buttons */
 #workspaces button:hover {
   color: @hover-fg;
@@ -330,8 +341,6 @@ tooltip {
 #custom-power {
   color: @main-bg;
   background: @power;
-  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.6);
-  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 1);
   border-radius: 20px;
   margin-top: 2px;
   margin-right: 4px;
@@ -345,69 +354,77 @@ tooltip {
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
-/* Module Hover Effects - Catppuccin Colors */
+/* Module Hover Effects - Rainbow order matching statusline */
+/* Left side (outer→center): g0→g1→g2→g3→g4 */
 #custom-fans:hover {
-  color: @sky;
+  color: @g0;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #custom-temp:hover {
-  color: @peach;
+  color: @g1;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #custom-gpu:hover {
-  color: @teal;
+  color: @g2;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #memory:hover {
-  color: @flamingo;
+  color: @g3;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #cpu:hover {
-  color: @pink;
+  color: @g4;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
-#clock:hover {
-  color: @lavender;
+/* Right side (center→outer): g5→g6→g7→g8→g9 */
+#clock.time:hover {
+  color: @g5;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+#clock.date:hover {
+  color: @g6;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #custom-pomodoro:hover {
-  color: @maroon;
+  color: @g7;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #bluetooth:hover {
-  color: @blue;
+  color: @g8;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #custom-wifi:hover {
-  color: @sapphire;
+  color: @g9;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #custom-media:hover {
-  color: @green;
+  color: @g3;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
+/* Right modules - accent colors */
 #pulseaudio:hover {
-  color: @red;
+  color: @g0;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #backlight:hover {
-  color: @yellow;
+  color: @accent-tertiary;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #custom-battery:hover {
-  color: @mauve;
+  color: @g7;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 

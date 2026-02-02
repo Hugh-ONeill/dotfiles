@@ -1,0 +1,155 @@
+# ${THEME_NAME} dircolors database
+# Usage: eval "$(dircolors ~/.config/themes/current/dircolors.db)"
+
+TERM Eterm
+TERM ansi
+TERM *color*
+TERM con[0-9]*x[0-9]*
+TERM cons25
+TERM console
+TERM cygwin
+TERM *direct*
+TERM dtterm
+TERM gnome
+TERM hurd
+TERM jfbterm
+TERM konsole
+TERM kterm
+TERM linux
+TERM linux-c
+TERM mlterm
+TERM putty
+TERM rxvt*
+TERM screen*
+TERM st
+TERM terminator
+TERM tmux*
+TERM vt100
+TERM xterm*
+TERM alacritty
+TERM kitty
+
+# Basic file types
+FILE 0
+RESET 0
+DIR 1;38;2;${FT_CODE_RGB}
+LINK 0;38;2;${SEM_LINK_RGB}
+MULTIHARDLINK 0
+FIFO 33
+SOCK 1;35
+DOOR 1;35
+BLK 1;33
+CHR 1;33
+ORPHAN 0;31
+MISSING 0;31
+SETUID 0;41
+SETGID 0;43
+CAPABILITY 0
+STICKY_OTHER_WRITABLE 0;42
+OTHER_WRITABLE 0;43
+STICKY 0;44
+EXEC 1;38;2;${FT_EXECUTABLE_RGB}
+
+# Code files
+.c 0;38;2;${FT_CODE_RGB}
+.cpp 0;38;2;${FT_CODE_RGB}
+.cc 0;38;2;${FT_CODE_RGB}
+.h 0;38;2;${FT_CODE_RGB}
+.hpp 0;38;2;${FT_CODE_RGB}
+.py 0;38;2;${FT_CODE_RGB}
+.rb 0;38;2;${FT_CODE_RGB}
+.rs 0;38;2;${FT_CODE_RGB}
+.go 0;38;2;${FT_CODE_RGB}
+.js 0;38;2;${FT_CODE_RGB}
+.ts 0;38;2;${FT_CODE_RGB}
+.jsx 0;38;2;${FT_CODE_RGB}
+.tsx 0;38;2;${FT_CODE_RGB}
+.vue 0;38;2;${FT_CODE_RGB}
+.java 0;38;2;${FT_CODE_RGB}
+.kt 0;38;2;${FT_CODE_RGB}
+.scala 0;38;2;${FT_CODE_RGB}
+.cs 0;38;2;${FT_CODE_RGB}
+.fs 0;38;2;${FT_CODE_RGB}
+.hs 0;38;2;${FT_CODE_RGB}
+.ml 0;38;2;${FT_CODE_RGB}
+.lua 0;38;2;${FT_CODE_RGB}
+.php 0;38;2;${FT_CODE_RGB}
+.pl 0;38;2;${FT_CODE_RGB}
+.pm 0;38;2;${FT_CODE_RGB}
+.sh 0;38;2;${FT_CODE_RGB}
+.bash 0;38;2;${FT_CODE_RGB}
+.zsh 0;38;2;${FT_CODE_RGB}
+.fish 0;38;2;${FT_CODE_RGB}
+.vim 0;38;2;${FT_CODE_RGB}
+.el 0;38;2;${FT_CODE_RGB}
+.clj 0;38;2;${FT_CODE_RGB}
+.ex 0;38;2;${FT_CODE_RGB}
+.exs 0;38;2;${FT_CODE_RGB}
+.erl 0;38;2;${FT_CODE_RGB}
+.swift 0;38;2;${FT_CODE_RGB}
+
+# Data files
+.json 0;38;2;${FT_DATA_RGB}
+.yaml 0;38;2;${FT_DATA_RGB}
+.yml 0;38;2;${FT_DATA_RGB}
+.toml 0;38;2;${FT_DATA_RGB}
+.xml 0;38;2;${FT_DATA_RGB}
+.csv 0;38;2;${FT_DATA_RGB}
+.sql 0;38;2;${FT_DATA_RGB}
+.db 0;38;2;${FT_DATA_RGB}
+.sqlite 0;38;2;${FT_DATA_RGB}
+
+# Config/text
+.conf 0;38;2;${SUBTEXT0_RGB}
+.config 0;38;2;${SUBTEXT0_RGB}
+.cfg 0;38;2;${SUBTEXT0_RGB}
+.ini 0;38;2;${SUBTEXT0_RGB}
+.txt 0
+.md 0
+.rst 0
+.org 0
+.log 0;38;2;${FT_IGNORE_RGB}
+
+# Media
+.jpg 0;38;2;${FT_MEDIA_RGB}
+.jpeg 0;38;2;${FT_MEDIA_RGB}
+.png 0;38;2;${FT_MEDIA_RGB}
+.gif 0;38;2;${FT_MEDIA_RGB}
+.bmp 0;38;2;${FT_MEDIA_RGB}
+.svg 0;38;2;${FT_MEDIA_RGB}
+.webp 0;38;2;${FT_MEDIA_RGB}
+.ico 0;38;2;${FT_MEDIA_RGB}
+.mp3 0;38;2;${FT_MEDIA_RGB}
+.flac 0;38;2;${FT_MEDIA_RGB}
+.ogg 0;38;2;${FT_MEDIA_RGB}
+.wav 0;38;2;${FT_MEDIA_RGB}
+.mp4 0;38;2;${FT_MEDIA_RGB}
+.mkv 0;38;2;${FT_MEDIA_RGB}
+.avi 0;38;2;${FT_MEDIA_RGB}
+.webm 0;38;2;${FT_MEDIA_RGB}
+.mov 0;38;2;${FT_MEDIA_RGB}
+
+# Archives
+.tar 0;38;2;${FT_ARCHIVE_RGB}
+.gz 0;38;2;${FT_ARCHIVE_RGB}
+.bz2 0;38;2;${FT_ARCHIVE_RGB}
+.xz 0;38;2;${FT_ARCHIVE_RGB}
+.zip 0;38;2;${FT_ARCHIVE_RGB}
+.7z 0;38;2;${FT_ARCHIVE_RGB}
+.rar 0;38;2;${FT_ARCHIVE_RGB}
+.deb 0;38;2;${FT_ARCHIVE_RGB}
+.rpm 0;38;2;${FT_ARCHIVE_RGB}
+
+# Build/object
+.o 0;38;2;${FT_BUILD_RGB}
+.a 0;38;2;${FT_BUILD_RGB}
+.so 0;38;2;${FT_BUILD_RGB}
+.dll 0;38;2;${FT_BUILD_RGB}
+.class 0;38;2;${FT_BUILD_RGB}
+.pyc 0;38;2;${FT_BUILD_RGB}
+
+# Ignored
+*~ 0;38;2;${FT_IGNORE_RGB}
+.git 0;38;2;${FT_IGNORE_RGB}
+.gitignore 0;38;2;${FT_IGNORE_RGB}
+.gitmodules 0;38;2;${FT_IGNORE_RGB}

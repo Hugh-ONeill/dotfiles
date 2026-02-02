@@ -11,17 +11,13 @@ notification_limit = 5
 # Appearance
 font = "Mononoki Nerd Font 11"
 frame_width = 1
-frame_color = "#b4befe"
 separator_color = frame
-corner_radius = 5
+corner_radius = 12
 corners = top-left,bottom
-progress_bar_corner_radius = 5
+progress_bar_corner_radius = 8
 progress_bar_corners = top-left,bottom-right
 
-# Colors
-background = "#1e1e2e"
-foreground = "#cdd6f4"
-highlight = "#b4befe,#a6e3a1"
+# Colors loaded from theme via dunstrc.d/00-colors.conf
 
 # Timing
 timeout = 5
@@ -47,18 +43,12 @@ format = "<b>󰁕 %a</b>\n%s\n<i>%b</i>"
 
 [urgency_low]
 timeout = 3
-foreground = "#a6e3a1"
-frame_color = "#a6e3a1"
 default_icon = "~/.config/dunst/icons/bell-badge-low.svg"
 
 [urgency_normal]
 timeout = 5
-foreground = "#b4befe"
-frame_color = "#b4befe"
 default_icon = "~/.config/dunst/icons/bell-badge.svg"
 
 [urgency_critical]
 timeout = 0
-foreground = "#f38ba8"
-frame_color = "#f38ba8"
 default_icon = "~/.config/dunst/icons/alert-decagram.svg"

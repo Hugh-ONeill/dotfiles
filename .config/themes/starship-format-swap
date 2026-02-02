@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Swap starship format between rounded and boxy styles."""
+import os
+import sys
+import re
+
+VALID_STYLES = ("rounded", "boxy", "angular")
+
+def main():
+    if len(sys.argv) != 2 or sys.argv[1] not in VALID_STYLES:
+        print(f"Usage: starship-format-swap <{'|'.join(VALID_STYLES)}>")
+        sys.exit(1)
+
+    style = sys.argv[1]
+    config_dir = os.path.expanduser("~/.config/starship")
+    config_path = os.path.join(config_dir, "starship.toml")
+    format_path = os.path.join(config_dir, f"format-{style}.txt")
+
+    # Read the format file
+    try:
+        with open(format_path, 'r') as f:
+            new_format = f.read()
+    except FileNotFoundError:
+        print(f"Format file not found: {format_path}")
+        sys.exit(1)
+
+    # Read the config
+    try:
+        with open(config_path, 'r') as f:
+            config = f.read()
+    except FileNotFoundError:
+        print(f"Config file not found: {config_path}")
+        sys.exit(1)
+
+    # Replace the format block using regex
+    # Match from 'format = """' to the closing '"""'
+    pattern = r'format = """.*?"""'
+
+    # Escape backslashes in replacement to avoid regex interpretation
+    escaped_format = new_format.replace('\\', '\\\\')
+    replacement = f'format = """\n{escaped_format}\n"""'
+
+    new_config, count = re.subn(pattern, replacement, config, flags=re.DOTALL)
+
+    if count == 0:
+        print("Error: Could not find format block in starship.toml")
+        sys.exit(1)
+
+    # Write back
+    with open(config_path, 'w') as f:
+        f.write(new_config)
+
+    print(f"Starship format set to: {style}")
+
+if __name__ == "__main__":
+    main()

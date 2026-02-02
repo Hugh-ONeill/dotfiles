@@ -14,8 +14,8 @@ zinit light kazhala/dotbare
 # Deferred Plugins
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Compinit and fzf-tab
-zinit ice wait lucid atinit"zicompinit; zicdreplay"
+# Compinit and fzf-tab (sync load for immediate completions)
+zinit ice atinit"zicompinit; zicdreplay" atload"_register_completions"
 zinit light Aloxaf/fzf-tab
 
 # fzf keybindings

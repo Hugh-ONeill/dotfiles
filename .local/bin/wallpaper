@@ -1,0 +1,271 @@
+#!/bin/bash
+
+# Wallpaper setter with color extraction
+# Sets wallpaper via hyprpaper and extracts colors with palette-extract
+
+WALLPAPER_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Backgrounds"
+
+show_help() {
+    echo "Usage: $(basename "$0") [options] [image]"
+    echo ""
+    echo "Options:"
+    echo "  -s, --set <image>     Set specific wallpaper"
+    echo "  -r, --random          Set random wallpaper from $WALLPAPER_DIR"
+    echo "  -p, --pick            Pick wallpaper with rofi/fzf"
+    echo "  -c, --current         Show current wallpaper"
+    echo "  -n, --no-wal          Don't extract colors (just set wallpaper)"
+    echo "  -a, --apply           Apply generated theme to apps (default)"
+    echo "  -g, --generate-only   Generate theme but don't apply"
+    echo "  -l, --light           Use light color scheme"
+    echo "  -u, --undo            Restore previous color scheme"
+    echo "  -h, --help            Show this help"
+    echo ""
+    echo "If called with just an image path, sets that wallpaper."
+}
+
+get_current() {
+    if [[ -f "$HOME/.cache/wal/wal" ]]; then
+        cat "$HOME/.cache/wal/wal"
+    else
+        echo "No wallpaper set via wal"
+    fi
+}
+
+undo_colors() {
+    if [[ -f "$HOME/.cache/wal/colors.json.bak" ]]; then
+        cp "$HOME/.cache/wal/colors.json.bak" "$HOME/.cache/wal/colors.json"
+        echo "Restoring previous colors..."
+        # Re-generate theme from restored colors.json (skip extraction)
+        if ! "$HOME/.config/themes/palette-extract" --from-cache --generate-theme; then
+            echo "Error: Failed to generate theme"
+            exit 1
+        fi
+        # Build GTK and Kvantum themes
+        local themes_dir="$HOME/.config/themes"
+        [[ -x "$themes_dir/build-gtk-theme.sh" ]] && "$themes_dir/build-gtk-theme.sh" chameleon 2>/dev/null || true
+        [[ -x "$themes_dir/build-kvantum-theme.sh" ]] && "$themes_dir/build-kvantum-theme.sh" chameleon 2>/dev/null || true
+        if theme set chameleon; then
+            echo "Restored previous colors"
+        else
+            echo "Error: Failed to apply restored colors"
+            exit 1
+        fi
+    else
+        echo "No backup found"
+        exit 1
+    fi
+}
+
+set_wallpaper() {
+    local image="$1"
+
+    # Resolve to absolute path
+    if [[ ! "$image" = /* ]]; then
+        image="$(realpath "$image")"
+    fi
+
+    if [[ ! -f "$image" ]]; then
+        echo "Error: Image not found: $image"
+        exit 1
+    fi
+
+    # Validate that it's actually an image file
+    if ! file "$image" | grep -qiE 'image|bitmap|png|jpeg|gif|webp'; then
+        echo "Error: Not a valid image file: $image"
+        exit 1
+    fi
+
+    echo "Setting wallpaper: $image"
+
+    # Determine which backend to use
+    # If swww-daemon is running, use swww (it handles both static and animated)
+    # Otherwise use hyprpaper for static images, swww for GIFs
+    local use_swww=false
+
+    if pgrep -x swww-daemon >/dev/null; then
+        use_swww=true
+    elif [[ "$image" == *.gif ]]; then
+        use_swww=true
+    fi
+
+    if [[ "$use_swww" == "true" ]]; then
+        # Ensure swww daemon is running
+        if ! pgrep -x swww-daemon >/dev/null; then
+            swww-daemon &
+            sleep 0.5
+        fi
+        # Kill hyprpaper if running to avoid conflicts
+        pkill -x hyprpaper 2>/dev/null || true
+
+        swww img "$image" --transition-type grow --transition-pos center
+    else
+        # Kill swww if running to avoid conflicts
+        pkill -x swww-daemon 2>/dev/null || true
+
+        # Set via hyprpaper
+        if ! hyprctl hyprpaper wallpaper ",$image"; then
+            echo "Warning: hyprctl hyprpaper command failed"
+        fi
+
+        # Update hyprpaper.conf for persistence
+        cat > "$HOME/.config/hypr/hyprpaper.conf" << EOF
+splash = false
+ipc = on
+
+wallpaper = ,$image
+EOF
+    fi
+
+    # Extract colors and generate theme
+    if [[ "$RUN_WAL" == "true" ]]; then
+        # Backup current colors before extraction
+        if [[ -f "$HOME/.cache/wal/colors.json" ]]; then
+            cp "$HOME/.cache/wal/colors.json" "$HOME/.cache/wal/colors.json.bak"
+        fi
+
+        echo "Extracting colors..."
+        local extract_flags="--generate-theme"
+        [[ "$LIGHT_MODE" == "true" ]] && extract_flags="$extract_flags --light"
+
+        if ! "$HOME/.config/themes/palette-extract" "$image" $extract_flags; then
+            echo "Error: Failed to extract colors from image"
+            exit 1
+        fi
+
+        # Build GTK and Kvantum themes for chameleon palette
+        local themes_dir="$HOME/.config/themes"
+        if [[ -x "$themes_dir/build-gtk-theme.sh" ]]; then
+            "$themes_dir/build-gtk-theme.sh" chameleon 2>/dev/null || true
+        fi
+        if [[ -x "$themes_dir/build-kvantum-theme.sh" ]]; then
+            "$themes_dir/build-kvantum-theme.sh" chameleon 2>/dev/null || true
+        fi
+
+        # Apply the chameleon theme
+        if [[ "$APPLY_THEME" == "true" ]]; then
+            if ! theme set chameleon; then
+                echo "Error: Failed to apply theme"
+                exit 1
+            fi
+        fi
+    fi
+
+    echo "Done!"
+}
+
+find_images() {
+    find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" -o -iname "*.gif" \) 2>/dev/null
+}
+
+pick_wallpaper() {
+    local selected=""
+
+    if command -v fzf &>/dev/null; then
+        selected=$(find_images | fzf \
+            --prompt="Wallpaper: " \
+            --preview="preview {}" \
+            --preview-window="right,60%")
+    elif command -v rofi &>/dev/null; then
+        selected=$(find_images | rofi -dmenu -p "Wallpaper" -i)
+    else
+        echo "Error: Neither fzf nor rofi found"
+        exit 1
+    fi
+
+    if [[ -n "$selected" ]]; then
+        set_wallpaper "$selected"
+    fi
+}
+
+random_wallpaper() {
+    local image
+    image=$(find_images | shuf -n 1)
+
+    if [[ -n "$image" ]]; then
+        set_wallpaper "$image"
+    else
+        echo "Error: No images found in $WALLPAPER_DIR"
+        exit 1
+    fi
+}
+
+# Defaults
+RUN_WAL="true"
+LIGHT_MODE="false"
+APPLY_THEME="true"
+ACTION=""
+IMAGE_ARG=""
+
+# Parse all arguments first
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -s|--set)
+            ACTION="set"
+            shift
+            IMAGE_ARG="$1"
+            ;;
+        -r|--random)
+            ACTION="random"
+            ;;
+        -p|--pick)
+            ACTION="pick"
+            ;;
+        -c|--current)
+            ACTION="current"
+            ;;
+        -n|--no-wal)
+            RUN_WAL="false"
+            ;;
+        -a|--apply)
+            APPLY_THEME="true"
+            ;;
+        -g|--generate-only)
+            APPLY_THEME="false"
+            ;;
+        -l|--light)
+            LIGHT_MODE="true"
+            ;;
+        -u|--undo)
+            ACTION="undo"
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            # Assume it's an image path
+            if [[ -f "$1" ]] || [[ -f "$(realpath "$1" 2>/dev/null)" ]]; then
+                ACTION="set"
+                IMAGE_ARG="$1"
+            else
+                echo "Unknown option or file not found: $1"
+                show_help
+                exit 1
+            fi
+            ;;
+    esac
+    shift
+done
+
+# Execute action after all flags are parsed
+case "$ACTION" in
+    set)
+        set_wallpaper "$IMAGE_ARG"
+        ;;
+    random)
+        random_wallpaper
+        ;;
+    pick)
+        pick_wallpaper
+        ;;
+    current)
+        get_current
+        ;;
+    undo)
+        undo_colors
+        ;;
+    "")
+        # No action specified - show picker
+        pick_wallpaper
+        ;;
+esac

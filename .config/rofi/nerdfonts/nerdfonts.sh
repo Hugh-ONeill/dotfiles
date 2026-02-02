@@ -2,10 +2,11 @@
 # vim:ft=bash
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Hyprlauncher Nerd Fonts Picker
+# Rofi Nerd Fonts Picker
 # Categorized browser for Nerd Font icons
-# Note: hyprlauncher has built-in unicode picker (type '.' prefix)
 # ══════════════════════════════════════════════════════════════════════════════
+DIR="$(dirname "$0")"
+ROFI="rofi -dmenu -i -p Icons -theme ${DIR}/style.rasi"
 nerd_font_file="/usr/lib/python3.14/site-packages/picker/data/nerd_font.csv"
 
 # Fallback if path changes
@@ -47,7 +48,7 @@ category_order=(cod dev fa fae linux md oct pl ple pom seti weather iec custom)
 show_categories() {
     for cat in "${category_order[@]}"; do
         echo "${categories[$cat]}"
-    done | hyprlauncher -m
+    done | $ROFI
 }
 
 get_category_prefix() {
@@ -62,7 +63,7 @@ get_category_prefix() {
 
 show_icons() {
     local prefix="$1"
-    grep " ${prefix}-" "$nerd_font_file" | sed 's/ /\t/' | hyprlauncher -m
+    grep " ${prefix}-" "$nerd_font_file" | sed 's/ /\t/' | $ROFI
 }
 
 # ══════════════════════════════════════════════════════════════════════════════

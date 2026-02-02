@@ -1,0 +1,229 @@
+#!/bin/bash
+# Theme generator script
+# Usage: ./generate-theme.sh <theme-name>
+# Generates theme config files from templates using the specified palette
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATES_DIR="$SCRIPT_DIR/templates"
+PALETTES_DIR="$SCRIPT_DIR/palettes"
+
+if [[ -z "$1" ]]; then
+    echo "Usage: $0 <theme-name>"
+    echo "Available themes:"
+    for f in "$PALETTES_DIR"/*.json; do
+        basename "$f" .json
+    done
+    exit 1
+fi
+
+THEME_NAME="$1"
+PALETTE_FILE="$PALETTES_DIR/$THEME_NAME.json"
+OUTPUT_DIR="$SCRIPT_DIR/$THEME_NAME"
+
+if [[ ! -f "$PALETTE_FILE" ]]; then
+    echo "Error: Palette file not found: $PALETTE_FILE"
+    exit 1
+fi
+
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
+
+# Function to convert hex color to RGB (e.g., #ff0000 -> 255;0;0)
+hex_to_rgb() {
+    local hex="${1#\#}"
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    echo "$r;$g;$b"
+}
+
+# Function to calculate perceived luminance (0-255) from hex color
+hex_luminance() {
+    local hex="${1#\#}"
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    echo $(( (299 * r + 587 * g + 114 * b) / 1000 ))
+}
+
+# Load JSON palette and resolve color references
+declare -A COLORS
+
+# First pass: load all hex values directly
+while IFS='=' read -r key value; do
+    COLORS["$key"]="$value"
+done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#")) | "\(.key)=\(.value)"' "$PALETTE_FILE")
+
+# Second pass: resolve references (values without #)
+while IFS='=' read -r key ref; do
+    resolved="${COLORS[$ref]}"
+    if [[ -n "$resolved" ]]; then
+        COLORS["$key"]="$resolved"
+    else
+        echo "Warning: unresolved reference '$ref' for '$key'" >&2
+    fi
+done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#") | not) | "\(.key)=\(.value)"' "$PALETTE_FILE")
+
+# Load style settings with defaults
+export STYLE_CORNER_RADIUS=$(jq -r '.style.corner_radius // 3' "$PALETTE_FILE")
+export STYLE_BORDER_WIDTH=$(jq -r '.style.border_width // 1' "$PALETTE_FILE")
+export STYLE_GAPS_IN=$(jq -r '.style.gaps_in // 5' "$PALETTE_FILE")
+export STYLE_GAPS_OUT=$(jq -r '.style.gaps_out // 10' "$PALETTE_FILE")
+export STYLE_DECORATION=$(jq -r '.style.decoration // "none"' "$PALETTE_FILE")
+export STYLE_BAR=$(jq -r '.style.bar // "rounded"' "$PALETTE_FILE")
+
+# Load font settings with defaults
+export FONT_FAMILY=$(jq -r '.font.family // "FiraCode Nerd Font"' "$PALETTE_FILE")
+export FONT_SIZE=$(jq -r '.font.size // 11' "$PALETTE_FILE")
+
+# Export theme metadata
+export THEME_NAME
+THEME_DESCRIPTION=$(jq -r '.description // ""' "$PALETTE_FILE")
+export THEME_DESCRIPTION="${THEME_DESCRIPTION:-$THEME_NAME theme}"
+
+# Get MODULE_FG values for contrast calculation
+MODULE_FG="${COLORS[module_fg]}"
+MODULE_FG_LIGHT="${COLORS[module_fg_light]}"
+
+# Function to get contrasting foreground color based on background luminance
+get_contrast_fg() {
+    local bg_color="$1"
+    local lum=$(hex_luminance "$bg_color")
+    if [[ $lum -gt 140 ]]; then
+        echo "$MODULE_FG"
+    else
+        echo "$MODULE_FG_LIGHT"
+    fi
+}
+
+# Export all colors as environment variables (uppercase)
+for key in "${!COLORS[@]}"; do
+    upper_key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
+    value="${COLORS[$key]}"
+    export "$upper_key=$value"
+    export "${upper_key}_NOHASH=${value#\#}"
+    export "${upper_key}_RGB=$(hex_to_rgb "$value")"
+done
+
+# Load and resolve gradient
+readarray -t GRADIENT_REFS < <(jq -r '.gradient[]' "$PALETTE_FILE")
+declare -a GRADIENT
+for ref in "${GRADIENT_REFS[@]}"; do
+    if [[ "$ref" == \#* ]]; then
+        GRADIENT+=("$ref")
+    else
+        resolved="${COLORS[$ref]}"
+        GRADIENT+=("${resolved:-$ref}")
+    fi
+done
+
+# Export gradient variables
+export GRADIENT_LEN="${#GRADIENT[@]}"
+for i in "${!GRADIENT[@]}"; do
+    value="${GRADIENT[$i]}"
+    export "GRADIENT_$i=$value"
+    export "GRADIENT_${i}_NOHASH=${value#\#}"
+    export "GRADIENT_${i}_RGB=$(hex_to_rgb "$value")"
+    # Auto-contrast foreground for this gradient color
+    fg_color=$(get_contrast_fg "$value")
+    export "GRADIENT_FG_$i=$fg_color"
+    export "GRADIENT_FG_${i}_RGB=$(hex_to_rgb "$fg_color")"
+done
+
+# Build list of variables to substitute
+VARS='$THEME_NAME $THEME_DESCRIPTION'
+
+# Add all color variables (uppercase versions)
+for key in "${!COLORS[@]}"; do
+    upper_key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
+    VARS="$VARS \$$upper_key \$${upper_key}_NOHASH \$${upper_key}_RGB"
+done
+
+# Add gradient variables
+VARS="$VARS \$GRADIENT_LEN"
+for i in $(seq 0 9); do
+    VARS="$VARS \$GRADIENT_$i \$GRADIENT_${i}_NOHASH \$GRADIENT_${i}_RGB"
+    VARS="$VARS \$GRADIENT_FG_$i \$GRADIENT_FG_${i}_RGB"
+done
+
+# Add style variables
+VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_GAPS_OUT \$STYLE_DECORATION \$STYLE_BAR"
+
+# Add font variables
+VARS="$VARS \$FONT_FAMILY \$FONT_SIZE"
+
+# Generate each config file from template
+echo "Generating $THEME_NAME theme..."
+
+for template in "$TEMPLATES_DIR"/*.tmpl; do
+    if [[ -f "$template" ]]; then
+        filename=$(basename "$template" .tmpl)
+        # Skip fsh.ini - handled separately below
+        [[ "$filename" == "fsh.ini" ]] && continue
+        # Check for override in templates/overrides/<theme>/ first, then in output dir
+        override=""
+        if [[ -f "$TEMPLATES_DIR/overrides/$THEME_NAME/$filename.override" ]]; then
+            override="$TEMPLATES_DIR/overrides/$THEME_NAME/$filename.override"
+        elif [[ -f "$OUTPUT_DIR/$filename.override" ]]; then
+            override="$OUTPUT_DIR/$filename.override"
+        fi
+        output="$OUTPUT_DIR/$filename"
+
+        if [[ -n "$override" ]]; then
+            # Use override file directly (still run envsubst for color variables)
+            echo "  -> $filename (override)"
+            envsubst "$VARS" < "$override" > "$output"
+        else
+            # Use template
+            echo "  -> $filename"
+            envsubst "$VARS" < "$template" > "$output"
+        fi
+        # Make shell scripts executable
+        [[ "$filename" == *.sh ]] && chmod +x "$output"
+    fi
+done
+
+# Generate fsh theme (fast-syntax-highlighting)
+if [[ -f "$TEMPLATES_DIR/fsh.ini.tmpl" ]]; then
+    FSH_OUTPUT="$OUTPUT_DIR/fsh"
+    mkdir -p "$FSH_OUTPUT"
+    echo "  -> fsh/$THEME_NAME.ini"
+    envsubst "$VARS" < "$TEMPLATES_DIR/fsh.ini.tmpl" > "$FSH_OUTPUT/$THEME_NAME.ini"
+fi
+
+# Generate dunst icons from templates
+DUNST_ICONS_TMPL="$TEMPLATES_DIR/dunst-icons-tmpl"
+if [[ -d "$DUNST_ICONS_TMPL" ]]; then
+    ICONS_OUTPUT="$OUTPUT_DIR/dunst-icons"
+    mkdir -p "$ICONS_OUTPUT"
+    echo "  -> dunst-icons/"
+    for template in "$DUNST_ICONS_TMPL"/*.svg.tmpl; do
+        if [[ -f "$template" ]]; then
+            filename=$(basename "$template" .tmpl)
+            envsubst "$VARS" < "$template" > "$ICONS_OUTPUT/$filename"
+        fi
+    done
+fi
+
+# Generate Stylus userstyles
+STYLUS_TMPL="$SCRIPT_DIR/stylus/templates"
+if [[ -d "$STYLUS_TMPL" ]]; then
+    STYLUS_OUTPUT="$OUTPUT_DIR/stylus"
+    mkdir -p "$STYLUS_OUTPUT"
+    echo "  -> stylus/"
+    for template in "$STYLUS_TMPL"/*.user.less.tmpl; do
+        if [[ -f "$template" ]]; then
+            filename=$(basename "$template" .tmpl)
+            envsubst "$VARS" < "$template" > "$STYLUS_OUTPUT/$filename"
+        fi
+    done
+    # Bundle into importable JSON
+    if [[ -x "$SCRIPT_DIR/stylus/bundle-styles.py" ]]; then
+        echo "  -> stylus-bundle.json"
+        "$SCRIPT_DIR/stylus/bundle-styles.py" "$THEME_NAME" > /dev/null
+    fi
+fi
+
+echo "Done! Generated files in: $OUTPUT_DIR"

@@ -1,0 +1,78 @@
+# ${THEME_NAME} theme for zsh-fast-syntax-highlighting
+# Copy to ~/.fsh/ and set: fast-theme ${THEME_NAME}
+
+[base]
+default          = none
+unknown-token    = fg=${SEM_ERR}
+commandseparator = fg=${ACCENT_SECONDARY}
+redirection      = fg=${SEM_WARN}
+here-string-tri  = fg=${SEM_WARN}
+here-string-text = fg=${SEM_WARN}
+here-string-var  = fg=${ACCENT_TERTIARY}
+exec-descriptor  = fg=${ACCENT_TERTIARY}
+comment          = fg=${OVERLAY0}
+correct-subtle   = fg=${OVERLAY0}
+incorrect-subtle = fg=${SEM_ERR}
+subtle-separator = fg=${OVERLAY0}
+subtle-bg        = bg=${SURFACE0}
+secondary        = fg=${ACCENT_TERTIARY}
+
+[command-point]
+reserved-word    = fg=${ACCENT_SECONDARY}
+subcommand       = fg=${ACCENT}
+alias            = fg=${SEM_OK}
+suffix-alias     = fg=${SEM_OK}
+global-alias     = fg=${SEM_OK}
+builtin          = fg=${ACCENT}
+function         = fg=${ACCENT}
+command          = fg=${SEM_OK}
+precommand       = fg=${ACCENT_SECONDARY},italic
+hashed-command   = fg=${SEM_OK}
+single-sq-bracket = fg=${SEM_WARN}
+double-sq-bracket = fg=${SEM_WARN}
+double-paren     = fg=${SEM_WARN}
+
+[paths]
+path             = fg=${ACCENT_TERTIARY}
+pathseparator    = fg=${ACCENT_TERTIARY}
+path-to-dir      = fg=${ACCENT},underline
+globbing         = fg=${ACCENT_SECONDARY}
+globbing-ext     = fg=${ACCENT_SECONDARY}
+
+[brackets]
+paired-bracket   = bg=${SURFACE1}
+bracket-level-1  = fg=${ACCENT_SECONDARY}
+bracket-level-2  = fg=${ACCENT_TERTIARY}
+bracket-level-3  = fg=${ACCENT}
+
+[arguments]
+single-hyphen-option   = fg=${SEM_WARN}
+double-hyphen-option   = fg=${SEM_WARN}
+back-quoted-argument   = fg=${ACCENT_SECONDARY}
+single-quoted-argument = fg=${SEM_WARN}
+double-quoted-argument = fg=${SEM_WARN}
+dollar-quoted-argument = fg=${SEM_WARN}
+
+[in-string]
+back-dollar-quoted-argument   = fg=${ACCENT_TERTIARY}
+back-or-dollar-double-quoted-argument = fg=${ACCENT_TERTIARY}
+
+[other]
+variable             = fg=${ACCENT_TERTIARY}
+assign               = fg=${ACCENT_TERTIARY}
+assign-array-bracket = fg=${ACCENT_TERTIARY}
+history-expansion    = fg=${ACCENT_SECONDARY}
+
+[math]
+mathvar = fg=${ACCENT_TERTIARY}
+mathnum = fg=${SEM_WARN}
+matherr = fg=${SEM_ERR}
+
+[for-loop]
+forvar = fg=${ACCENT_TERTIARY}
+fornum = fg=${SEM_WARN}
+
+[case]
+case-input    = fg=${ACCENT_TERTIARY}
+case-parentheses = fg=${ACCENT_SECONDARY}
+case-condition = fg=${ACCENT_SECONDARY},bold

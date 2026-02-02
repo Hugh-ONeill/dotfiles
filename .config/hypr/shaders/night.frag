@@ -1,15 +1,18 @@
+#version 300 es
+// Night mode shader (reduce blue)
+
 precision mediump float;
-varying vec2 v_texcoord;
+
+in vec2 v_texcoord;
+out vec4 fragColor;
+
 uniform sampler2D tex;
-
 uniform float time;
-
 uniform vec2 topLeft;
 uniform vec2 fullSize;
 
-void main(){
-    vec4 pixColor = texture2D(tex, v_texcoord);
+void main() {
+    vec4 pixColor = texture(tex, v_texcoord);
     pixColor[2] *= 0.8;
-
-    gl_FragColor = pixColor;
+    fragColor = pixColor;
 }

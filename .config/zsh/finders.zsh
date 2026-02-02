@@ -10,14 +10,12 @@ export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/ripgreprc"
 # FZF Configuration
 # ══════════════════════════════════════════════════════════════════════════════
 
+# Source theme colors
+[[ -f "$HOME/.config/themes/current/fzf.sh" ]] && source "$HOME/.config/themes/current/fzf.sh"
+
 export FZF_DEFAULT_OPTS="\
---multi --exact --reverse --cycle --height=90% \
---color=fg:#BAC2DE,fg+:#CDD6F4,bg:#1e1e2e,bg+:#45475A \
---color=hl:#CBA6F7,hl+:#74C7EC,info:#94E2D5,marker:#A6E3A1 \
---color=prompt:#74C7EC,spinner:#94E2D5,pointer:#F5C2E7,header:#B4BEFE \
---color=gutter:#313244,border:#CBA6F7,separator:#94E2D5,scrollbar:#F9E2AF \
---color=preview-fg:#BAC2DE,preview-bg:#181825,preview-border:#F5C2E7,preview-scrollbar:#F9E2AF \
---color=preview-label:#A6E3A1,label:#A6E3A1,query:#BAC2DE,disabled:#585B70 \
+--ansi --multi --exact --reverse --cycle --height=90% \
+${FZF_COLORS:-} \
 --border='rounded' --border-label-pos='0' \
 --preview-window='right,40%' \
 --bind='ctrl-/:change-preview-window(down,70%,wrap,border-top|hidden|right,40%)' \
@@ -25,19 +23,19 @@ export FZF_DEFAULT_OPTS="\
 --pointer='' --separator='🭷' --scrollbar='▌'"
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FZF Commands (bfs-based)
+# FZF Commands (bfd hybrid: bfs for shallow, fd for deep)
 # ══════════════════════════════════════════════════════════════════════════════
 
-export FZF_DEFAULT_COMMAND="command bfs -name '.git' -prune -o -print"
-export FZF_ALT_C_COMMAND="command bfs -type d -name '.git' -prune -o -type d -print"
+export FZF_DEFAULT_COMMAND="bfd -c always"
+export FZF_ALT_C_COMMAND="fd --type d --color=always"
 export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
 
 _fzf_compgen_path() {
-  command bfs ${1} -name '.git' -prune -o -print
+  bfd -c always "${1}"
 }
 
 _fzf_compgen_dir() {
-  command bfs ${1} -name '.git' -prune -o -type d -print
+  fd --type d --color=always . "${1}"
 }
 
 # ══════════════════════════════════════════════════════════════════════════════

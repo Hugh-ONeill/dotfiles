@@ -1,13 +1,15 @@
-// vim: set ft=glsl:
-// blue light filter shader
-// values from https://reshade.me/forum/shader-discussion/3673-blue-light-filter-similar-to-f-lux
+#version 300 es
+// Invert colors shader
 
 precision mediump float;
-varying vec2 v_texcoord;
+
+in vec2 v_texcoord;
+out vec4 fragColor;
+
 uniform sampler2D tex;
 
 void main() {
-    vec4 pixColor = texture2D(tex, v_texcoord);
+    vec4 pixColor = texture(tex, v_texcoord);
     pixColor.rgb = 1.0 - pixColor.rgb;
-    gl_FragColor = pixColor;
+    fragColor = pixColor;
 }

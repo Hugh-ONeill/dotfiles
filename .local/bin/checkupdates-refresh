@@ -1,8 +1,18 @@
 #!/bin/bash
 # Refresh cached update count
-# Run periodically via systemd timer
+# Run periodically via systemd timer or pacman hook
 
-cache_file="$HOME/.cache/checkupdates-count"
+# Get the real user's home (even when run as root via pacman hook)
+if [[ -n "$SUDO_USER" ]]; then
+    real_home=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+elif [[ $EUID -eq 0 ]]; then
+    # Fallback: hardcode if running as root without SUDO_USER
+    real_home="/home/wiz"
+else
+    real_home="$HOME"
+fi
+
+cache_file="$real_home/.cache/checkupdates-count"
 
 # Count available updates (pacman + AUR if paru/yay available)
 count=0

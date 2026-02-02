@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # vim:ft=bash
 
+DIR="$(dirname "$0")"
+ROFI="rofi -dmenu -i -p Todo -theme ${DIR}/style.rasi"
 # ══════════════════════════════════════════════════════════════════════════════
-# Hyprlauncher Todo Manager
+# Rofi Todo Manager
 # ══════════════════════════════════════════════════════════════════════════════
 todo_file="${XDG_DATA_HOME:-$HOME/.local/share}/todo.txt"
 
@@ -55,7 +57,7 @@ todo_actions() {
     line_num="${line_num##* }"
 
     local action
-    action=$(echo -e "󰄬  Toggle Complete\n  Delete\n  Back" | hyprlauncher -m)
+    action=$(echo -e "󰄬  Toggle Complete\n  Delete\n  Back" | $ROFI)
 
     case "$action" in
         *"Toggle"*) toggle_todo "$line_num" ;;
@@ -79,7 +81,7 @@ main_menu() {
     local options="  Add Task\n󰃢  Clear Completed"
     [[ -n "$todos" ]] && options="$options\n$todos"
 
-    echo -e "$options" | hyprlauncher -m
+    echo -e "$options" | $ROFI
 }
 
 while true; do

@@ -34,7 +34,8 @@ zstyle ':completion:*:matches' group 'yes'
 zstyle ':completion:*:options' description 'yes'
 zstyle ':completion:*' file-sort modification
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' menu select
+# NOTE: Use 'no' instead of 'select' for fzf-tab to properly capture prefix
+zstyle ':completion:*' menu no
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Matching & Sorting
@@ -67,15 +68,9 @@ zstyle ':fzf-tab:*' fzf-pad 4
 zstyle ':fzf-tab:*' switch-group ',' '.'
 zstyle ':fzf-tab:*' use-fzf-default-opts no
 zstyle ':fzf-tab:*' fzf-bindings 'ctrl-space:toggle-preview' 'ctrl-/:change-preview-window(down,70%,wrap,border-top|hidden|right,50%,nowrap)'
-zstyle ':fzf-tab:*' fzf-flags \
-  '--preview-window=right,50%,nowrap' \
-  '--color=fg:#BAC2DE,fg+:#CDD6F4,bg:#1e1e2e,bg+:#45475A' \
-  '--color=hl:#CBA6F7,hl+:#74C7EC,info:#94E2D5,marker:#A6E3A1' \
-  '--color=prompt:#74C7EC,spinner:#94E2D5,pointer:#F5C2E7,header:#B4BEFE' \
-  '--color=gutter:#313244,border:#CBA6F7,separator:#94E2D5,scrollbar:#F9E2AF' \
-  '--color=preview-fg:#BAC2DE,preview-bg:#181825,preview-border:#F5C2E7,preview-scrollbar:#F9E2AF' \
-  '--border=rounded' '--reverse' '--height=90%' \
-  "--prompt=☠ " "--marker=❯" "--pointer=" "--separator=🭷" "--scrollbar=▌"
+# Source theme colors for fzf-tab
+[[ -f "$HOME/.config/themes/current/fzf-tab-flags.zsh" ]] && source "$HOME/.config/themes/current/fzf-tab-flags.zsh"
+zstyle ':fzf-tab:*' fzf-flags ${FZF_TAB_FLAGS[@]}
 zstyle ':fzf-tab:*' continuous-trigger '/'
 zstyle ':fzf-tab:*' accept-line ctrl-x
 
@@ -143,3 +138,105 @@ zstyle ':fzf-tab:complete:pushd:*' fzf-preview 'eza --color=always --all --group
 
 # Generic fallback
 zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -d $realpath ]]; then eza --color=always --all --group-directories-first --tree --level=2 $realpath; elif [[ -f $realpath ]]; then bat --color=always --line-range :100 $realpath 2>/dev/null || file $realpath; fi'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Custom Completions (functions defined here, compdef called after compinit)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Register custom completions (called after compinit)
+_register_completions() {
+    compdef _theme theme
+    compdef _wallpaper wallpaper wp
+    compdef _volumecontrol volumecontrol
+    compdef _brightnesscontrol brightnesscontrol
+    compdef _unarchive unarchive
+}
+
+# theme: complete with commands and themes
+_theme() {
+    local -a commands themes
+    commands=(
+        'list:List available themes'
+        'current:Show current theme'
+        'set:Apply theme to all apps'
+        'generate:Regenerate theme from palette'
+        'generate-all:Regenerate all themes'
+        'preview:Preview theme colors'
+        'validate:Check if theme is complete'
+        'edit:Edit theme palette'
+        'rofi:Interactive theme picker'
+    )
+    themes=($(find ~/.config/themes -maxdepth 1 -mindepth 1 -type d ! -name "palettes" ! -name "templates" ! -name "lib" ! -name "current" ! -name "stylus" -printf "%f\n" 2>/dev/null | sort))
+
+    if (( CURRENT == 2 )); then
+        _describe 'commands' commands
+        _describe 'themes' themes
+    elif (( CURRENT == 3 )); then
+        case "$words[2]" in
+            set|generate|preview|validate|edit)
+                _describe 'themes' themes
+                ;;
+            generate-all)
+                local -a opts=('--cursors:Also rebuild cursor themes')
+                _describe 'options' opts
+                ;;
+        esac
+    fi
+}
+
+# theme preview
+zstyle ':fzf-tab:complete:theme:*' fzf-preview '~/.config/themes/preview-theme.sh $word 2>/dev/null || echo "No preview"'
+
+# wallpaper: complete with options and image files
+_wallpaper() {
+    local -a commands
+    commands=(
+        '-s:Set specific wallpaper'
+        '-r:Set random wallpaper'
+        '-p:Pick wallpaper with rofi/fzf'
+        '-c:Show current wallpaper'
+        '-n:Skip wal color extraction'
+        '-l:Use light color scheme'
+        '-h:Show help'
+    )
+
+    _describe 'commands' commands
+    _path_files -g '*.{jpg,jpeg,png,webp}'
+}
+
+# wallpaper preview
+zstyle ':fzf-tab:complete:wallpaper:*' fzf-preview '[[ -f $realpath ]] && chafa -s ${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES} $realpath 2>/dev/null || echo $word'
+zstyle ':fzf-tab:complete:wp:*' fzf-preview '[[ -f $realpath ]] && chafa -s ${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES} $realpath 2>/dev/null || echo $word'
+
+# volumecontrol.sh
+_volumecontrol() {
+    local -a opts actions
+    opts=('-o:action (i/d/m)' '-s:select output device' '-v:volume step')
+    actions=('i:increase volume' 'd:decrease volume' 'm:toggle mute')
+
+    case "$words[2]" in
+        -o) _describe 'actions' actions ;;
+        -v) _message 'step (default: 5)' ;;
+        *) _describe 'options' opts ;;
+    esac
+}
+
+# brightnesscontrol.sh
+_brightnesscontrol() {
+    local -a actions
+    actions=('i:increase brightness' 'd:decrease brightness')
+
+    if (( CURRENT == 2 )); then
+        _describe 'actions' actions
+    elif (( CURRENT == 3 )); then
+        _message 'step (default: 5)'
+    fi
+}
+
+# unarchive - complete only archive files
+_unarchive() {
+    _files -g '*.{7z,001,rar,tar,tar.bz,tar.bz2,tbz,tbz2,tar.gz,tgz,tar.lzma,tlz,tar.xz,txz,tar.zst,tzst,zip,bz,bz2,gz,lzma,xz,zst,Z}'
+}
+
+# Re-register completions on rf (if compdef exists from previous compinit)
+(( $+functions[compdef] )) && _register_completions
