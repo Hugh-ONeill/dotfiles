@@ -4,15 +4,20 @@
 apply_waybar() {
     local theme="$1"
     local palette_path="$2"
+    local applied=false
 
     if copy_to_current "$theme" "waybar.css"; then
-        # Update power icon color from palette
-        if [[ -n "$palette_path" ]]; then
-            local icon_color=$(grep -oP '^export CRUST="\K[^"]+' "$palette_path" 2>/dev/null)
-            if [[ -n "$icon_color" ]]; then
-                sed -i "s/<span color='#[^']*'>/<span color='$icon_color'>/" "$HOME/.config/waybar/config.jsonc"
-            fi
-        fi
+        applied=true
+    fi
+
+    # Copy themed waybar config if it exists
+    local theme_config="$THEMES_DIR/$theme/waybar-config.jsonc"
+    if [[ -f "$theme_config" ]]; then
+        cp "$theme_config" "$HOME/.config/waybar/config.jsonc"
+        applied=true
+    fi
+
+    if $applied; then
         # Full restart needed for structural changes
         if pgrep -x waybar >/dev/null; then
             pkill -x waybar 2>/dev/null

@@ -73,6 +73,81 @@ export STYLE_GAPS_IN=$(jq -r '.style.gaps_in // 5' "$PALETTE_FILE")
 export STYLE_GAPS_OUT=$(jq -r '.style.gaps_out // 10' "$PALETTE_FILE")
 export STYLE_DECORATION=$(jq -r '.style.decoration // "none"' "$PALETTE_FILE")
 export STYLE_BAR=$(jq -r '.style.bar // "rounded"' "$PALETTE_FILE")
+export STYLE_WAYBAR=$(jq -r '.style.waybar // "rounded"' "$PALETTE_FILE")
+
+# Map waybar style to separator characters
+case "$STYLE_WAYBAR" in
+    angular)
+        export WAYBAR_SEP_LEFT=$'\ue0b2'
+        export WAYBAR_SEP_RIGHT=$'\ue0b0'
+        ;;
+    flame)
+        export WAYBAR_SEP_LEFT=$'\ue0c2 '
+        export WAYBAR_SEP_RIGHT=$'\ue0c0 '
+        ;;
+    pixels)
+        export WAYBAR_SEP_LEFT=$'\ue0c5 '
+        export WAYBAR_SEP_RIGHT=$'\ue0c4 '
+        ;;
+    slashes)
+        export WAYBAR_SEP_LEFT=$'\ue0bc'
+        export WAYBAR_SEP_RIGHT=$'\ue0bc'
+        ;;
+    boxy)
+        export WAYBAR_SEP_LEFT=' '
+        export WAYBAR_SEP_RIGHT=' '
+        ;;
+    rounded|*)
+        export WAYBAR_SEP_LEFT=$'\ue0b6'
+        export WAYBAR_SEP_RIGHT=$'\ue0b4'
+        ;;
+esac
+
+# When both separators use the same glyph, one set of separators needs its fg/bg
+# swapped since the glyph fills the opposite side. Which set depends on whether
+# the left or right variant is used. window#waybar prefix for higher specificity.
+WAYBAR_SEPARATOR_CSS=""
+if [[ "$WAYBAR_SEP_LEFT" == "$WAYBAR_SEP_RIGHT" && "$STYLE_WAYBAR" != "boxy" ]]; then
+    # Detect which variant: left-variant glyphs (odd codepoints) need right-sep swaps,
+    # right-variant glyphs (even codepoints) need left-sep swaps.
+    sep_byte=$(printf '%s' "$WAYBAR_SEP_LEFT" | xxd -p | tail -c 3 | head -c 2)
+    sep_last=$((16#$sep_byte))
+    if (( sep_last % 2 == 0 )); then
+        # Right variant for both: swap left-position separators
+        read -r -d '' WAYBAR_SEPARATOR_CSS << 'SEPCSS' || true
+/* Same-direction separator overrides: swap fg/bg on left-position separators.
+   Uses window#waybar prefix for higher specificity than style.css rules. */
+window#waybar #custom-left-ws-workspaces { color: @main-bg; background: @workspaces; }
+window#waybar #custom-left-bar-fans { color: @main-bg; background: @module1-bg; border-radius: 0; }
+window#waybar #custom-left-fans-temp { color: @module1-bg; background: @module2-bg; }
+window#waybar #custom-left-temp-gpu { color: @module2-bg; background: @module3-bg; }
+window#waybar #custom-left-gpu-memory { color: @module3-bg; background: @module4-bg; }
+window#waybar #custom-left-memory-cpu { color: @module4-bg; background: @module5-bg; }
+window#waybar #custom-leftin-cpu-idle { color: @module5-bg; background: @main-bg; }
+window#waybar #custom-left-idle-center { color: @main-bg; background: @idle-bg; }
+window#waybar #custom-left-cava-audio { color: @main-bg; background: @pulseaudio; }
+window#waybar #custom-left-audio-backlight { color: @pulseaudio; background: @backlight; }
+window#waybar #custom-left-backlight-battery { color: @backlight; background: @battery; }
+window#waybar #custom-leftin-battery-power { color: @battery; background: @main-bg; }
+SEPCSS
+    else
+        # Left variant for both: swap right-position separators
+        read -r -d '' WAYBAR_SEPARATOR_CSS << 'SEPCSS' || true
+/* Same-direction separator overrides: swap fg/bg on right-position separators.
+   Uses window#waybar prefix for higher specificity than style.css rules. */
+window#waybar #custom-right-workspaces-window { color: @main-bg; background: @workspaces; }
+window#waybar #custom-right-center-clock { color: @main-bg; background: @idle-bg; }
+window#waybar #custom-rightin-clock-time { color: @module5-bg; background: @main-bg; }
+window#waybar #custom-right-time-date { color: @module4-bg; background: @module5-bg; }
+window#waybar #custom-right-date-pomodoro { color: @module3-bg; background: @module4-bg; }
+window#waybar #custom-right-pomodoro-bluetooth { color: @module2-bg; background: @module3-bg; }
+window#waybar #custom-right-bluetooth-wifi { color: @module1-bg; background: @module2-bg; }
+window#waybar #custom-right-wifi-end { color: @main-bg; background: @module1-bg; }
+window#waybar #custom-left-bar-fans { border-radius: 0; }
+SEPCSS
+    fi
+fi
+export WAYBAR_SEPARATOR_CSS
 
 # Load font settings with defaults
 export FONT_FAMILY=$(jq -r '.font.family // "FiraCode Nerd Font"' "$PALETTE_FILE")
@@ -149,7 +224,7 @@ for i in $(seq 0 9); do
 done
 
 # Add style variables
-VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_GAPS_OUT \$STYLE_DECORATION \$STYLE_BAR"
+VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_GAPS_OUT \$STYLE_DECORATION \$STYLE_BAR \$STYLE_WAYBAR \$WAYBAR_SEP_LEFT \$WAYBAR_SEP_RIGHT \$WAYBAR_SEPARATOR_CSS"
 
 # Add font variables
 VARS="$VARS \$FONT_FAMILY \$FONT_SIZE"

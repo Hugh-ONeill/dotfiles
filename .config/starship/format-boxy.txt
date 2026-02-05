@@ -1,0 +1,30 @@
+[|](fg:surface2 bg:base)\
+[\U000f011b](fg:mantle bg:base)\
+[|](fg:surface2 bg:base)\
+${custom.dir_first}\
+[/](fg:text bg:base)\
+${custom.dir_second}\
+[|](fg:surface2 bg:base)\
+$jobs\
+$git_branch\
+$git_status\
+[|](fg:surface2 bg:base)\
+$cmd_duration\
+$c\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[|](fg:surface2 bg:base)\
+$status\
+$docker_context\
+${custom.updates}\
+[|](fg:surface2 bg:base)\
+${custom.uptime}\
+[|](fg:surface2 bg:base)\
+$line_break\
+$character

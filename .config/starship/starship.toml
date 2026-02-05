@@ -3,20 +3,20 @@
 add_newline = false
 
 format = """
-[](fg:surface0)\
+[\ue0b8](fg:crust bg:surface0)\
 [\U000f011b](fg:text bg:surface0)\
-[](fg:surface0 bg:g0)\
+[\ue0be](fg:g0 bg:surface0)\
 ${custom.dir_first}\
-[](fg:g0 bg:g1)\
+[\ue0be](fg:g1 bg:g0)\
 ${custom.dir_second}\
-[](fg:g1 bg:g2)\
+[\ue0be](fg:g2 bg:g1)\
 $jobs\
-[](fg:g2 bg:g3)\
+[\ue0be](fg:g3 bg:g2)\
 $git_branch\
 $git_status\
-[](fg:g3 bg:g4)\
+[\ue0be](fg:g4 bg:g3)\
 $cmd_duration\
-[](fg:g4 bg:g5)\
+[\ue0be](fg:g5 bg:g4)\
 $c\
 $rust\
 $golang\
@@ -26,22 +26,22 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[](fg:g5 bg:g6)\
+[\ue0be](fg:g6 bg:g5)\
 $status\
-[](fg:g6 bg:g7)\
+[\ue0be](fg:g7 bg:g6)\
 $docker_context\
-[](fg:g7 bg:g8)\
+[\ue0be](fg:g8 bg:g7)\
 ${custom.updates}\
-[](fg:g8 bg:g9)\
+[\ue0be](fg:g9 bg:g8)\
 ${custom.uptime}\
-[](fg:g9 bg:text)\
-[](fg:text)\
+[\ue0be](fg:text bg:g9)\
+[ \ue0be](fg:crust bg:text)\
 $line_break\
 $character
 
 """
 
-palette = 'crystal'
+palette = 'cassette'
 
 [palettes.cardiac]
 # Structural
@@ -86,6 +86,50 @@ g6_fg = "#f0eced"
 g7_fg = "#f0eced"
 g8_fg = "#f0eced"
 g9_fg = "#f0eced"
+
+[palettes.cassette]
+# Structural
+text = "#f8f0e8"
+subtext1 = "#e8d8c8"
+subtext0 = "#d8c8b8"
+overlay2 = "#6e5888"
+overlay1 = "#5c4874"
+overlay0 = "#4a3860"
+surface2 = "#3a284a"
+surface1 = "#2e203e"
+surface0 = "#241832"
+base = "#1a1028"
+mantle = "#120c20"
+crust = "#0c0818"
+# Gradient
+g0 = "#ffd040"
+g1 = "#ffb030"
+g2 = "#ff8830"
+g3 = "#ff6848"
+g4 = "#ff5068"
+g5 = "#f03888"
+g6 = "#d040a0"
+g7 = "#a048b8"
+g8 = "#8050c0"
+g9 = "#6058c0"
+# Semantic
+sem_ok = "#50d890"
+sem_warn = "#ffb030"
+sem_err = "#ff5068"
+sem_info = "#6058c0"
+module_fg = "#120c20"
+module_fg_light = "#f8f0e8"
+# Auto-contrast foreground for each gradient
+g0_fg = "#120c20"
+g1_fg = "#120c20"
+g2_fg = "#120c20"
+g3_fg = "#120c20"
+g4_fg = "#f8f0e8"
+g5_fg = "#f8f0e8"
+g6_fg = "#f8f0e8"
+g7_fg = "#f8f0e8"
+g8_fg = "#f8f0e8"
+g9_fg = "#f8f0e8"
 
 [palettes.catppuccin_mocha]
 # Structural
@@ -136,15 +180,15 @@ g9_fg = "#181825"
 text = "#f4e8e4"
 subtext1 = "#dcd0c8"
 subtext0 = "#c8b0a8"
-overlay2 = "#5a3a2c"
-overlay1 = "#4a2a20"
-overlay0 = "#3a1c14"
-surface2 = "#381a10"
-surface1 = "#28120c"
-surface0 = "#1c0c08"
-base = "#140806"
-mantle = "#0e0504"
-crust = "#080202"
+overlay2 = "#501818"
+overlay1 = "#441214"
+overlay0 = "#380e10"
+surface2 = "#2c0a0c"
+surface1 = "#220708"
+surface0 = "#180506"
+base = "#100304"
+mantle = "#0a0203"
+crust = "#060102"
 # Gradient
 g0 = "#d06050"
 g1 = "#e09070"
@@ -180,9 +224,9 @@ g9_fg = "#080202"
 text = "#eef0f2"
 subtext1 = "#cdd0d4"
 subtext0 = "#a0a4a8"
-overlay2 = "#58595c"
-overlay1 = "#484a4c"
-overlay0 = "#383a3c"
+overlay2 = "#585a5c"
+overlay1 = "#4c4e50"
+overlay0 = "#404244"
 surface2 = "#343638"
 surface1 = "#252628"
 surface0 = "#17181a"
@@ -221,56 +265,56 @@ g9_fg = "#050506"
 
 [palettes.chameleon]
 # Structural
-text = "#a1d5f4"
-subtext1 = "#9eb5c3"
-subtext0 = "#a1d5f4"
-overlay2 = "#656a79"
-overlay1 = "#4a4d56"
-overlay0 = "#363942"
-surface2 = "#2c2f38"
-surface1 = "#22252e"
-surface0 = "#181b24"
-base = "#0e111a"
-mantle = "#0e111a"
-crust = "#090c15"
+text = "#dcdcdc"
+subtext1 = "#c2c2c2"
+subtext0 = "#dcdcdc"
+overlay2 = "#747474"
+overlay1 = "#484848"
+overlay0 = "#343434"
+surface2 = "#2a2a2a"
+surface1 = "#202020"
+surface0 = "#161616"
+base = "#0c0c0c"
+mantle = "#0c0c0c"
+crust = "#070707"
 # Gradient
-g0 = "#96d0f1"
-g1 = "#86c9f0"
-g2 = "#3fb1f4"
-g3 = "#26a7f4"
-g4 = "#827df2"
-g5 = "#a968f5"
-g6 = "#e65ff2"
-g7 = "#ea75f4"
-g8 = "#ef98ee"
-g9 = "#ef93ed"
+g0 = "#677f33"
+g1 = "#75913a"
+g2 = "#3c1a4b"
+g3 = "#662d7f"
+g4 = "#843aa4"
+g5 = "#57266c"
+g6 = "#f1034a"
+g7 = "#bf033b"
+g8 = "#750224"
+g9 = "#a70434"
 # Semantic
-sem_ok = "#47ea79"
-sem_warn = "#eab847"
-sem_err = "#ea4777"
-sem_info = "#96d0f1"
-module_fg = "#0e111a"
-module_fg_light = "#a1d5f4"
+sem_ok = "#4da625"
+sem_warn = "#677f33"
+sem_err = "#f1034a"
+sem_info = "#257ea6"
+module_fg = "#0c0c0c"
+module_fg_light = "#dcdcdc"
 # Auto-contrast foreground for each gradient
-g0_fg = "#0e111a"
-g1_fg = "#0e111a"
-g2_fg = "#0e111a"
-g3_fg = "#a1d5f4"
-g4_fg = "#a1d5f4"
-g5_fg = "#a1d5f4"
-g6_fg = "#0e111a"
-g7_fg = "#0e111a"
-g8_fg = "#0e111a"
-g9_fg = "#0e111a"
+g0_fg = "#dcdcdc"
+g1_fg = "#dcdcdc"
+g2_fg = "#dcdcdc"
+g3_fg = "#dcdcdc"
+g4_fg = "#dcdcdc"
+g5_fg = "#dcdcdc"
+g6_fg = "#dcdcdc"
+g7_fg = "#dcdcdc"
+g8_fg = "#dcdcdc"
+g9_fg = "#dcdcdc"
 
 [palettes.confetti]
 # Structural
 text = "#f4e0e8"
 subtext1 = "#d8c8d0"
 subtext0 = "#988890"
-overlay2 = "#504444"
-overlay1 = "#3e3636"
-overlay0 = "#322a2a"
+overlay2 = "#685858"
+overlay1 = "#584848"
+overlay0 = "#484040"
 surface2 = "#403838"
 surface1 = "#302828"
 surface0 = "#201818"
@@ -307,14 +351,58 @@ g7_fg = "#0c0404"
 g8_fg = "#0c0404"
 g9_fg = "#0c0404"
 
+[palettes.crystal]
+# Structural
+text = "#f0e8f8"
+subtext1 = "#d8c8e8"
+subtext0 = "#c8b8d8"
+overlay2 = "#6e5884"
+overlay1 = "#5c4a70"
+overlay0 = "#4a3c5c"
+surface2 = "#3a2e4a"
+surface1 = "#2e243c"
+surface0 = "#241c30"
+base = "#1a1424"
+mantle = "#120e1a"
+crust = "#0a0812"
+# Gradient
+g0 = "#ff3090"
+g1 = "#e040a0"
+g2 = "#c850b0"
+g3 = "#b060b8"
+g4 = "#9868c0"
+g5 = "#8878c8"
+g6 = "#7888d0"
+g7 = "#68a0d8"
+g8 = "#50c0e0"
+g9 = "#40e0d0"
+# Semantic
+sem_ok = "#40e0d0"
+sem_warn = "#e0ff00"
+sem_err = "#ff3090"
+sem_info = "#68a0d8"
+module_fg = "#120e1a"
+module_fg_light = "#f0e8f8"
+# Auto-contrast foreground for each gradient
+g0_fg = "#f0e8f8"
+g1_fg = "#f0e8f8"
+g2_fg = "#f0e8f8"
+g3_fg = "#f0e8f8"
+g4_fg = "#f0e8f8"
+g5_fg = "#f0e8f8"
+g6_fg = "#f0e8f8"
+g7_fg = "#120e1a"
+g8_fg = "#120e1a"
+g9_fg = "#120e1a"
+
 [palettes.cyberpunk]
 # Structural
 text = "#f0faff"
 subtext1 = "#c4d0d8"
 subtext0 = "#848e92"
-overlay2 = "#3c484e"
-overlay1 = "#2c383e"
-overlay0 = "#1c282e"
+overlay2 = "#48545c"
+overlay1 = "#384450"
+overlay0 = "#303c44"
 surface2 = "#28343c"
 surface1 = "#18242c"
 surface0 = "#10161a"
@@ -350,50 +438,6 @@ g6_fg = "#00060a"
 g7_fg = "#00060a"
 g8_fg = "#00060a"
 g9_fg = "#00060a"
-
-[palettes.crystal]
-# Structural
-text = "#f0e8f8"
-subtext1 = "#d8c8e8"
-subtext0 = "#c8b8d8"
-overlay2 = "#6e5884"
-overlay1 = "#5c4a70"
-overlay0 = "#4a3c5c"
-surface2 = "#3a2e4a"
-surface1 = "#2e243c"
-surface0 = "#241c30"
-base = "#1a1424"
-mantle = "#120e1a"
-crust = "#0a0812"
-# Gradient (hotpink -> aqua)
-g0 = "#ff3090"
-g1 = "#e040a0"
-g2 = "#c850b0"
-g3 = "#b060b8"
-g4 = "#9868c0"
-g5 = "#8878c8"
-g6 = "#7888d0"
-g7 = "#68a0d8"
-g8 = "#50c0e0"
-g9 = "#40e0d0"
-# Semantic
-sem_ok = "#40e0d0"
-sem_warn = "#e0a060"
-sem_err = "#ff3090"
-sem_info = "#68a0d8"
-module_fg = "#120e1a"
-module_fg_light = "#f0e8f8"
-# Auto-contrast foreground for each gradient
-g0_fg = "#120e1a"
-g1_fg = "#120e1a"
-g2_fg = "#120e1a"
-g3_fg = "#120e1a"
-g4_fg = "#f0e8f8"
-g5_fg = "#f0e8f8"
-g6_fg = "#f0e8f8"
-g7_fg = "#120e1a"
-g8_fg = "#120e1a"
-g9_fg = "#120e1a"
 
 [palettes.win98]
 # Structural

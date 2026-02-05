@@ -1,7 +1,8 @@
 {
   "description": "Neon over midnight black",
   "style": {
-    "bar": "slashes"
+    "bar": "slashes",
+    "waybar": "slashes"
   },
   "colors": {
     "crust": "#00060a",

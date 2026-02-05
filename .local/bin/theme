@@ -123,6 +123,7 @@ cmd_set() {
     apply_pywal "$theme"
     apply_stylus "$theme"
     apply_firefox "$theme"
+    apply_wlogout "$theme"
 
     # Update palette symlink
     [[ -f "$PALETTES_DIR/$theme.sh" ]] && ln -sf "$theme.sh" "$PALETTES_DIR/current.sh"

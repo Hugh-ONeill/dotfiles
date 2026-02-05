@@ -336,10 +336,23 @@ main() {
     # Create output directory
     mkdir -p "$CURSOR_OUTPUT_DIR"
 
-    # Build for each palette
-    for palette in "$PALETTES_DIR"/*.json; do
-        build_cursor_theme "$palette"
-    done
+    # Build for specified themes or all
+    if [[ $# -gt 0 ]]; then
+        # Build only specified themes
+        for theme in "$@"; do
+            local palette="$PALETTES_DIR/$theme.json"
+            if [[ -f "$palette" ]]; then
+                build_cursor_theme "$palette"
+            else
+                echo "Warning: palette '$theme' not found, skipping"
+            fi
+        done
+    else
+        # Build for all palettes
+        for palette in "$PALETTES_DIR"/*.json; do
+            build_cursor_theme "$palette"
+        done
+    fi
 
     # Cleanup
     rm -rf "$BUILD_DIR"

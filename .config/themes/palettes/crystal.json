@@ -1,7 +1,8 @@
 {
   "description": "Vaporwave cityscape with pink and cyan neons",
   "style": {
-    "bar": "pixels"
+    "bar": "pixels",
+    "waybar": "angular"
   },
   "colors": {
     "crust": "#0a0812",

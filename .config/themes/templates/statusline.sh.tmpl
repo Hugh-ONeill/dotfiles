@@ -80,6 +80,7 @@ fg_subtext0=$'\033[38;2;${SUBTEXT0_RGB}m'
 bg_surface0=$'\033[48;2;${SURFACE0_RGB}m'
 bg_subtext0=$'\033[48;2;${SUBTEXT0_RGB}m'
 bg_text=$'\033[48;2;${TEXT_RGB}m'
+bg_base=$'\033[48;2;${BASE_RGB}m'
 bg_crust=$'\033[48;2;${CRUST_RGB}m'
 fg_crust=$'\033[38;2;${CRUST_RGB}m'
 
@@ -138,9 +139,10 @@ case "${STYLE_BAR}" in
     sep_mod=$'\ue0c6'    # U+E0C6 pixelated squares big (between modules)
     ;;
   slashes)
-    sep_left=$'\ue0ba'   # U+E0BA lower right triangle (start cap)
-    sep_right=$'\ue0bc'  # U+E0BC upper left triangle (end cap)
-    sep_mod=$'\ue0bc'    # U+E0BC upper left triangle (between modules)
+    sep_left=$'\ue0b8'   # U+E0B8 lower left triangle (start cap, reversed)
+    sep_right=$'\ue0be'  # U+E0BE upper right triangle (end cap, reversed)
+    sep_mod=$'\ue0be'    # U+E0BE upper right triangle (between modules)
+    sep_reversed=true
     ;;
   boxy)
     sep_left='['         # simple bracket (start cap)
@@ -154,19 +156,52 @@ case "${STYLE_BAR}" in
     ;;
 esac
 
+# Precompute separator transition colors
+# Normal: separator fg = prev section color, bg = next section color
+# Reversed (\ slashes): swap fg↔bg since glyph fills opposite side
+if [[ "${sep_reversed:-}" == "true" ]]; then
+    sep_start="${fg_base}${bg_surface0}"
+    sep_s0_g0="${bg_surface0}${fg_g0}"
+    sep_g0_g1="${bg_g0}${fg_g1}"
+    sep_g1_g2="${bg_g1}${fg_g2}"
+    sep_g2_g3="${bg_g2}${fg_g3}"
+    sep_g3_g4="${bg_g3}${fg_g4}"
+    sep_g4_g5="${bg_g4}${fg_g5}"
+    sep_g5_g6="${bg_g5}${fg_g6}"
+    sep_g6_g7="${bg_g6}${fg_g7}"
+    sep_g7_g8="${bg_g7}${fg_g8}"
+    sep_g8_g9="${bg_g8}${fg_g9}"
+    sep_g9_text="${bg_g9}${fg_text}"
+    sep_end="${bg_text}${fg_base}"
+else
+    sep_start="${fg_surface0}${bg_base}"
+    sep_s0_g0="${fg_surface0}${bg_g0}"
+    sep_g0_g1="${fg_g0}${bg_g1}"
+    sep_g1_g2="${fg_g1}${bg_g2}"
+    sep_g2_g3="${fg_g2}${bg_g3}"
+    sep_g3_g4="${fg_g3}${bg_g4}"
+    sep_g4_g5="${fg_g4}${bg_g5}"
+    sep_g5_g6="${fg_g5}${bg_g6}"
+    sep_g6_g7="${fg_g6}${bg_g7}"
+    sep_g7_g8="${fg_g7}${bg_g8}"
+    sep_g8_g9="${fg_g8}${bg_g9}"
+    sep_g9_text="${fg_g9}${bg_text}"
+    sep_end="${fg_text}${bg_base}"
+fi
+
 # Build statusline with spread out values
 # Start with surface0 section (Arch icon) - icon uses subtext0 color
-echo -ne "${fg_surface0}${sep_left}${reset}"
+echo -ne "${sep_start}${sep_left}${reset}"
 echo -ne "${fg_text}${bg_surface0}\U000f011b${reset}"
 
 # Section 1 (first part of path) - gradient[0]
-echo -ne "${fg_surface0}${bg_g0}${sep_right}${reset}"
+echo -ne "${sep_s0_g0}${sep_right}${reset}"
 echo -ne "${fg_g0_text}${bg_g0}${dir_first} ${reset}"
-echo -ne "${fg_g0}${bg_g1}${sep_mod}${reset}"
+echo -ne "${sep_g0_g1}${sep_mod}${reset}"
 
 # Section 2 (second part of path) - gradient[1]
 echo -ne "${fg_g1_text}${bg_g1} ${dir_second} ${reset}"
-echo -ne "${fg_g1}${bg_g2}${sep_mod}${reset}"
+echo -ne "${sep_g1_g2}${sep_mod}${reset}"
 
 # Section 3: Git branch - gradient[2]
 if [ -n "$git_branch" ]; then
@@ -177,35 +212,35 @@ if [ -n "$git_branch" ]; then
 else
   echo -ne "${fg_g2_text}${bg_g2} \U0000f126 — ${reset}"
 fi
-echo -ne "${fg_g2}${bg_g3}${sep_mod}${reset}"
+echo -ne "${sep_g2_g3}${sep_mod}${reset}"
 
 # Section 4: Model name - gradient[3]
 echo -ne "${fg_g3_text}${bg_g3} \U0000ee9c [${model_name}] ${reset}"
-echo -ne "${fg_g3}${bg_g4}${sep_mod}${reset}"
+echo -ne "${sep_g3_g4}${sep_mod}${reset}"
 
 # Section 5: Output style - gradient[4]
 echo -ne "${fg_g4_text}${bg_g4} \U0000f075 ${output_style} ${reset}"
-echo -ne "${fg_g4}${bg_g5}${sep_mod}${reset}"
+echo -ne "${sep_g4_g5}${sep_mod}${reset}"
 
 # Section 6: Tokens in/out - gradient[5]
 echo -ne "${fg_g5_text}${bg_g5} \U0000f063 $(abbreviate_num $input_tokens) \U0000f062 $(abbreviate_num $output_tokens) ${reset}"
-echo -ne "${fg_g5}${bg_g6}${sep_mod}${reset}"
+echo -ne "${sep_g5_g6}${sep_mod}${reset}"
 
 # Section 7: Context percentage - gradient[6]
 echo -ne "${fg_g6_text}${bg_g6} \U0000f200 ${context_percent}% ${reset}"
-echo -ne "${fg_g6}${bg_g7}${sep_mod}${reset}"
+echo -ne "${sep_g6_g7}${sep_mod}${reset}"
 
 # Section 8: Lines changed - gradient[7]
 echo -ne "${fg_g7_text}${bg_g7} \U0000f040 +${lines_added} -${lines_removed} ${reset}"
-echo -ne "${fg_g7}${bg_g8}${sep_mod}${reset}"
+echo -ne "${sep_g7_g8}${sep_mod}${reset}"
 
 # Section 9: Cost - gradient[8]
 echo -ne "${fg_g8_text}${bg_g8} \U0000f155 ${total_cost} ${reset}"
-echo -ne "${fg_g8}${bg_g9}${sep_mod}${reset}"
+echo -ne "${sep_g8_g9}${sep_mod}${reset}"
 
 # Section 10: Duration - gradient[9]
 echo -ne "${fg_g9_text}${bg_g9} \U0000f017 ${duration} ${reset}"
 
 # Final cap (into text bg, space, then endcap)
-echo -ne "${fg_g9}${bg_text}${sep_mod} ${reset}"
-echo -ne "${fg_text}${sep_right}${reset}"
+echo -ne "${sep_g9_text}${sep_mod}${reset}"
+echo -ne "${bg_text} ${sep_end}${sep_right}${reset}"

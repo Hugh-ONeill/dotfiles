@@ -137,7 +137,7 @@ paru_files() {
 fzf_colorize() {
   # Colorize lines from stdin based on membership in lists
   # Usage: command | fzf_colorize <color> <(list)> [<color> <(list)>] ...
-  # Example: paru -Slq | fzf_colorize green <(paru -Qqe) yellow <(paru -Qqd) | fzf --ansi
+  # Example: paru -Slq | fzf_colorize sem_ok <(paru -Qqe) yellow <(paru -Qqd) | fzf --ansi
   # Colors: Named colors (from THEME_COLORS array), R;G;B for truecolor, or number for 256/ANSI
 
   local -a colors files
@@ -147,8 +147,8 @@ fzf_colorize() {
     # Use THEME_COLORS array if color name exists, otherwise use raw value
     if [[ -n "${THEME_COLORS[$1]}" ]]; then
       colors+=("${THEME_COLORS[$1]}")
-    elif [[ "$1" == "purple" && -n "${THEME_COLORS[mauve]}" ]]; then
-      colors+=("${THEME_COLORS[mauve]}")
+    elif [[ "$1" == "purple" && -n "${THEME_COLORS[accent_tertiary]}" ]]; then
+      colors+=("${THEME_COLORS[accent_tertiary]}")
     else
       colors+=("$1")
     fi
@@ -305,7 +305,7 @@ qr() { echo "$1" | curl -s -F-=\<- qrenco.de }
 
 slist() {
   systemctl list-units --type=service --all | \
-    C_GREEN="${THEME_COLORS[green]}" C_YELLOW="${THEME_COLORS[yellow]}" C_RED="${THEME_COLORS[red]}" awk 'NR<=1 {print; next}
+    C_GREEN="${THEME_COLORS[sem_ok]}" C_YELLOW="${THEME_COLORS[sem_warn]}" C_RED="${THEME_COLORS[sem_err]}" awk 'NR<=1 {print; next}
     / running / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], $0; next}
     / exited / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_YELLOW"], $0; next}
     / failed / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0; next}
@@ -321,14 +321,14 @@ slist() {
 
 sfailed() {
   systemctl list-units --state=failed | \
-    C_RED="${THEME_COLORS[red]}" awk 'NR<=1 {print; next}
+    C_RED="${THEME_COLORS[sem_err]}" awk 'NR<=1 {print; next}
     {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0}' | fzf --ansi \
     --preview="systemctl status {1}; echo '---LOGS---'; journalctl -u {1} --no-pager -n 30"
 }
 
 jfu() {
   systemctl list-units --type=service --all --no-legend | \
-    C_GREEN="${THEME_COLORS[green]}" C_RED="${THEME_COLORS[red]}" awk '{
+    C_GREEN="${THEME_COLORS[sem_ok]}" C_RED="${THEME_COLORS[sem_err]}" awk '{
     name = ($1 ~ /●/) ? $2 : $1
     sub_status = ($1 ~ /●/) ? $5 : $4
     if (sub_status == "running") printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], name
@@ -346,27 +346,33 @@ jfu() {
 # ══════════════════════════════════════════════════════════════════════════════
 
 parup() {
-  paru -Syy && paru -Quq | fzf_colorize mauve <(paru -Qqm) | fzf --ansi --multi \
+  local aur_color="${THEME_COLORS[accent_tertiary]:-205;150;205}"
+  local header="enter:update selected | ctrl-a:select all | ctrl-u:update all | $(printf '\033[38;2;%sm●\033[0m' "$aur_color") AUR"
+  paru -Syy && paru -Quq | fzf_colorize accent_tertiary <(paru -Qqm) | fzf --ansi --multi \
     --preview="paru -Si {1}" \
-    --header="enter:update selected | ctrl-a:select all | ctrl-u:update all | mauve=AUR" \
+    --header="$header" \
     --bind="ctrl-a:select-all" \
-    --bind="ctrl-u:execute(paru -Su)+abort" \
-    --bind="enter:execute(paru -S {+})+abort"
+    --bind="ctrl-u:become(paru -Su)" \
+    --bind="enter:become(paru -S {+})"
 }
 
 parebuild() {
-  checkrebuild 2>/dev/null | awk '{print $2}' | fzf_colorize mauve <(paru -Qqm) | fzf --ansi --multi \
+  local aur_color="${THEME_COLORS[accent_tertiary]:-205;150;205}"
+  local header="enter:rebuild selected | ctrl-a:select all | ctrl-r:rebuild all | $(printf '\033[38;2;%sm●\033[0m' "$aur_color") AUR"
+  checkrebuild 2>/dev/null | awk '{print $2}' | fzf_colorize accent_tertiary <(paru -Qqm) | fzf --ansi --multi \
     --preview="paru -Qi {1}" \
-    --header="enter:rebuild selected | ctrl-a:select all | ctrl-r:rebuild all | mauve=AUR" \
+    --header="$header" \
     --bind="ctrl-a:select-all" \
-    --bind="ctrl-r:execute(checkrebuild 2>/dev/null | awk '{print \$2}' | xargs paru -S --rebuild)+abort" \
-    --bind="enter:execute(paru -S --rebuild {+})+abort"
+    --bind="ctrl-r:become(checkrebuild 2>/dev/null | awk '{print \$2}' | xargs paru -S --rebuild)" \
+    --bind="enter:become(paru -S --rebuild {+})"
 }
 
 pinl() {
-  paru -Qq | fzf_colorize mauve <(paru -Qqm) | fzf --ansi --multi \
+  local aur_color="${THEME_COLORS[accent_tertiary]:-205;150;205}"
+  local header="ctrl-r:remove | ctrl-d:asdeps | ctrl-e:asexplicit | ctrl-o:files | $(printf '\033[38;2;%sm●\033[0m' "$aur_color") AUR"
+  paru -Qq | fzf_colorize accent_tertiary <(paru -Qqm) | fzf --ansi --multi \
     --preview="paru -Qii {1}" \
-    --header="ctrl-r:remove | ctrl-d:asdeps | ctrl-e:asexplicit | ctrl-o:files | mauve=AUR" \
+    --header="$header" \
     --bind="ctrl-r:execute(paru -Rns {+})+reload(paru -Qq)" \
     --bind="ctrl-d:execute(sudo pacman -D --asdeps {+})+reload(paru -Qq)" \
     --bind="ctrl-e:execute(sudo pacman -D --asexplicit {+})+reload(paru -Qq)" \
@@ -374,41 +380,50 @@ pinl() {
 }
 
 pinle() {
-  paru -Qqe | fzf_colorize mauve <(paru -Qqm) | fzf --ansi --multi \
+  local aur_color="${THEME_COLORS[accent_tertiary]:-205;150;205}"
+  local header="ctrl-r:remove | ctrl-d:asdeps | ctrl-o:files | $(printf '\033[38;2;%sm●\033[0m' "$aur_color") AUR"
+  paru -Qqe | fzf_colorize accent_tertiary <(paru -Qqm) | fzf --ansi --multi \
     --preview="paru -Qii {1}" \
-    --header="ctrl-r:remove | ctrl-d:asdeps | ctrl-o:files | mauve=AUR" \
+    --header="$header" \
     --bind="ctrl-r:execute(paru -Rns {+})+reload(paru -Qqe)" \
     --bind="ctrl-d:execute(sudo pacman -D --asdeps {+})+reload(paru -Qqe)" \
     --bind="ctrl-o:execute(zsh -ic 'paru_files {1}')"
 }
 
 pinld() {
-  paru -Qqd | fzf_colorize mauve <(paru -Qqm) | fzf --ansi --multi \
+  local aur_color="${THEME_COLORS[accent_tertiary]:-205;150;205}"
+  local header="ctrl-r:remove | ctrl-e:asexplicit | ctrl-o:files | $(printf '\033[38;2;%sm●\033[0m' "$aur_color") AUR"
+  paru -Qqd | fzf_colorize accent_tertiary <(paru -Qqm) | fzf --ansi --multi \
     --preview="paru -Qii {1}" \
-    --header="ctrl-r:remove | ctrl-e:asexplicit | ctrl-o:files | mauve=AUR" \
+    --header="$header" \
     --bind="ctrl-r:execute(paru -Rns {+})+reload(paru -Qqd)" \
     --bind="ctrl-e:execute(sudo pacman -D --asexplicit {+})+reload(paru -Qqd)" \
     --bind="ctrl-o:execute(zsh -ic 'paru_files {1}')"
 }
 
 pclean() {
-  paru -Qdtq | fzf_colorize mauve <(paru -Qqm) | fzf --ansi --multi \
+  local aur_color="${THEME_COLORS[accent_tertiary]:-205;150;205}"
+  local header="enter:remove selected | ctrl-a:select all | $(printf '\033[38;2;%sm●\033[0m' "$aur_color") AUR"
+  paru -Qdtq | fzf_colorize accent_tertiary <(paru -Qqm) | fzf --ansi --multi \
     --preview="paru -Qii {1}" \
-    --header="enter:remove selected | ctrl-a:select all | mauve=AUR" \
+    --header="$header" \
     --bind="ctrl-a:select-all" \
-    --bind="enter:execute(paru -Rns {+})+abort"
+    --bind="enter:become(paru -Rns {+})"
 }
 
 psearch() {
-  paru -Slq | fzf_colorize green <(paru -Qqe) yellow <(paru -Qqd) | fzf --ansi --multi \
+  local green_color="${THEME_COLORS[sem_ok]:-150;205;150}"
+  local yellow_color="${THEME_COLORS[sem_warn]:-205;205;150}"
+  local header="enter:install | ctrl-p:view PKGBUILD | $(printf '\033[38;2;%sm●\033[0m' "$green_color") explicit | $(printf '\033[38;2;%sm●\033[0m' "$yellow_color") dependency"
+  paru -Slq | fzf_colorize sem_ok <(paru -Qqe) yellow <(paru -Qqd) | fzf --ansi --multi \
     --preview="paru -Si {1} 2>/dev/null || paru -Gp {1}" \
-    --header="enter:install | ctrl-p:view PKGBUILD | green=explicit | yellow=dependency" \
-    --bind="enter:execute(paru -S {+})+abort" \
+    --header="$header" \
+    --bind="enter:become(paru -S {+})" \
     --bind="ctrl-p:execute(paru -Gp {1} | bat --language=bash)"
 }
 
 parown() {
-  paru -Qq | fzf_colorize mauve <(paru -Qqm) | fzf --ansi \
+  paru -Qq | fzf_colorize accent_tertiary <(paru -Qqm) | fzf --ansi \
     --preview="paru -Ql {1} | tail -50" \
     --header="enter:browse files | mauve=AUR" \
     --bind="enter:execute(zsh -ic 'paru_files {1}')"
@@ -435,7 +450,7 @@ pskill() {
 # ══════════════════════════════════════════════════════════════════════════════
 
 gco() {
-  git branch -a | sed "s/^[\* ]*//" | fzf_colorize green <(git branch --show-current) blue <(git branch -r --format="%(refname:short)") | fzf --ansi \
+  git branch -a | sed "s/^[\* ]*//" | fzf_colorize sem_ok <(git branch --show-current) blue <(git branch -r --format="%(refname:short)") | fzf --ansi \
     --preview="git log --oneline --graph --color=always {1} | head -50" \
     --header="enter:checkout | green=current | blue=remote" \
     --bind="enter:execute(git checkout {1})+abort"
@@ -452,8 +467,8 @@ gflog() {
 
 gadd() {
   git status -s | \
-    C_YELLOW="${THEME_COLORS[yellow]}" C_GREEN="${THEME_COLORS[green]}" C_RED="${THEME_COLORS[red]}" \
-    C_BLUE="${THEME_COLORS[blue]}" C_LAVENDER="${THEME_COLORS[lavender]}" awk '{
+    C_YELLOW="${THEME_COLORS[sem_warn]}" C_GREEN="${THEME_COLORS[sem_ok]}" C_RED="${THEME_COLORS[sem_err]}" \
+    C_BLUE="${THEME_COLORS[sem_link]}" C_LAVENDER="${THEME_COLORS[accent_secondary]}" awk '{
     if ($1 ~ /M/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_YELLOW"], $0
     else if ($1 ~ /A/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], $0
     else if ($1 ~ /D/) printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0
@@ -480,7 +495,7 @@ gstash() {
 
 dps() {
   docker ps -a | \
-    C_GREEN="${THEME_COLORS[green]}" C_RED="${THEME_COLORS[red]}" awk 'NR==1 {print; next}
+    C_GREEN="${THEME_COLORS[sem_ok]}" C_RED="${THEME_COLORS[sem_err]}" awk 'NR==1 {print; next}
     /Up / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_GREEN"], $0; next}
     /Exited / {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0; next}
     {print}' | fzf --ansi --multi --header-lines=1 \
@@ -494,7 +509,7 @@ dps() {
 
 dim() {
   docker images | \
-    C_RED="${THEME_COLORS[red]}" awk 'NR==1 {print; next}
+    C_RED="${THEME_COLORS[sem_err]}" awk 'NR==1 {print; next}
     /<none>/ {printf "\033[38;2;%sm%s\033[0m\n", ENVIRON["C_RED"], $0; next}
     {print}' | fzf --ansi --multi --header-lines=1 \
     --header="ctrl-r:remove | red=dangling" \

@@ -1,17 +1,17 @@
-[\ue0ba](fg:surface0)\
+[\ue0b8](fg:crust bg:surface0)\
 [\U000f011b](fg:text bg:surface0)\
-[\ue0bc](fg:surface0 bg:g0)\
+[\ue0be](fg:g0 bg:surface0)\
 ${custom.dir_first}\
-[\ue0bc](fg:g0 bg:g1)\
+[\ue0be](fg:g1 bg:g0)\
 ${custom.dir_second}\
-[\ue0bc](fg:g1 bg:g2)\
+[\ue0be](fg:g2 bg:g1)\
 $jobs\
-[\ue0bc](fg:g2 bg:g3)\
+[\ue0be](fg:g3 bg:g2)\
 $git_branch\
 $git_status\
-[\ue0bc](fg:g3 bg:g4)\
+[\ue0be](fg:g4 bg:g3)\
 $cmd_duration\
-[\ue0bc](fg:g4 bg:g5)\
+[\ue0be](fg:g5 bg:g4)\
 $c\
 $rust\
 $golang\
@@ -21,15 +21,15 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[\ue0bc](fg:g5 bg:g6)\
+[\ue0be](fg:g6 bg:g5)\
 $status\
-[\ue0bc](fg:g6 bg:g7)\
+[\ue0be](fg:g7 bg:g6)\
 $docker_context\
-[\ue0bc](fg:g7 bg:g8)\
+[\ue0be](fg:g8 bg:g7)\
 ${custom.updates}\
-[\ue0bc](fg:g8 bg:g9)\
+[\ue0be](fg:g9 bg:g8)\
 ${custom.uptime}\
-[\ue0bc ](fg:g9 bg:text)\
-[\ue0bc](fg:text)\
+[\ue0be](fg:text bg:g9)\
+[ \ue0be](fg:crust bg:text)\
 $line_break\
 $character

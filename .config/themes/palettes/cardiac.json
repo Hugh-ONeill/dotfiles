@@ -1,7 +1,8 @@
 {
   "description": "Dark shrine with crimson accents and monitor glow",
   "style": {
-    "bar": "flame"
+    "bar": "flame",
+    "waybar": "flame"
   },
   "colors": {
     "crust": "#050506",

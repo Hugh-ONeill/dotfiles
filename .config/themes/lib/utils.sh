@@ -13,15 +13,15 @@ get_current() {
 
 has_palette() {
     local theme="$1"
-    [[ -f "$PALETTES_DIR/$theme.sh" ]] || [[ -f "$THEMES_DIR/$theme/palette.sh" ]]
+    [[ -f "$PALETTES_DIR/$theme.json" ]] || [[ -f "$THEMES_DIR/$theme/palette.json" ]]
 }
 
 get_palette_path() {
     local theme="$1"
-    if [[ -f "$THEMES_DIR/$theme/palette.sh" ]]; then
-        echo "$THEMES_DIR/$theme/palette.sh"
-    elif [[ -f "$PALETTES_DIR/$theme.sh" ]]; then
-        echo "$PALETTES_DIR/$theme.sh"
+    if [[ -f "$THEMES_DIR/$theme/palette.json" ]]; then
+        echo "$THEMES_DIR/$theme/palette.json"
+    elif [[ -f "$PALETTES_DIR/$theme.json" ]]; then
+        echo "$PALETTES_DIR/$theme.json"
     fi
 }
 
