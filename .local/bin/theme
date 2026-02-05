@@ -113,6 +113,7 @@ cmd_set() {
     apply_fzf_tab "$theme"
     apply_shell_colors "$theme"
     apply_dircolors "$theme"
+    apply_eza "$theme"
     apply_bat "$theme"
     apply_fsh "$theme"
     apply_starship "$theme" "$palette_path"

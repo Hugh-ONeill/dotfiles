@@ -37,6 +37,18 @@ apply_dircolors() {
     fi
 }
 
+apply_eza() {
+    local theme="$1"
+    local theme_dir="$THEMES_DIR/$theme"
+    if [[ -f "$theme_dir/eza-theme.yml" ]]; then
+        mkdir -p "$HOME/.config/eza"
+        cp "$theme_dir/eza-theme.yml" "$HOME/.config/eza/theme.yml"
+        report_ok "eza"
+    else
+        report_skip "eza (no theme file)"
+    fi
+}
+
 apply_bat() {
     local theme="$1"
     local theme_dir="$THEMES_DIR/$theme"

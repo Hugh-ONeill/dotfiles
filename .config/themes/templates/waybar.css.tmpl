@@ -53,3 +53,26 @@
 @define-color accent                ${ACCENT};
 @define-color accent-secondary      ${ACCENT_SECONDARY};
 @define-color accent-tertiary       ${ACCENT_TERTIARY};
+
+/* Power Button - dark text on light background */
+#custom-power {
+  color: @active-fg;
+  background: @power;
+  border-radius: 20px;
+  margin-top: 2px;
+  margin-right: 4px;
+  margin-bottom: 2px;
+  padding-right: 6px;
+  padding-left: 9px;
+}
+
+#custom-power:hover {
+  color: @hover-bg;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}
+
+/* Idle Inhibitor hover */
+#idle_inhibitor:hover {
+  color: @hover-bg;
+  transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
+}

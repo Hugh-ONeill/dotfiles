@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Swap starship format between rounded and boxy styles."""
+"""Swap starship format between rounded, boxy, angular, and flame styles."""
 import os
 import sys
 import re
 
-VALID_STYLES = ("rounded", "boxy", "angular")
+VALID_STYLES = ("rounded", "boxy", "angular", "flame", "pixels", "slashes")
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in VALID_STYLES:

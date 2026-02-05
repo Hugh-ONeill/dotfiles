@@ -35,7 +35,7 @@ desc=$(jq -r '.description // empty' "$palette")
 # Base colors
 echo "Bases:"
 printf "  "
-for c in crust mantle base surface0 surface1 surface2; do
+for c in crust mantle base surface0 surface1 surface2 overlay0 overlay1 overlay2; do
     color_block "$(get_color $c)"
 done
 echo ""
