@@ -1,4 +1,4 @@
-[\ue0b8](fg:crust bg:surface0)\
+[\ue0b8](fg:base bg:surface0)\
 [\U000f011b](fg:text bg:surface0)\
 [\ue0be](fg:g0 bg:surface0)\
 ${custom.dir_first}\
@@ -30,6 +30,6 @@ ${custom.updates}\
 [\ue0be](fg:g9 bg:g8)\
 ${custom.uptime}\
 [\ue0be](fg:text bg:g9)\
-[ \ue0be](fg:crust bg:text)\
+[ \ue0be](fg:base bg:text)\
 $line_break\
 $character
