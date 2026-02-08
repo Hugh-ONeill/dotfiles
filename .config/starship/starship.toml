@@ -3,20 +3,20 @@
 add_newline = false
 
 format = """
-[\ue0b8](fg:crust bg:surface0)\
+[\ue0b6](fg:surface0 bg:base)\
 [\U000f011b](fg:text bg:surface0)\
-[\ue0be](fg:g0 bg:surface0)\
+[\ue0b4](fg:surface0 bg:g0)\
 ${custom.dir_first}\
-[\ue0be](fg:g1 bg:g0)\
+[\ue0c0 ](fg:g0 bg:g1)\
 ${custom.dir_second}\
-[\ue0be](fg:g2 bg:g1)\
+[\ue0c0 ](fg:g1 bg:g2)\
 $jobs\
-[\ue0be](fg:g3 bg:g2)\
+[\ue0c0 ](fg:g2 bg:g3)\
 $git_branch\
 $git_status\
-[\ue0be](fg:g4 bg:g3)\
+[\ue0c0 ](fg:g3 bg:g4)\
 $cmd_duration\
-[\ue0be](fg:g5 bg:g4)\
+[\ue0c0 ](fg:g4 bg:g5)\
 $c\
 $rust\
 $golang\
@@ -26,22 +26,22 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[\ue0be](fg:g6 bg:g5)\
+[\ue0c0 ](fg:g5 bg:g6)\
 $status\
-[\ue0be](fg:g7 bg:g6)\
+[\ue0c0 ](fg:g6 bg:g7)\
 $docker_context\
-[\ue0be](fg:g8 bg:g7)\
+[\ue0c0 ](fg:g7 bg:g8)\
 ${custom.updates}\
-[\ue0be](fg:g9 bg:g8)\
+[\ue0c0 ](fg:g8 bg:g9)\
 ${custom.uptime}\
-[\ue0be](fg:text bg:g9)\
-[ \ue0be](fg:crust bg:text)\
+[\ue0c0 ](fg:g9 bg:text)\
+[\ue0b4](fg:text bg:base)\
 $line_break\
 $character
 
 """
 
-palette = 'cassette'
+palette = 'cardiac'
 
 [palettes.cardiac]
 # Structural

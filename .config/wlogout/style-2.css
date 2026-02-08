@@ -1,0 +1,91 @@
+/* cardiac wlogout style-2 */
+
+* {
+  font-family: "FiraCode Nerd Font";
+  font-size: 1em;
+  transition-property: background-color, background-size;
+  transition-duration: 0.3s;
+  background-image: none;
+}
+
+window {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+button {
+  color: #f0eced;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 20%;
+  border: 0.8em solid transparent;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+button:focus {
+  color: #261e21;
+  background-color: #a82d42;
+  background-size: 30%;
+  outline: 1px solid #a82d42;
+  border-radius: 3px;
+}
+
+button:hover {
+  background-color: #1c1618;
+  background-size: 30%;
+}
+
+button:hover#lock {
+  background-size: 35%;
+}
+
+button:hover#logout {
+  background-size: 35%;
+}
+
+/* Default icons - white for dark themes */
+#lock {
+  background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
+  background-size: 25%;
+  border-radius: 3px;
+  margin: ${y_margin}px 0 0 ${x_margin}px;
+}
+
+#logout {
+  background-image: url("${HOME}/.config/wlogout/icons/logout-white.png");
+  background-size: 25%;
+  border-radius: 3px;
+  margin: 0 0 ${y_margin}px ${x_margin}px;
+}
+
+#shutdown {
+  background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
+  border-radius: 3px;
+  margin: ${y_margin}px ${x_margin}px 0 0;
+}
+
+#reboot {
+  background-image: url("${HOME}/.config/wlogout/icons/reboot-white.png");
+  border-radius: 3px;
+  margin: 0 ${x_margin}px ${y_margin}px 0;
+}
+
+/* Focused state icons */
+button:focus#lock {
+  background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
+  background-size: 35%;
+}
+
+button:focus#logout {
+  background-image: url("${HOME}/.config/wlogout/icons/logout-white.png");
+  background-size: 35%;
+}
+
+button:focus#shutdown {
+  background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
+}
+
+button:focus#reboot {
+  background-image: url("${HOME}/.config/wlogout/icons/reboot-white.png");
+}

@@ -29,7 +29,7 @@ $docker_context\
 ${custom.updates}\
 [](fg:g8 bg:g9)\
 ${custom.uptime}\
-[](fg:g9 bg:text)\
+[ ](fg:g9 bg:text)\
 [](fg:text bg:base)\
 $line_break\
 $character

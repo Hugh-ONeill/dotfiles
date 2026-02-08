@@ -1,6 +1,20 @@
 # vim:ft=zsh
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Listing
+# ══════════════════════════════════════════════════════════════════════════════
+
+# List with dotbare git status (eza can't discover bare repos without a .git pointer)
+ldot() {
+  local gitfile="$DOTBARE_TREE/.git"
+  echo "gitdir: $DOTBARE_DIR" > "$gitfile"
+  git --git-dir="$DOTBARE_DIR" config core.bare false
+  ll "$@"
+  git --git-dir="$DOTBARE_DIR" config core.bare true
+  rm -f "$gitfile"
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Display
 # ══════════════════════════════════════════════════════════════════════════════
 
