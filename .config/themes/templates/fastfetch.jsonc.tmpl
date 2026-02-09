@@ -1,0 +1,113 @@
+// ${THEME_NAME} fastfetch config
+// Modified from: https://github.com/fastfetch-cli/fastfetch/discussions/1269
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "source": "~/.config/fastfetch/ascii.txt",
+    "color": {
+      "1": "${GRADIENT_0}",
+      "2": "${GRADIENT_1}",
+      "3": "${GRADIENT_2}",
+      "4": "${GRADIENT_3}",
+      "5": "${GRADIENT_4}",
+      "6": "${GRADIENT_5}",
+      "7": "${GRADIENT_6}",
+      "8": "${GRADIENT_7}",
+      "9": "${GRADIENT_8}"
+    }
+  },
+  "display": {
+    "separator": "",
+    "constants": [
+      // CONSTANT {$1} - COLOR BACKGROUND FOR KEY
+      "\u001b[48;2;${SURFACE0_RGB}m",
+      // CONSTANT {$2} - COLOR BACKGROUND FOR OUTPUT
+      "\u001b[48;2;${SURFACE1_RGB}m",
+      // CONSTANT {$3} - VERTICAL BARS AT START AND 65th CHARACTERS FORWARD AND BACKWARD
+      "\u001b[38;2;${SUBTEXT0_RGB}m│                                                  │\u001b[50D\u001b[39m",
+    ]
+  },
+  "modules": [
+    // CUSTOM - Top UI bar
+    {
+      "type": "custom",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}╭─────────────╮",
+      "format": "\u001b[38;2;${SUBTEXT0_RGB}m{$2}╭──────────────────────────────────────────────────╮",
+    },
+    {
+      "type": "title",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_0_RGB}mUser        \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{user-name} \u001b[38;2;${SUBTEXT0_RGB}m[{home-dir}]"
+    },
+    {
+      "type": "title",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_0_RGB}mHost        \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}\u001b[38;2;${TEXT_RGB}m{host-name}"
+    },
+    {
+      "type": "datetime",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_1_RGB}mDatetime    \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{year}-{month-pretty}-{day-in-month}  {hour-pretty}:{minute-pretty}:{second-pretty}  \u001b[38;2;${SUBTEXT0_RGB}m{weekday}  [W{week}] [UTC{offset-from-utc}]"
+    },
+    {
+      "type": "host",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_2_RGB}mMachine     \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{name} \u001b[38;2;${SUBTEXT0_RGB}m{version}"
+    },
+    {
+      "type": "os",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_3_RGB}mOS          \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{pretty-name} {codename} \u001b[38;2;${SUBTEXT0_RGB}m[v{version}] [{arch}]"
+    },
+    {
+      "type": "kernel",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_4_RGB}mKernel      \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{sysname} \u001b[38;2;${SUBTEXT0_RGB}m[v{release}]"
+    },
+    {
+      "type": "uptime",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_5_RGB}mUptime      \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{?days}{days} Days + {?}{hours}:{minutes}:{seconds}"
+    },
+    {
+      "type": "cpu",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_6_RGB}mCPU         \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "showPeCoreCount": true,
+      "temp": true,
+      "format": "{$2}{$3}{name} \u001b[38;2;${SUBTEXT0_RGB}m[C:{core-types}] [{freq-max}]"
+    },
+    {
+      "type": "gpu",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_7_RGB}mGPU         \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "detectionMethod": "auto",
+      "driverSpecific": true,
+      "format": "{$2}{$3}{name} \u001b[38;2;${SUBTEXT0_RGB}m[C:{core-count}] [{type}]"
+    },
+    {
+      "type": "memory",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_8_RGB}mMemory      \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{used} / {total} ({percentage}{$2})"
+    },
+    {
+      "type": "disk",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_9_RGB}mDisk        \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{size-used} / {size-total} ({size-percentage}{$2})"
+    },
+    {
+      "type": "poweradapter",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}│ \u001b[38;2;${GRADIENT_0_RGB}mPower       \u001b[38;2;${SUBTEXT0_RGB}m│",
+      "format": "{$2}{$3}{name}"
+    },
+    // CUSTOM - Bottom UI bar
+    {
+      "type": "custom",
+      "key": "\u001b[38;2;${SUBTEXT0_RGB}m{$1}╰─────────────╯",
+      "format": "\u001b[38;2;${SUBTEXT0_RGB}m{$2}╰──────────────────────────────────────────────────╯"
+    },
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "{#97}󰤄 {#91}󰈸 {#92}󱥰 {#93} {#94}󱑷 {#95} {#96}󰆥 {#90}"
+    }
+  ]
+}

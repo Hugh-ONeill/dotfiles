@@ -5,7 +5,8 @@
 # Don't exit on error - we want to build all themes even if some fail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PALETTES_DIR="$SCRIPT_DIR/palettes"
+THEMES_DIR="$(dirname "$SCRIPT_DIR")"
+PALETTES_DIR="$THEMES_DIR/palettes"
 CURSOR_OUTPUT_DIR="$HOME/.local/share/icons"
 SVG_SRC_DIR="/tmp/catppuccin-cursors/src/svgs"
 BUILD_DIR="/tmp/cursor-build"

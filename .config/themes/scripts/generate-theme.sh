@@ -6,8 +6,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATES_DIR="$SCRIPT_DIR/templates"
-PALETTES_DIR="$SCRIPT_DIR/palettes"
+THEMES_DIR="$(dirname "$SCRIPT_DIR")"
+TEMPLATES_DIR="$THEMES_DIR/templates"
+PALETTES_DIR="$THEMES_DIR/palettes"
 
 if [[ -z "$1" ]]; then
     echo "Usage: $0 <theme-name>"
@@ -20,7 +21,7 @@ fi
 
 THEME_NAME="$1"
 PALETTE_FILE="$PALETTES_DIR/$THEME_NAME.json"
-OUTPUT_DIR="$SCRIPT_DIR/$THEME_NAME"
+OUTPUT_DIR="$THEMES_DIR/$THEME_NAME"
 
 if [[ ! -f "$PALETTE_FILE" ]]; then
     echo "Error: Palette file not found: $PALETTE_FILE"
@@ -260,6 +261,30 @@ for template in "$TEMPLATES_DIR"/*.tmpl; do
     fi
 done
 
+# Append hyprbars plugin config if decoration style requests it (skip if override already includes it)
+if [[ "$STYLE_DECORATION" == "hyprbars" ]] && ! grep -q "hyprbars" "$OUTPUT_DIR/hypr-colors.conf" 2>/dev/null; then
+    cat >> "$OUTPUT_DIR/hypr-colors.conf" <<EOF
+
+# Hyprbars (window title bars)
+plugin {
+    hyprbars {
+        bar_height = 18
+        bar_color = rgb(${ACCENT_NOHASH})
+        bar_text_size = 11
+        bar_text_font = ${FONT_FAMILY}
+        col.text = rgb(ffffff)
+        bar_part_of_window = true
+        bar_precedence_over_border = true
+
+        hyprbars-button = rgb(c0c0c0), 13, 󰖭, hyprctl dispatch killactive
+        hyprbars-button = rgb(c0c0c0), 13, 󰖯, hyprctl dispatch fullscreen 1
+        hyprbars-button = rgb(c0c0c0), 13, 󰖰, hyprctl dispatch movetospecialnamed minimize
+    }
+}
+EOF
+    echo "  -> hypr-colors.conf (+ hyprbars)"
+fi
+
 # Generate fsh theme (fast-syntax-highlighting)
 if [[ -f "$TEMPLATES_DIR/fsh.ini.tmpl" ]]; then
     FSH_OUTPUT="$OUTPUT_DIR/fsh"
@@ -283,7 +308,7 @@ if [[ -d "$DUNST_ICONS_TMPL" ]]; then
 fi
 
 # Generate Stylus userstyles
-STYLUS_TMPL="$SCRIPT_DIR/stylus/templates"
+STYLUS_TMPL="$THEMES_DIR/stylus/templates"
 if [[ -d "$STYLUS_TMPL" ]]; then
     STYLUS_OUTPUT="$OUTPUT_DIR/stylus"
     mkdir -p "$STYLUS_OUTPUT"
@@ -295,9 +320,9 @@ if [[ -d "$STYLUS_TMPL" ]]; then
         fi
     done
     # Bundle into importable JSON
-    if [[ -x "$SCRIPT_DIR/stylus/bundle-styles.py" ]]; then
+    if [[ -x "$THEMES_DIR/stylus/bundle-styles.py" ]]; then
         echo "  -> stylus-bundle.json"
-        "$SCRIPT_DIR/stylus/bundle-styles.py" "$THEME_NAME" > /dev/null
+        "$THEMES_DIR/stylus/bundle-styles.py" "$THEME_NAME" > /dev/null
     fi
 fi
 

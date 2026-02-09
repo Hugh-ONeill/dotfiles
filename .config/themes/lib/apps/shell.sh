@@ -96,8 +96,8 @@ apply_starship() {
             [[ -n "$json_bar" ]] && style_bar="$json_bar"
         fi
 
-        [[ -x "$THEMES_DIR/starship-format-swap" ]] && \
-            "$THEMES_DIR/starship-format-swap" "$style_bar" >/dev/null 2>&1
+        [[ -x "$SCRIPTS_DIR/starship-format-swap" ]] && \
+            "$SCRIPTS_DIR/starship-format-swap" "$style_bar" >/dev/null 2>&1
 
         report_ok "starship"
     else

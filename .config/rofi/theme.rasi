@@ -17,8 +17,8 @@ window {
     anchor:           center;
     width:            700px;
     border:           2px solid;
-    border-color:     @accent-secondary;
-    border-radius:    8px;
+    border-color:     @selected;
+    border-radius:    @border-radius;
     background-color: @background;
     cursor:           "default";
 }
@@ -46,14 +46,14 @@ inputbar {
 
 prompt {
     padding:          12px 16px;
-    border-radius:    6px;
+    border-radius:    @border-radius;
     background-color: @accent;
     text-color:       @crust;
 }
 
 entry {
     padding:          12px;
-    border-radius:    6px;
+    border-radius:    @border-radius;
     background-color: @surface0;
     text-color:       @foreground;
     cursor:           text;
@@ -76,7 +76,7 @@ listview {
 
 scrollbar {
     width:            4px;
-    border-radius:    4px;
+    border-radius:    @border-radius;
     handle-width:     4px;
     handle-color:     @accent;
     background-color: @surface0;
@@ -89,7 +89,7 @@ scrollbar {
 element {
     spacing:          12px;
     padding:          10px 12px;
-    border-radius:    6px;
+    border-radius:    @border-radius;
     cursor:           pointer;
 }
 
@@ -112,8 +112,8 @@ element alternate.active {
 }
 
 element selected.normal {
-    background-color: @surface0;
-    text-color:       @accent;
+    background-color: @selected;
+    text-color:       @base;
 }
 
 element selected.urgent {
@@ -147,7 +147,7 @@ mode-switcher {
 
 button {
     padding:          8px 16px;
-    border-radius:    6px;
+    border-radius:    @border-radius;
     background-color: @surface0;
     text-color:       @subtext0;
     cursor:           pointer;
@@ -168,7 +168,7 @@ message {
 
 textbox {
     padding:          10px 12px;
-    border-radius:    6px;
+    border-radius:    @border-radius;
     background-color: @surface0;
     text-color:       @foreground;
 }
@@ -176,7 +176,7 @@ textbox {
 error-message {
     padding:          12px;
     border:           2px solid;
-    border-radius:    6px;
+    border-radius:    @border-radius;
     border-color:     @accent-secondary;
     background-color: @background;
 }

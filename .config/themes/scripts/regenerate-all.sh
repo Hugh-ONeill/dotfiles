@@ -3,6 +3,7 @@
 # Usage: ./regenerate-all.sh [--cursors]
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+THEMES_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$SCRIPT_DIR"
 
 BUILD_CURSORS=false
@@ -21,7 +22,7 @@ trap "rm -rf $tmpdir" EXIT
 # Generate theme configs in parallel
 pids=()
 themes=()
-for palette in palettes/*.json; do
+for palette in "$THEMES_DIR"/palettes/*.json; do
     [[ ! -f "$palette" ]] && continue
     theme=$(basename "$palette" .json)
     themes+=("$theme")
@@ -48,7 +49,7 @@ hex_block() {
 
 # Print gradient blocks for a theme
 print_gradient() {
-    local palette="palettes/$1.json"
+    local palette="$THEMES_DIR/palettes/$1.json"
     [[ ! -f "$palette" ]] && return
     local colors=$(jq -r '.gradient[]' "$palette" 2>/dev/null)
     for color in $colors; do

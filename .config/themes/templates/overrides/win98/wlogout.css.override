@@ -1,0 +1,89 @@
+/* ${THEME_NAME} wlogout theme - Win98 style with BSOD accent */
+
+* {
+    font-family: "BigBlueTermPlus Nerd Font Mono", "Terminess Nerd Font Mono", "GohuFont 14 Nerd Font Mono", monospace;
+    font-size: 1em;
+    transition-property: background-color, background-size;
+    transition-duration: 0.2s;
+    background-image: none;
+}
+
+window {
+    background-color: rgba(0, 0, 170, 0.85);  /* BSOD blue overlay */
+}
+
+button {
+    color: ${TEXT};
+    background-color: ${BASE};
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25%;
+    border: 2px outset ${SURFACE1};
+    border-radius: 0px;
+    text-shadow: none;
+    box-shadow: none;
+    margin: 8px;
+}
+
+button:focus {
+    color: ${SURFACE1};
+    background-color: ${BSOD};
+    background-size: 35%;
+    border: 2px inset ${SURFACE2};
+}
+
+button:hover {
+    background-color: ${SURFACE0};
+    background-size: 35%;
+    border: 2px outset ${SURFACE1};
+}
+
+/* Dark icons for light theme */
+#lock {
+    background-image: url("${HOME}/.config/wlogout/icons/lock-black.png");
+}
+
+#logout {
+    background-image: url("${HOME}/.config/wlogout/icons/logout-black.png");
+}
+
+#suspend {
+    background-image: url("${HOME}/.config/wlogout/icons/suspend-black.png");
+}
+
+#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-black.png");
+}
+
+#hibernate {
+    background-image: url("${HOME}/.config/wlogout/icons/hibernate-black.png");
+}
+
+#reboot {
+    background-image: url("${HOME}/.config/wlogout/icons/reboot-black.png");
+}
+
+/* Focused state - white icons on BSOD blue */
+button:focus#lock {
+    background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
+}
+
+button:focus#logout {
+    background-image: url("${HOME}/.config/wlogout/icons/logout-white.png");
+}
+
+button:focus#suspend {
+    background-image: url("${HOME}/.config/wlogout/icons/suspend-white.png");
+}
+
+button:focus#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
+}
+
+button:focus#hibernate {
+    background-image: url("${HOME}/.config/wlogout/icons/hibernate-white.png");
+}
+
+button:focus#reboot {
+    background-image: url("${HOME}/.config/wlogout/icons/reboot-white.png");
+}

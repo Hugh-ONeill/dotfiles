@@ -80,7 +80,7 @@ cmd_set() {
         local wallpaper=$(swww query 2>/dev/null | grep -oP 'image: \K[^\s]+' | head -1)
         if [[ -n "$wallpaper" && -f "$wallpaper" ]]; then
             echo -e "  ${CYAN}Extracting colors from wallpaper...${NC}"
-            "$HOME/.config/themes/palette-extract" "$wallpaper" --generate-theme 2>/dev/null && \
+            "$SCRIPTS_DIR/palette-extract" "$wallpaper" --generate-theme 2>/dev/null && \
                 echo -e "  ${GREEN}✓${NC} colors extracted from wallpaper"
         else
             echo -e "  ${YELLOW}⊘${NC} no wallpaper found, using cached colors"
@@ -119,7 +119,7 @@ cmd_set() {
     apply_starship "$theme" "$palette_path"
     apply_dunst "$theme"
     apply_gtk_qt "$theme"
-    apply_spicetify "$theme"
+    # apply_spicetify "$theme"  # disabled: segfaults with Spotify 1.2.82
     apply_pywal "$theme"
     apply_stylus "$theme"
     apply_firefox "$theme"
@@ -148,8 +148,8 @@ cmd_generate() {
         exit 1
     fi
 
-    if [[ -x "$THEMES_DIR/generate-theme.sh" ]]; then
-        "$THEMES_DIR/generate-theme.sh" "$theme"
+    if [[ -x "$SCRIPTS_DIR/generate-theme.sh" ]]; then
+        "$SCRIPTS_DIR/generate-theme.sh" "$theme"
     else
         echo -e "${RED}Error: generate-theme.sh not found${NC}"
         exit 1
@@ -161,8 +161,8 @@ cmd_generate_all() {
     for arg in "$@"; do
         args+=("$arg")
     done
-    if [[ -x "$THEMES_DIR/regenerate-all.sh" ]]; then
-        "$THEMES_DIR/regenerate-all.sh" "${args[@]}"
+    if [[ -x "$SCRIPTS_DIR/regenerate-all.sh" ]]; then
+        "$SCRIPTS_DIR/regenerate-all.sh" "${args[@]}"
     else
         echo -e "${CYAN}Regenerating all themes...${NC}"
         for palette in "$PALETTES_DIR"/*.json; do
@@ -176,8 +176,8 @@ cmd_generate_all() {
 
 cmd_preview() {
     local theme="${1:-$(get_current)}"
-    if [[ -x "$THEMES_DIR/preview-theme.sh" ]]; then
-        "$THEMES_DIR/preview-theme.sh" "$theme"
+    if [[ -x "$SCRIPTS_DIR/preview-theme.sh" ]]; then
+        "$SCRIPTS_DIR/preview-theme.sh" "$theme"
     else
         echo -e "${RED}Error: preview-theme.sh not found${NC}"
         exit 1

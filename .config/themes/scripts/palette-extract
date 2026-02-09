@@ -1209,11 +1209,12 @@ def main():
         generate_theme_palette(palette, chameleon_json)
 
         # Run generate-theme.sh
-        generate_script = os.path.join(themes_dir, "generate-theme.sh")
+        scripts_dir = os.path.join(themes_dir, "scripts")
+        generate_script = os.path.join(scripts_dir, "generate-theme.sh")
         if os.path.isfile(generate_script):
             import subprocess
             print("Running generate-theme.sh chameleon...")
-            result = subprocess.run([generate_script, "chameleon"], cwd=themes_dir)
+            result = subprocess.run([generate_script, "chameleon"], cwd=scripts_dir)
             if result.returncode != 0:
                 print("Error: generate-theme.sh failed")
                 sys.exit(1)
@@ -1221,9 +1222,9 @@ def main():
             print(f"Warning: {generate_script} not found, skipping theme generation")
 
         # Update starship palettes
-        starship_script = os.path.join(themes_dir, "update-starship-palettes.sh")
+        starship_script = os.path.join(scripts_dir, "update-starship-palettes.sh")
         if os.path.isfile(starship_script):
-            subprocess.run([starship_script], cwd=themes_dir, stderr=subprocess.DEVNULL)
+            subprocess.run([starship_script], cwd=scripts_dir, stderr=subprocess.DEVNULL)
 
 
 if __name__ == "__main__":

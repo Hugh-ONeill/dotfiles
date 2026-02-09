@@ -1,34 +1,39 @@
-/* ${THEME_NAME} Theme - Boxy Win98 Style */
+/* ${THEME_NAME} Theme - Windows 98 Taskbar */
 
 /* Main Colors */
-@define-color main-bg               ${BASE};
+@define-color main-bg               ${CRUST};
 @define-color main-fg               ${TEXT};
 @define-color main-br               ${TEXT};
 
-@define-color active-bg             ${MANTLE};
-@define-color active-fg             ${SURFACE1};
+@define-color active-bg             ${SURFACE2};
+@define-color active-fg             ${TEXT};
 
-@define-color hover-bg              ${SURFACE0};
+@define-color hover-bg              ${MANTLE};
 @define-color hover-fg              ${TEXT};
+
+/* Win98 3D border colors: white highlight, gray shadow */
+@define-color highlight             ${BASE};
+@define-color shadow                ${OVERLAY0};
+@define-color shadow-dark           ${OVERLAY2};
 
 /* Module Colors - Uniform gray like Win98 taskbar */
 @define-color module-fg             ${TEXT};
 
-@define-color workspaces            ${BASE};
+@define-color workspaces            ${CRUST};
 
 @define-color idle-fg               ${TEXT};
-@define-color idle-bg               ${BASE};
+@define-color idle-bg               ${CRUST};
 
-@define-color module1-bg            ${BASE};
-@define-color module2-bg            ${BASE};
-@define-color module3-bg            ${BASE};
-@define-color module4-bg            ${BASE};
-@define-color module5-bg            ${BASE};
+@define-color module1-bg            ${CRUST};
+@define-color module2-bg            ${CRUST};
+@define-color module3-bg            ${CRUST};
+@define-color module4-bg            ${CRUST};
+@define-color module5-bg            ${CRUST};
 
-@define-color pulseaudio            ${BASE};
-@define-color backlight             ${BASE};
-@define-color battery               ${BASE};
-@define-color power                 ${BASE};
+@define-color pulseaudio            ${CRUST};
+@define-color backlight             ${CRUST};
+@define-color battery               ${CRUST};
+@define-color power                 ${CRUST};
 
 /* State Colors */
 @define-color good                  ${SEM_OK};
@@ -55,40 +60,43 @@
 @define-color g9                    ${GRADIENT_9};
 
 /* ══════════════════════════════════════════════════════════════════════════════
- * WIN98 BOXY STYLING
+ * WIN98 TASKBAR STYLING
  * ══════════════════════════════════════════════════════════════════════════════ */
 
 /* Global Styling - Retro Font */
 * {
-    font-family: "BigBlueTermPlus Nerd Font Mono", "Terminess Nerd Font Mono", "GohuFont 14 Nerd Font Mono", monospace;
+    font-family: "BigBlueTermPlus Nerd Font Mono", "Terminess Nerd Font Mono", monospace;
     font-weight: normal;
-    font-size: 13px;
+    font-size: 15px;
     min-height: 0px;
     border-radius: 0px;
 }
 
-/* Main Bar - Flat gray with 3D border effect */
+/* Main Bar - Raised 3D taskbar */
 window#waybar {
     background: @main-bg;
-    border-bottom: 2px solid ${SURFACE2};
-    border-top: 2px solid ${SURFACE1};
+    border-top: 1px solid @highlight;
+    border-bottom: 1px solid @shadow-dark;
 }
 
 window#waybar > box {
     margin: 0px;
-    padding: 0px;
+    padding: 1px 2px;
 }
 
 /* Tooltip - Boxy */
 tooltip {
     color: @main-fg;
     background: @main-bg;
-    border: 2px outset ${SURFACE1};
+    border-top: 1px solid @highlight;
+    border-left: 1px solid @highlight;
+    border-bottom: 1px solid @shadow-dark;
+    border-right: 1px solid @shadow-dark;
     border-radius: 0px;
 }
 
 /* ════════════════════════════════════════════════════════════════════
- * HIDE POWERLINE ARROWS - Replace with borders
+ * HIDE POWERLINE ARROWS - Not used in Win98 style
  * ════════════════════════════════════════════════════════════════════ */
 
 #custom-left1,
@@ -114,7 +122,28 @@ tooltip {
 #custom-leftin3,
 #custom-rightin1,
 #custom-rightin2,
-#custom-rightin3 {
+#custom-rightin3,
+#custom-left-ws-workspaces,
+#custom-left-bar-fans,
+#custom-left-fans-temp,
+#custom-left-temp-gpu,
+#custom-left-gpu-memory,
+#custom-left-memory-cpu,
+#custom-leftin-cpu-idle,
+#custom-left-idle-center,
+#custom-left-cava-audio,
+#custom-left-audio-backlight,
+#custom-left-backlight-battery,
+#custom-leftin-battery-power,
+#custom-right-workspaces-window,
+#custom-right-center-clock,
+#custom-rightin-clock-time,
+#custom-right-time-date,
+#custom-right-date-pomodoro,
+#custom-right-pomodoro-bluetooth,
+#custom-right-bluetooth-wifi,
+#custom-right-wifi-end,
+#custom-left-ws-workspaces0 {
     font-size: 0px;
     min-width: 0px;
     padding: 0px;
@@ -122,7 +151,7 @@ tooltip {
 }
 
 /* ════════════════════════════════════════════════════════════════════
- * MODULE BASE STYLING - Inset 3D effect
+ * MODULE BASE - Sunken status area (like Win98 system tray)
  * ════════════════════════════════════════════════════════════════════ */
 
 #custom-ws,
@@ -142,29 +171,58 @@ tooltip {
 #backlight,
 #custom-battery,
 #custom-power,
-#idle_inhibitor {
+#idle_inhibitor,
+#custom-cava {
     color: @module-fg;
     background: @main-bg;
-    border: 2px inset ${SURFACE1};
+    border-top: 1px solid @shadow;
+    border-left: 1px solid @shadow;
+    border-bottom: 1px solid @highlight;
+    border-right: 1px solid @highlight;
     border-radius: 0px;
-    margin: 2px 1px;
-    padding: 0px 8px;
+    margin: 2px 0px;
+    padding: 0px 6px;
 }
 
 /* ════════════════════════════════════════════════════════════════════
- * WORKSPACES - Button style
+ * START BUTTON - Raised 3D button (most iconic Win98 element)
+ * ════════════════════════════════════════════════════════════════════ */
+
+#custom-ws {
+    background: @main-bg;
+    color: @main-fg;
+    border-top: 1px solid @highlight;
+    border-left: 1px solid @highlight;
+    border-bottom: 1px solid @shadow-dark;
+    border-right: 1px solid @shadow-dark;
+    padding: 0px 6px;
+    margin: 2px 2px;
+}
+
+#custom-ws:hover {
+    background: @hover-bg;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * WORKSPACES - Raised buttons in a sunken tray
  * ════════════════════════════════════════════════════════════════════ */
 
 #workspaces {
     background: @main-bg;
-    border: 2px inset ${SURFACE1};
+    border-top: 1px solid @shadow;
+    border-left: 1px solid @shadow;
+    border-bottom: 1px solid @highlight;
+    border-right: 1px solid @highlight;
     padding: 0px 2px;
 }
 
 #workspaces button {
     color: @module-fg;
     background: @main-bg;
-    border: 2px outset ${SURFACE1};
+    border-top: 1px solid @highlight;
+    border-left: 1px solid @highlight;
+    border-bottom: 1px solid @shadow-dark;
+    border-right: 1px solid @shadow-dark;
     border-radius: 0px;
     margin: 2px 1px;
     padding: 0px 6px;
@@ -173,13 +231,15 @@ tooltip {
 
 #workspaces button:hover {
     background: @hover-bg;
-    border: 2px outset ${SURFACE1};
 }
 
 #workspaces button.active {
     color: @active-fg;
     background: @active-bg;
-    border: 2px inset ${SURFACE2};
+    border-top: 1px solid @shadow-dark;
+    border-left: 1px solid @shadow-dark;
+    border-bottom: 1px solid @highlight;
+    border-right: 1px solid @highlight;
 }
 
 #workspaces button.visible:not(.active) {
@@ -191,81 +251,48 @@ tooltip {
 }
 
 /* ════════════════════════════════════════════════════════════════════
- * WINDOW TITLE
+ * WINDOW TITLE - Sunken display area
  * ════════════════════════════════════════════════════════════════════ */
 
 #window {
     background: @main-bg;
-    border: 2px inset ${SURFACE1};
     padding: 0px 10px;
 }
 
 /* ════════════════════════════════════════════════════════════════════
- * WINDOW ICON (left corner)
- * ════════════════════════════════════════════════════════════════════ */
-
-#custom-ws {
-    background: @workspaces;
-    color: @active-fg;
-    border: 2px outset ${SURFACE1};
-    padding: 0px 4px;
-}
-
-/* ════════════════════════════════════════════════════════════════════
- * CENTER MODULES - Alternating colors with separators
- * ════════════════════════════════════════════════════════════════════ */
-
-#custom-fans,
-#custom-gpu,
-#memory,
-#cpu,
-#clock.time,
-#custom-pomodoro,
-#bluetooth,
-#custom-wifi {
-    border: 2px inset ${SURFACE1};
-}
-
-#custom-temp,
-#clock.date {
-    border: 2px inset ${SURFACE1};
-}
-
-/* ════════════════════════════════════════════════════════════════════
- * IDLE INHIBITOR - Special toggle button
+ * IDLE INHIBITOR - Raised toggle button
  * ════════════════════════════════════════════════════════════════════ */
 
 #idle_inhibitor {
-    background: @idle-bg;
-    color: @idle-fg;
-    border: 2px outset ${SURFACE1};
+    background: @main-bg;
+    color: @main-fg;
+    border-top: 1px solid @highlight;
+    border-left: 1px solid @highlight;
+    border-bottom: 1px solid @shadow-dark;
+    border-right: 1px solid @shadow-dark;
     padding: 0px 6px;
 }
 
 #idle_inhibitor.activated {
-    border: 2px inset ${SURFACE2};
+    border-top: 1px solid @shadow-dark;
+    border-left: 1px solid @shadow-dark;
+    border-bottom: 1px solid @highlight;
+    border-right: 1px solid @highlight;
     background: @active-bg;
 }
 
 /* ════════════════════════════════════════════════════════════════════
- * RIGHT MODULES
- * ════════════════════════════════════════════════════════════════════ */
-
-#pulseaudio,
-#backlight,
-#custom-battery {
-    border: 2px inset ${SURFACE1};
-}
-
-/* ════════════════════════════════════════════════════════════════════
- * POWER BUTTON - Classic Win98 Start button style
+ * POWER BUTTON - Classic Start button style (raised)
  * ════════════════════════════════════════════════════════════════════ */
 
 #custom-power {
     background: @main-bg;
-    color: ${TEXT};
-    border: 2px outset ${SURFACE1};
-    margin: 2px 4px 2px 1px;
+    color: @main-fg;
+    border-top: 1px solid @highlight;
+    border-left: 1px solid @highlight;
+    border-bottom: 1px solid @shadow-dark;
+    border-right: 1px solid @shadow-dark;
+    margin: 2px 2px;
     padding: 0px 8px;
 }
 
@@ -322,4 +349,5 @@ tooltip {
     min-width: 0px;
     padding: 0px;
     margin: 0px;
+    border: none;
 }

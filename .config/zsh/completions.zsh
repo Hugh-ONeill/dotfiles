@@ -185,7 +185,7 @@ _theme() {
 }
 
 # theme preview
-zstyle ':fzf-tab:complete:theme:*' fzf-preview '~/.config/themes/preview-theme.sh $word 2>/dev/null || echo "No preview"'
+zstyle ':fzf-tab:complete:theme:*' fzf-preview '~/.config/themes/scripts/preview-theme.sh $word 2>/dev/null || echo "No preview"'
 
 # wallpaper: complete with options and image files
 _wallpaper() {

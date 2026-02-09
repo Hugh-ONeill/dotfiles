@@ -1,12 +1,13 @@
 #!/bin/bash
-# Build Kvantum theme from palette by find-replacing catppuccin colors
-# Usage: ./build-kvantum-theme.sh <theme-name>
+# Build GTK theme from palette by find-replacing catppuccin colors
+# Usage: ./build-gtk-theme.sh <theme-name>
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PALETTES_DIR="$SCRIPT_DIR/palettes"
-OUTPUT_DIR="$HOME/.config/Kvantum"
+THEMES_DIR="$(dirname "$SCRIPT_DIR")"
+PALETTES_DIR="$THEMES_DIR/palettes"
+OUTPUT_DIR="$HOME/.themes"
 
 # Catppuccin Mocha colors (source)
 declare -A CATPPUCCIN_MOCHA=(
@@ -116,27 +117,29 @@ hex_to_luminance() {
 LUMINANCE=$(hex_to_luminance "$BASE_COLOR")
 if [[ $LUMINANCE -gt 140 ]]; then
     IS_LIGHT=true
-    BASE_THEME_NAME="catppuccin-latte-lavender"
+    BASE_THEME_NAME="catppuccin-latte"
     declare -n CATPPUCCIN_SRC=CATPPUCCIN_LATTE
     echo "Detected light theme (luminance: $LUMINANCE)"
 else
     IS_LIGHT=false
-    BASE_THEME_NAME="catppuccin-mocha-lavender"
+    BASE_THEME_NAME="catppuccin-mocha"
     declare -n CATPPUCCIN_SRC=CATPPUCCIN_MOCHA
     echo "Detected dark theme (luminance: $LUMINANCE)"
 fi
 
-# Find base theme
-BASE_THEME="$OUTPUT_DIR/$BASE_THEME_NAME"
+# Find base theme - prefer lavender accent as neutral base
+BASE_THEME=$(find /usr/share/themes ~/.local/share/themes ~/.themes \
+    -maxdepth 1 -type d -name "${BASE_THEME_NAME}-lavender-standard+default" 2>/dev/null | head -1)
 
-if [[ ! -d "$BASE_THEME" ]]; then
-    # Try system location
-    BASE_THEME="/usr/share/Kvantum/$BASE_THEME_NAME"
+if [[ -z "$BASE_THEME" ]]; then
+    # Try any accent
+    BASE_THEME=$(find /usr/share/themes ~/.local/share/themes ~/.themes \
+        -maxdepth 1 -type d -name "${BASE_THEME_NAME}-*-standard+default" 2>/dev/null | head -1)
 fi
 
-if [[ ! -d "$BASE_THEME" ]]; then
-    echo "Error: No catppuccin Kvantum theme found: $BASE_THEME_NAME"
-    echo "Install catppuccin-kvantum first"
+if [[ -z "$BASE_THEME" ]]; then
+    echo "Error: No catppuccin base theme found"
+    echo "Install catppuccin-gtk first"
     exit 1
 fi
 
@@ -180,6 +183,10 @@ for i in "${!GRADIENT[@]}"; do
     fi
 done
 
+# Map gradient to catppuccin rainbow (10 colors -> 14 catppuccin colors)
+# Catppuccin order: red, maroon, peach, yellow, green, teal, sky, sapphire, blue, lavender, mauve, pink, flamingo, rosewater
+# We'll map our 10 gradient colors and derive the rest
+
 # Get accent color for lavender replacement
 ACCENT=$(resolve_color "accent")
 [[ -z "$ACCENT" ]] && ACCENT="${GRADIENT[7]}"  # Default to ~lavender position
@@ -191,6 +198,7 @@ SEM_OK=$(resolve_color "sem_ok")
 SEM_INFO=$(resolve_color "sem_info")
 
 # Build color mapping (catppuccin -> ours)
+# Structural
 OUR_COLORS[red]="${SEM_ERR:-${GRADIENT[0]}}"
 OUR_COLORS[maroon]="${GRADIENT[0]}"
 OUR_COLORS[peach]="${GRADIENT[1]}"
@@ -210,11 +218,26 @@ OUR_COLORS[rosewater]="${OUR_COLORS[text]}"
 THEME_OUTPUT="$OUTPUT_DIR/$THEME_NAME"
 mkdir -p "$THEME_OUTPUT"
 
-echo "Building Kvantum theme: $THEME_NAME"
+echo "Building GTK theme: $THEME_NAME"
 
-# Copy base theme files with new name
-cp "$BASE_THEME"/*.kvconfig "$THEME_OUTPUT/$THEME_NAME.kvconfig" 2>/dev/null || true
-cp "$BASE_THEME"/*.svg "$THEME_OUTPUT/$THEME_NAME.svg" 2>/dev/null || true
+# Copy base theme
+cp -r "$BASE_THEME"/* "$THEME_OUTPUT/"
+
+# Update index.theme
+cat > "$THEME_OUTPUT/index.theme" << EOF
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=$THEME_NAME
+Comment=GTK theme generated from $THEME_NAME palette
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=$THEME_NAME
+MetacityTheme=$THEME_NAME
+IconTheme=Papirus-Dark
+CursorTheme=Adwaita
+ButtonLayout=close,minimize,maximize:menu
+EOF
 
 # Build sed replacement script
 SED_SCRIPT=""
@@ -233,23 +256,30 @@ for key in "${!CATPPUCCIN_SRC[@]}"; do
     fi
 done
 
-# Apply replacements to kvconfig and svg
+# Apply replacements to all CSS and SVG files
 echo "  Replacing colors..."
-for file in "$THEME_OUTPUT"/*.kvconfig "$THEME_OUTPUT"/*.svg; do
-    [[ -f "$file" ]] && sed -i "$SED_SCRIPT" "$file"
+find "$THEME_OUTPUT" -type f \( -name "*.css" -o -name "*.svg" \) | while read -r file; do
+    sed -i "$SED_SCRIPT" "$file"
 done
+
+# Also update gnome-shell if present
+if [[ -d "$THEME_OUTPUT/gnome-shell" ]]; then
+    find "$THEME_OUTPUT/gnome-shell" -type f -name "*.css" | while read -r file; do
+        sed -i "$SED_SCRIPT" "$file"
+    done
+fi
 
 echo "  Done! Theme installed to: $THEME_OUTPUT"
 
-# Update theme.conf to use this Kvantum theme
-THEME_CONF="$SCRIPT_DIR/$THEME_NAME/theme.conf"
+# Update theme.conf to use this GTK theme
+THEME_CONF="$THEMES_DIR/$THEME_NAME/theme.conf"
 if [[ -f "$THEME_CONF" ]]; then
-    if grep -q "^kvantum_theme=" "$THEME_CONF"; then
-        sed -i "s|^kvantum_theme=.*|kvantum_theme=$THEME_NAME|" "$THEME_CONF"
+    if grep -q "^gtk_theme=" "$THEME_CONF"; then
+        sed -i "s|^gtk_theme=.*|gtk_theme=$THEME_NAME|" "$THEME_CONF"
     fi
     echo "  Updated theme.conf"
 fi
 
 echo ""
-echo "Kvantum theme '$THEME_NAME' ready!"
-echo "Apply with: kvantummanager --set $THEME_NAME"
+echo "GTK theme '$THEME_NAME' ready!"
+echo "Apply with: theme set $THEME_NAME"

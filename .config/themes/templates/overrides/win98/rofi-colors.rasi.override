@@ -1,0 +1,61 @@
+/* vim:ft=css */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * ${THEME_NAME} Palette — Windows 98 Style
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+* {
+    /* Gradient colors */
+    g0: ${GRADIENT_0};
+    g1: ${GRADIENT_1};
+    g2: ${GRADIENT_2};
+    g3: ${GRADIENT_3};
+    g4: ${GRADIENT_4};
+    g5: ${GRADIENT_5};
+    g6: ${GRADIENT_6};
+    g7: ${GRADIENT_7};
+    g8: ${GRADIENT_8};
+    g9: ${GRADIENT_9};
+
+    /* Accent */
+    accent:           ${ACCENT};
+    accent-secondary: ${ACCENT_SECONDARY};
+    accent-tertiary:  ${ACCENT_TERTIARY};
+    accent-bright:    ${ACCENT_BRIGHT};
+    accent-secondary-bright: ${ACCENT_SECONDARY_BRIGHT};
+    accent-tertiary-bright:  ${ACCENT_TERTIARY_BRIGHT};
+
+    /* Text colors */
+    text:         ${TEXT};
+    subtext1:     ${SUBTEXT1};
+    subtext0:     ${SUBTEXT0};
+
+    /* Surface colors */
+    overlay2:     ${OVERLAY2};
+    overlay1:     ${OVERLAY1};
+    overlay0:     ${OVERLAY0};
+    surface2:     ${SURFACE2};
+    surface1:     ${SURFACE1};
+    surface0:     ${SURFACE0};
+    base:         ${BASE};
+    mantle:       ${MANTLE};
+    crust:        ${CRUST};
+
+    /* Semantic */
+    background:     @crust;
+    background-alt: @surface0;
+    foreground:     @text;
+    selected:       ${BSOD};
+    active:         ${SEM_OK};
+    urgent:         ${SEM_ERR};
+    warning:        ${SEM_WARN};
+    info:           ${SEM_INFO};
+
+    /* Win98: no rounded corners */
+    border-radius:  0px;
+
+    /* Win98 3D border colors */
+    highlight:      @base;
+    shadow:         @overlay0;
+    shadow-dark:    @overlay2;
+}

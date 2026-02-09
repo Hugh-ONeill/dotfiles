@@ -5,8 +5,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PALETTES_DIR="$SCRIPT_DIR/palettes"
-TEMPLATES_DIR="$SCRIPT_DIR/templates/dunst-icons"
+THEMES_DIR="$(dirname "$SCRIPT_DIR")"
+PALETTES_DIR="$THEMES_DIR/palettes"
+TEMPLATES_DIR="$THEMES_DIR/templates/dunst-icons"
 ICONS_DIR="$HOME/.config/dunst/icons"
 
 if [[ -z "$1" ]]; then

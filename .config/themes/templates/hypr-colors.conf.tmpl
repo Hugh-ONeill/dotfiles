@@ -64,10 +64,13 @@ $cursor_size = 24
 # Style settings
 decoration {
     rounding = ${STYLE_CORNER_RADIUS}
+    screen_shader = [[EMPTY]]
 }
 
 general {
     border_size = ${STYLE_BORDER_WIDTH}
     gaps_in = ${STYLE_GAPS_IN}
     gaps_out = ${STYLE_GAPS_OUT}
+    col.active_border = rgba(${ACCENT_NOHASH}FF)
+    col.inactive_border = rgba(${OVERLAY0_NOHASH}FF)
 }

@@ -5,7 +5,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PALETTES_DIR="$SCRIPT_DIR/palettes"
+THEMES_DIR="$(dirname "$SCRIPT_DIR")"
+PALETTES_DIR="$THEMES_DIR/palettes"
 STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 
 if [[ ! -f "$STARSHIP_CONFIG" ]]; then
@@ -114,21 +115,16 @@ g9_fg = "$(get_contrast_fg "${gradient[9]}" "$MODULE_FG" "$MODULE_FG_LIGHT")"
 EOF
 }
 
-# Read the starship config up to the first palette section
-# and everything after palettes (custom sections, character, etc.)
-BEFORE_PALETTES=$(sed -n '1,/^\[palettes\./{ /^\[palettes\./!p }' "$STARSHIP_CONFIG")
-# Get content from [custom.dir_first] onwards, filtering out any stray palette sections
-AFTER_PALETTES=$(awk '
-    /^\[custom\.dir_first\]/,0 {
-        if (/^\[palettes\./) { in_palette=1; next }
-        if (in_palette && /^\[/) { in_palette=0 }
-        if (!in_palette) print
-    }
+# Read everything except palette sections (palettes are always at the end)
+NON_PALETTE=$(awk '
+    /^\[palettes\./ { in_palette=1; next }
+    in_palette && /^\[/ && !/^\[palettes\./ { in_palette=0 }
+    !in_palette { print }
 ' "$STARSHIP_CONFIG")
 
-# Generate new config
+# Generate new config: non-palette content first, then fresh palettes appended
 {
-    echo "$BEFORE_PALETTES"
+    echo "$NON_PALETTE"
     echo ""
 
     # Generate palettes for all JSON themes
@@ -140,8 +136,6 @@ AFTER_PALETTES=$(awk '
         generate_palette_block "$palette_file" "$palette_name"
         echo ""
     done
-
-    echo "$AFTER_PALETTES"
 } > "$STARSHIP_CONFIG.new"
 
 # Replace the config

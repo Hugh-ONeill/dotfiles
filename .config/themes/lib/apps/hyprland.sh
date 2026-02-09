@@ -9,18 +9,16 @@ apply_hyprland() {
         if [[ -x "$HOME/.config/hypr/scripts/set-cursor.sh" ]]; then
             "$HOME/.config/hypr/scripts/set-cursor.sh" &>/dev/null
         fi
-        # Apply screen shader if specified in theme.conf
-        local theme_conf="$THEMES_DIR/$theme/theme.conf"
-        local shader=""
-        if [[ -f "$theme_conf" ]]; then
-            shader=$(grep -E '^shader=' "$theme_conf" | cut -d= -f2)
-        fi
-        if [[ -n "$shader" && "$shader" != "none" ]]; then
-            hyprctl keyword decoration:screen_shader "$shader" &>/dev/null
-            report_ok "hyprland + shader"
+        report_ok "hyprland"
+
+        # Toggle hyprbars plugin based on decoration style
+        local json_palette="$PALETTES_DIR/$theme.json"
+        local decoration=$(jq -r '.style.decoration // "none"' "$json_palette" 2>/dev/null)
+        local hyprbars_so="/var/cache/hyprpm/wiz/hyprland-plugins/hyprbars.so"
+        if [[ "$decoration" == "hyprbars" && -f "$hyprbars_so" ]]; then
+            hyprctl plugin load "$hyprbars_so" &>/dev/null
         else
-            hyprctl keyword decoration:screen_shader "[[EMPTY]]" &>/dev/null
-            report_ok "hyprland"
+            hyprctl plugin unload "$hyprbars_so" &>/dev/null
         fi
     else
         report_skip "hyprland (no theme file)"

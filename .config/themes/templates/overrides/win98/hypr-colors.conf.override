@@ -58,32 +58,56 @@ $g9 = rgb(${GRADIENT_9_NOHASH})
 # Style settings
 decoration {
     rounding = ${STYLE_CORNER_RADIUS}
+    screen_shader = ~/.config/hypr/shaders/crt.frag
+
+    # Win98: no transparency effects
+    active_opacity = 1.0
+    inactive_opacity = 1.0
+
+    dim_inactive = false
+
+    blur {
+        enabled = false
+    }
+
+    shadow {
+        enabled = false
+    }
 }
 
 general {
-    border_size = ${STYLE_BORDER_WIDTH}
+    border_size = 4
     gaps_in = ${STYLE_GAPS_IN}
     gaps_out = ${STYLE_GAPS_OUT}
+    col.active_border = rgb(${BASE_NOHASH}) rgb(${BASE_NOHASH}) rgb(${OVERLAY2_NOHASH}) rgb(${OVERLAY2_NOHASH}) 25deg
+    col.inactive_border = rgb(${MANTLE_NOHASH}) rgb(${MANTLE_NOHASH}) rgb(${OVERLAY0_NOHASH}) rgb(${OVERLAY0_NOHASH}) 25deg
 }
+
+# Win98: float all windows by default, half-screen size
+windowrule = match:class .*, float on
+windowrule = match:class .*, size 960 540
+windowrule = match:class .*, center on
+windowrule = match:class .*, suppress_event maximize
 
 # Hyprbars plugin (Windows 98 title bars)
 plugin {
     hyprbars {
-        bar_height = 20
+        bar_height = 22
         bar_color = rgb(${MANTLE_NOHASH})
-        bar_text_size = 11
+        bar_text_size = 12
         bar_text_font = "Tahoma, Sans"
         col.text = rgb(${TEXT_NOHASH})
+        bar_text_align = left
         bar_part_of_window = true
         bar_precedence_over_border = true
+        bar_padding = 4
 
-        # Win98-style buttons (close, maximize, minimize)
-        hyprbars-button = rgb(${OVERLAY0_NOHASH}), 14, 󰖭, hyprctl dispatch killactive
-        hyprbars-button = rgb(${OVERLAY0_NOHASH}), 14, 󰁌, hyprctl dispatch fullscreen 1
-        hyprbars-button = rgb(${OVERLAY0_NOHASH}), 14, 󰖰, hyprctl dispatch movetoworkspacesilent special
+        # Win98-style buttons (gray with dark icons)
+        hyprbars-button = rgb(${SURFACE0_NOHASH}), 14, 󰖭, hyprctl dispatch killactive, rgb(${TEXT_NOHASH})
+        hyprbars-button = rgb(${SURFACE0_NOHASH}), 14, 󰁌, hyprctl dispatch fullscreen 1, rgb(${TEXT_NOHASH})
+        hyprbars-button = rgb(${SURFACE0_NOHASH}), 14, 󰖰, hyprctl dispatch movetoworkspacesilent special, rgb(${TEXT_NOHASH})
     }
 
-    # Disable borders-plus-plus for this theme
     borders-plus-plus {
         add_borders = 0
     }

@@ -36,14 +36,14 @@ undo_colors() {
         cp "$HOME/.cache/wal/colors.json.bak" "$HOME/.cache/wal/colors.json"
         echo "Restoring previous colors..."
         # Re-generate theme from restored colors.json (skip extraction)
-        if ! "$HOME/.config/themes/palette-extract" --from-cache --generate-theme; then
+        if ! "$HOME/.config/themes/scripts/palette-extract" --from-cache --generate-theme; then
             echo "Error: Failed to generate theme"
             exit 1
         fi
         # Build GTK and Kvantum themes
         local themes_dir="$HOME/.config/themes"
-        [[ -x "$themes_dir/build-gtk-theme.sh" ]] && "$themes_dir/build-gtk-theme.sh" chameleon 2>/dev/null || true
-        [[ -x "$themes_dir/build-kvantum-theme.sh" ]] && "$themes_dir/build-kvantum-theme.sh" chameleon 2>/dev/null || true
+        [[ -x "$themes_dir/scripts/build-gtk-theme.sh" ]] && "$themes_dir/scripts/build-gtk-theme.sh" chameleon 2>/dev/null || true
+        [[ -x "$themes_dir/scripts/build-kvantum-theme.sh" ]] && "$themes_dir/scripts/build-kvantum-theme.sh" chameleon 2>/dev/null || true
         if theme set chameleon; then
             echo "Restored previous colors"
         else
@@ -127,18 +127,18 @@ EOF
         local extract_flags="--generate-theme"
         [[ "$LIGHT_MODE" == "true" ]] && extract_flags="$extract_flags --light"
 
-        if ! "$HOME/.config/themes/palette-extract" "$image" $extract_flags; then
+        if ! "$HOME/.config/themes/scripts/palette-extract" "$image" $extract_flags; then
             echo "Error: Failed to extract colors from image"
             exit 1
         fi
 
         # Build GTK and Kvantum themes for chameleon palette
         local themes_dir="$HOME/.config/themes"
-        if [[ -x "$themes_dir/build-gtk-theme.sh" ]]; then
-            "$themes_dir/build-gtk-theme.sh" chameleon 2>/dev/null || true
+        if [[ -x "$themes_dir/scripts/build-gtk-theme.sh" ]]; then
+            "$themes_dir/scripts/build-gtk-theme.sh" chameleon 2>/dev/null || true
         fi
-        if [[ -x "$themes_dir/build-kvantum-theme.sh" ]]; then
-            "$themes_dir/build-kvantum-theme.sh" chameleon 2>/dev/null || true
+        if [[ -x "$themes_dir/scripts/build-kvantum-theme.sh" ]]; then
+            "$themes_dir/scripts/build-kvantum-theme.sh" chameleon 2>/dev/null || true
         fi
 
         # Apply the chameleon theme
