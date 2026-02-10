@@ -114,3 +114,6 @@ element-text {
     horizontal-align: 0.5;
     vertical-align:   0.5;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "../shared/overrides.rasi"

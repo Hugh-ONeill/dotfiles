@@ -108,3 +108,6 @@ element selected.active {
 element-text active {
     text-color: inherit;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "../shared/overrides.rasi"

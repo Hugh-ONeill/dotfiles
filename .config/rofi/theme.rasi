@@ -180,3 +180,6 @@ error-message {
     border-color:     @accent-secondary;
     background-color: @background;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "shared/overrides.rasi"

@@ -7,8 +7,9 @@ apply_rofi() {
     if copy_to_current "$theme" "rofi-colors.rasi"; then
         ok=true
     fi
-    # Also copy fonts if available
+    # Also copy fonts and overrides if available
     copy_to_current "$theme" "fonts.rasi" &>/dev/null
+    copy_to_current "$theme" "rofi-overrides.rasi" &>/dev/null
     if $ok; then
         report_ok "rofi"
     else

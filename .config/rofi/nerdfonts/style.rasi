@@ -103,3 +103,6 @@ element-text {
     vertical-align:   0.5;
     highlight:        bold underline;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "../shared/overrides.rasi"

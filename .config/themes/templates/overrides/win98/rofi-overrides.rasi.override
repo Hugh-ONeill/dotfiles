@@ -1,0 +1,151 @@
+/* vim:ft=css */
+/* Win98 3D Dialog — beveled borders, sunken inputs, raised buttons.
+   Imported last in all rofi style files to override per-applet styling.
+   border-color shorthand must be set to neutralize applet values before
+   per-side overrides take effect. */
+
+/* ── Window: raised 3D frame ─────────────────────────────────────────────── */
+
+window {
+    border-radius:       0px;
+    border-color:        @highlight;
+    border-right-color:  @shadow-dark;
+    border-bottom-color: @shadow-dark;
+}
+
+/* ── Mainbox: 3D on applets that put the border here (calendar) ──────────── */
+
+mainbox {
+    border-radius:       0px;
+    border-color:        @highlight;
+    border-right-color:  @shadow-dark;
+    border-bottom-color: @shadow-dark;
+}
+
+/* ── Prompt: raised gray button ──────────────────────────────────────────── */
+
+prompt {
+    background-color:    @crust;
+    text-color:          @text;
+    border:              2px;
+    border-radius:       0px;
+    border-color:        @highlight;
+    border-right-color:  @shadow-dark;
+    border-bottom-color: @shadow-dark;
+}
+
+/* ── Entry: sunken white input field ─────────────────────────────────────── */
+
+entry {
+    background-color:    @base;
+    border:              2px;
+    border-radius:       0px;
+    border-color:        @shadow-dark;
+    border-right-color:  @highlight;
+    border-bottom-color: @highlight;
+}
+
+/* ── List View: sunken white listbox ─────────────────────────────────────── */
+
+listview {
+    background-color:    @base;
+    border:              2px;
+    border-color:        @shadow-dark;
+    border-right-color:  @highlight;
+    border-bottom-color: @highlight;
+}
+
+/* ── Elements ────────────────────────────────────────────────────────────── */
+
+element {
+    border-radius: 0px;
+    border:        0 0 1px 0;
+    border-color:  @surface1;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: @base;
+    text-color:       @text;
+}
+
+element selected.normal {
+    background-color: @selected;
+    text-color:       @base;
+    border:           0;
+}
+
+element selected.urgent {
+    background-color: @urgent;
+    text-color:       @base;
+    border:           0;
+}
+
+element selected.active {
+    background-color: @selected;
+    text-color:       @base;
+    border:           0;
+}
+
+element-text selected {
+    text-color: @base;
+}
+
+element-icon selected {
+    text-color: @base;
+}
+
+/* ── Scrollbar: classic wide Win98 ───────────────────────────────────────── */
+
+scrollbar {
+    width:               16px;
+    handle-width:        16px;
+    handle-color:        @crust;
+    background-color:    @surface1;
+    border-radius:       0px;
+    border:              1px;
+    border-color:        @highlight;
+    border-right-color:  @shadow;
+    border-bottom-color: @shadow;
+}
+
+/* ── Buttons: raised 3D with dotted focus indicator ──────────────────────── */
+
+button {
+    background-color:    @crust;
+    text-color:          @text;
+    border:              2px;
+    border-radius:       0px;
+    border-color:        @highlight;
+    border-right-color:  @shadow-dark;
+    border-bottom-color: @shadow-dark;
+}
+
+button selected {
+    background-color:    @surface0;
+    border-color:        @shadow-dark;
+    border-right-color:  @highlight;
+    border-bottom-color: @highlight;
+    text-color:          @text;
+    border:              1px dash;
+    border-color:        @text;
+}
+
+/* ── Message / Textbox ───────────────────────────────────────────────────── */
+
+textbox {
+    background-color:    @base;
+    border:              2px;
+    border-radius:       0px;
+    border-color:        @shadow-dark;
+    border-right-color:  @highlight;
+    border-bottom-color: @highlight;
+}
+
+error-message {
+    border:              2px;
+    border-radius:       0px;
+    border-color:        @shadow-dark;
+    border-right-color:  @highlight;
+    border-bottom-color: @highlight;
+}

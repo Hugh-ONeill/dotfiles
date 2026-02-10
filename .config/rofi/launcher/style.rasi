@@ -135,3 +135,6 @@ button selected {
     background-color: @g4;
     text-color:       @crust;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "../shared/overrides.rasi"

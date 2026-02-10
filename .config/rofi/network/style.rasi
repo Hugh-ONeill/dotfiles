@@ -105,3 +105,6 @@ element normal.urgent {
     background-color: transparent;
     text-color:       @overlay0;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "../shared/overrides.rasi"

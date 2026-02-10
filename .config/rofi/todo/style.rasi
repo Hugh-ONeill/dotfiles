@@ -110,3 +110,6 @@ element selected.active {
     background-color: @surface1;
     text-color:       @overlay0;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "../shared/overrides.rasi"

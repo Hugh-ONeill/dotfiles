@@ -66,3 +66,6 @@ element selected.normal {
 element alternate.normal {
     background-color: @surface0;
 }
+
+/* Per-theme layout overrides — must be last to win the cascade */
+@import "../shared/overrides.rasi"
