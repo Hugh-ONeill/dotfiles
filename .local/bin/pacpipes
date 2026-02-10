@@ -1,0 +1,149 @@
+#!/bin/bash
+# pacpipes - Pac-Man terminal screensaver
+#
+# Fills the screen with dots, then Pac-Man eats through random rows
+# left to right, leaving colored trails. Resets when all rows are eaten.
+
+set -u
+
+# ── Glyphs ──────────────────────────────────────────────────
+PAC_OPEN=$'\U000F0BAF'   # 󰮯 pac-man facing right
+PAC_CLOSED="●"
+DOT="•"
+
+# ── Configuration ───────────────────────────────────────────
+EAT_SPEED=0.015      # seconds between each pac-man step
+
+# ── Colors ──────────────────────────────────────────────────
+hex_to_ansi() {
+    local hex="${1#\#}"
+    printf '\033[38;2;%d;%d;%dm' "$((16#${hex:0:2}))" "$((16#${hex:2:2}))" "$((16#${hex:4:2}))"
+}
+
+declare -a TRAIL_COLORS
+CURRENT_THEME=$(cat "$HOME/.config/themes/.current" 2>/dev/null)
+PALETTE="$HOME/.config/themes/palettes/${CURRENT_THEME:-none}.json"
+
+if [[ -f "$PALETTE" ]] && command -v jq &>/dev/null; then
+    while IFS= read -r hex; do
+        [[ -n "$hex" ]] && TRAIL_COLORS+=("$(hex_to_ansi "$hex")")
+    done < <(jq -r '
+        .gradient[] as $name |
+        if .colors[$name] then
+            if (.colors[$name] | startswith("#")) then .colors[$name]
+            else .colors[.colors[$name]] // .colors[$name]
+            end
+        else $name end
+    ' "$PALETTE" 2>/dev/null)
+
+    pac_hex=$(jq -r '.colors.accent // empty' "$PALETTE" 2>/dev/null)
+    if [[ -n "$pac_hex" && "$pac_hex" == \#* ]]; then
+        PAC_COLOR=$(hex_to_ansi "$pac_hex")
+    elif [[ -n "$pac_hex" ]]; then
+        pac_hex=$(jq -r ".colors[\"$pac_hex\"] // empty" "$PALETTE" 2>/dev/null)
+        [[ -n "$pac_hex" ]] && PAC_COLOR=$(hex_to_ansi "$pac_hex")
+    fi
+fi
+
+if [[ ${#TRAIL_COLORS[@]} -eq 0 ]]; then
+    TRAIL_COLORS=(
+        "\033[38;5;196m" "\033[38;5;208m" "\033[38;5;220m"
+        "\033[38;5;82m"  "\033[38;5;39m"  "\033[38;5;63m"
+        "\033[38;5;129m" "\033[38;5;213m" "\033[38;5;203m"
+        "\033[38;5;117m"
+    )
+fi
+PAC_COLOR="${PAC_COLOR:-\033[38;5;226m}"
+
+DOT_COLOR="\033[38;5;239m"
+RST="\033[0m"
+
+# ── Terminal setup ──────────────────────────────────────────
+cleanup() {
+    tput cnorm 2>/dev/null
+    printf "$RST"
+    clear
+    exit 0
+}
+trap cleanup EXIT INT TERM
+
+tput civis
+ROWS=$(tput lines)
+COLS=$(tput cols)
+
+move_to() {
+    printf "\033[%d;%dH" "$1" "$2"
+}
+
+# ── Fill screen with dots ──────────────────────────────────
+fill_dots() {
+    clear
+    local dot_line=""
+    for (( c=1; c<=COLS; c++ )); do
+        dot_line+="$DOT"
+    done
+    printf "${DOT_COLOR}"
+    for (( r=1; r<=ROWS; r++ )); do
+        move_to "$r" 1
+        printf '%s' "$dot_line"
+    done
+    printf "${RST}"
+}
+
+# ── Shuffle array (Fisher-Yates) ──────────────────────────
+shuffle() {
+    local -n arr=$1
+    local i j tmp
+    for (( i=${#arr[@]}-1; i>0; i-- )); do
+        j=$(( RANDOM % (i+1) ))
+        tmp=${arr[$i]}
+        arr[$i]=${arr[$j]}
+        arr[$j]=$tmp
+    done
+}
+
+# ── Main loop ───────────────────────────────────────────────
+while true; do
+    fill_dots
+
+    # Build shuffled list of rows
+    declare -a rows=()
+    for (( r=1; r<=ROWS; r++ )); do
+        rows+=("$r")
+    done
+    shuffle rows
+
+    color_idx=0
+    trail_color="${TRAIL_COLORS[$color_idx]}"
+
+    for row in "${rows[@]}"; do
+        # Eat this row left to right
+        for (( c=1; c<=COLS; c++ )); do
+            # Trail behind pac-man
+            if (( c > 1 )); then
+                move_to "$row" "$((c-1))"
+                printf "${trail_color}─${RST}"
+            fi
+
+            # Pac-man with mouth animation
+            move_to "$row" "$c"
+            if (( c % 4 < 2 )); then
+                printf "${PAC_COLOR}${PAC_OPEN}${RST}"
+            else
+                printf "${PAC_COLOR}${PAC_CLOSED}${RST}"
+            fi
+
+            sleep "$EAT_SPEED"
+        done
+
+        # Replace final pac-man position with trail
+        move_to "$row" "$COLS"
+        printf "${trail_color}─${RST}"
+
+        # Cycle to next gradient color for next row
+        color_idx=$(( (color_idx + 1) % ${#TRAIL_COLORS[@]} ))
+        trail_color="${TRAIL_COLORS[$color_idx]}"
+    done
+
+    sleep 1
+done

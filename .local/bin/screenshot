@@ -1,0 +1,11 @@
+#!/bin/bash
+# Screenshot wrapper - saves to file and copies to clipboard
+
+mode="${1:-output}"
+dir="${XDG_SCREENSHOTS_DIR:-$HOME/Pictures/Screenshots}"
+mkdir -p "$dir"
+
+filename="$(date +%Y-%m-%d_%H-%M-%S).png"
+
+# hyprshot handles saving, clipboard, and notifications
+hyprshot -m "$mode" -o "$dir" -f "$filename" 2>/dev/null || true

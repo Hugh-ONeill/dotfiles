@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# bfd - hybrid breadth-first/depth-first file finder
+# Three tiers: bfs shallow, fd medium, fd deep (at bottom)
+
+set -euo pipefail
+
+color=auto
+bfs_depth=2
+mid_depth=5
+path="."
+
+usage() {
+  cat <<EOF
+Usage: bfd [OPTIONS] [PATH]
+
+Options:
+  -c, --color <when>    Color output: always, auto, never (default: auto)
+  -d, --depth <n>       BFS depth (default: 2)
+  -m, --mid <n>         Mid-tier max depth before bottom (default: 5)
+  -h, --help            Show this help
+
+Tiers (with defaults):
+  0-2:  BFS (breadth-first) - nearby files first
+  3-5:  fd (depth-first) - medium depth
+  6+:   fd (depth-first) - deep files at bottom
+
+Examples:
+  bfd                   Search current directory
+  bfd ~/projects        Search specific path
+  bfd -c always         Force colors (for piping to fzf --ansi)
+  bfd -d 3 -m 6         BFS 0-3, fd 4-6, fd 7+ at bottom
+EOF
+  exit 0
+}
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -c|--color) color="$2"; shift 2 ;;
+    -d|--depth) bfs_depth="$2"; shift 2 ;;
+    -m|--mid) mid_depth="$2"; shift 2 ;;
+    -h|--help) usage ;;
+    -*) echo "Unknown option: $1" >&2; exit 1 ;;
+    *) path="$1"; shift ;;
+  esac
+done
+
+color_flag=""
+fd_color=""
+[[ "$color" == "always" ]] && color_flag="--color=always" && fd_color="--color=always"
+[[ "$color" == "never" ]] && color_flag="--color=never" && fd_color="--color=never"
+
+# Tier 1: BFS for shallow files (breadth-first ordering)
+bfs "$path" -maxdepth "$bfs_depth" -name '.git' -prune -o -print 2>/dev/null | while IFS= read -r file; do
+  if [[ -n "$color_flag" ]]; then
+    eza -d $color_flag -- "$file" 2>/dev/null || printf '%s\n' "$file"
+  else
+    printf '%s\n' "$file"
+  fi
+done
+
+# Tier 2: fd for medium depth (appears in middle)
+fd --min-depth "$((bfs_depth + 1))" --max-depth "$mid_depth" --exclude .git $fd_color . "$path" 2>/dev/null
+
+# Tier 3: fd for deep files (appears at bottom)
+fd --min-depth "$((mid_depth + 1))" --exclude .git $fd_color . "$path" 2>/dev/null
