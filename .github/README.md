@@ -1,11 +1,10 @@
-# dotbare
+# ⁂ RumpusDots ⁂
 
-A dotfile management system built on a bare Git repository pattern, combining seamless config tracking with a powerful theme engine that unifies colors, fonts, and styles across 30+ applications from a single JSON palette.
+Managed via Dotbare
 
 ![Arch Linux](https://img.shields.io/badge/Arch_Linux-1793D1?style=flat&logo=archlinux&logoColor=white)
 ![Hyprland](https://img.shields.io/badge/Hyprland-58E1FF?style=flat&logo=hyprland&logoColor=black)
 ![Shell](https://img.shields.io/badge/Shell-Zsh-green?style=flat)
-![License](https://img.shields.io/badge/License-MIT-blue?style=flat)
 
 ![Desktop with tiled terminal windows, waybar, and theme colors](screenshots/layout_tiled.png)
 
@@ -34,7 +33,6 @@ A dotfile management system built on a bare Git repository pattern, combining se
 - [Features](#features)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Usage](#usage)
 - [Theme System](#theme-system)
   - [Palettes](#palettes)
   - [Templates](#templates)
@@ -80,7 +78,7 @@ On top of file tracking, a template-driven theme engine generates consistent col
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Palette (JSON)                        │
+│                    Palette (JSON)                       │
 │  colors, fonts, style, gradient definitions             │
 └──────────────────────┬──────────────────────────────────┘
                        │
@@ -105,7 +103,7 @@ On top of file tracking, a template-driven theme engine generates consistent col
                        ▼
 ┌─────────────────────────────────────────────────────────┐
 │                 theme set <name>                        │
-│  Copy to current/ → apply per-app → signal/restart     │
+│  Copy to current/ → apply per-app → signal/restart      │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -195,6 +193,15 @@ dotbare checkout
 dotbare config status.showUntrackedFiles no
 ```
 
+### Managing dotfiles
+
+```bash
+dotbare status                  # See tracked file changes
+dotbare add ~/.config/foo       # Track a new config file
+dotbare commit -m "add foo"     # Commit changes
+dotbare push                    # Push to remote
+```
+
 ### Generate themes
 
 ```bash
@@ -207,7 +214,7 @@ dotbare config status.showUntrackedFiles no
 theme set catppuccin
 ```
 
-## Usage
+## Theme System
 
 The `theme` CLI (`~/.local/bin/theme`) is the main interface for managing themes.
 
@@ -226,17 +233,6 @@ theme rofi                Launch the rofi theme picker
 ```
 
 ![Rofi theme picker](screenshots/rofi_themeswitcher.png)
-
-### Managing dotfiles
-
-```bash
-dotbare status                  # See tracked file changes
-dotbare add ~/.config/foo       # Track a new config file
-dotbare commit -m "add foo"     # Commit changes
-dotbare push                    # Push to remote
-```
-
-## Theme System
 
 ### Palettes
 
@@ -1156,4 +1152,4 @@ Plus 70+ additional ASCII art scripts and color palette demos.
 
 ---
 
-> **Tip:** Run `theme rofi` or just `theme` to get an interactive picker with color previews.
+> Thank you for checkin' them out (´°ω°`)
