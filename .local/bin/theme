@@ -111,6 +111,7 @@ cmd_set() {
     apply_youtube_tui "$theme"
     apply_sptlrx "$theme"
     apply_claude "$theme"
+    apply_nvim "$theme"
     apply_fastfetch "$theme"
     apply_cava "$theme"
     apply_fzf "$theme"

@@ -1,0 +1,58 @@
+-- Auto-generated nvim color palette for catppuccin
+-- Source: theme system (~/.config/themes/)
+-- Do not edit -- regenerate with: theme generate <name>
+
+return {
+  color_overrides = {
+    all = {
+      -- structural
+      crust    = "${CRUST}",
+      mantle   = "${MANTLE}",
+      base     = "${BASE}",
+      surface0 = "${SURFACE0}",
+      surface1 = "${SURFACE1}",
+      surface2 = "${SURFACE2}",
+      overlay0 = "${OVERLAY0}",
+      overlay1 = "${OVERLAY1}",
+      overlay2 = "${OVERLAY2}",
+      subtext0 = "${SUBTEXT0}",
+      subtext1 = "${SUBTEXT1}",
+      text     = "${TEXT}",
+
+      -- native catppuccin named colors
+      red       = "${RED}",
+      maroon    = "${MAROON}",
+      green     = "${GREEN}",
+      yellow    = "${YELLOW}",
+      peach     = "${PEACH}",
+      blue      = "${BLUE}",
+      sapphire  = "${SAPPHIRE}",
+      teal      = "${TEAL}",
+      sky       = "${SKY}",
+      pink      = "${PINK}",
+      flamingo  = "${FLAMINGO}",
+      mauve     = "${MAUVE}",
+      lavender  = "${LAVENDER}",
+      rosewater = "${ROSEWATER}",
+    },
+  },
+
+  highlight_overrides = {
+    all = function(C)
+      return {
+        -- diagnostics (use semantic colors, may differ from ansi in some themes)
+        DiagnosticError = { fg = "${SEM_ERR}" },
+        DiagnosticWarn  = { fg = "${SEM_WARN}" },
+        DiagnosticInfo  = { fg = "${SEM_INFO}" },
+        DiagnosticHint  = { fg = "${SEM_INFO}" },
+        DiagnosticOk    = { fg = "${SEM_OK}" },
+
+        DiagnosticUnderlineError = { sp = "${SEM_ERR}", style = { "undercurl" } },
+        DiagnosticUnderlineWarn  = { sp = "${SEM_WARN}", style = { "undercurl" } },
+        DiagnosticUnderlineInfo  = { sp = "${SEM_INFO}", style = { "undercurl" } },
+        DiagnosticUnderlineHint  = { sp = "${SEM_INFO}", style = { "undercurl" } },
+        DiagnosticUnderlineOk    = { sp = "${SEM_OK}", style = { "undercurl" } },
+      }
+    end,
+  },
+}
