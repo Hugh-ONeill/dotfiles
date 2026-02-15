@@ -368,6 +368,13 @@ tooltip {
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
+/* Recording Indicator */
+#custom-recording.recording {
+  color: #ff3333;
+  padding-left: 8px;
+  padding-right: 4px;
+}
+
 /* Module Hover Effects - Rainbow order matching statusline */
 /* Left side (outer→center): g0→g1→g2→g3→g4 */
 #custom-fans:hover {

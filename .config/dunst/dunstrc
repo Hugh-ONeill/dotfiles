@@ -29,6 +29,7 @@ icon_path = /usr/share/icons/Papirus-Dark/48x48/apps:/usr/share/icons/Papirus-Da
 enable_recursive_icon_lookup = true
 
 # Behavior
+dmenu = ~/.local/bin/dunst-dmenu
 show_indicators = yes
 sticky_history = yes
 history_length = 20
@@ -36,7 +37,7 @@ history_length = 20
 # Mouse actions
 mouse_left_click = close_current
 mouse_right_click = close_all
-mouse_middle_click = do_action
+mouse_middle_click = context_all
 
 # Format
 format = "<b>󰁕 %a</b>\n%s\n<i>%b</i>"

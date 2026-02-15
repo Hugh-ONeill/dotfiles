@@ -137,7 +137,7 @@ zstyle ':fzf-tab:complete:z:*' fzf-preview 'eza --color=always --all --group-dir
 zstyle ':fzf-tab:complete:pushd:*' fzf-preview 'eza --color=always --all --group-directories-first --tree --level=2 $realpath'
 
 # Generic fallback
-zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -d $realpath ]]; then eza --color=always --all --group-directories-first --tree --level=2 $realpath; elif [[ -f $realpath ]]; then bat --color=always --line-range :100 $realpath 2>/dev/null || file $realpath; fi'
+zstyle ':fzf-tab:complete:*:*' fzf-preview '[[ -n $realpath ]] && preview $realpath'
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Custom Completions (functions defined here, compdef called after compinit)
@@ -166,7 +166,7 @@ _theme() {
         'edit:Edit theme palette'
         'rofi:Interactive theme picker'
     )
-    themes=($(find ~/.config/themes -maxdepth 1 -mindepth 1 -type d ! -name "palettes" ! -name "templates" ! -name "lib" ! -name "current" ! -name "stylus" -printf "%f\n" 2>/dev/null | sort))
+    themes=($(find ~/.config/themes -maxdepth 1 -mindepth 1 -type d ! -name "palettes" ! -name "templates" ! -name "lib" ! -name "current" ! -name "scripts" ! -name "stylus" -printf "%f\n" 2>/dev/null | sort))
 
     if (( CURRENT == 2 )); then
         _describe 'commands' commands

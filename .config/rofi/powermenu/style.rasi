@@ -19,7 +19,7 @@ window {
     width:            400px;
     border:           2px solid;
     border-color:     @g0;
-    border-radius:    12px;
+    border-radius:    @border-radius;
     background-color: @background;
 }
 
@@ -43,7 +43,7 @@ inputbar {
 
 prompt {
     padding:          12px 18px;
-    border-radius:    8px;
+    border-radius:    @border-radius;
     background-color: @g0;
     text-color:       @crust;
 }
@@ -58,7 +58,7 @@ message {
 
 textbox {
     padding:          10px 14px;
-    border-radius:    8px;
+    border-radius:    @border-radius;
     background-color: @surface0;
 }
 
@@ -79,7 +79,7 @@ listview {
 
 element {
     padding:       14px 18px;
-    border-radius: 8px;
+    border-radius: @border-radius;
     cursor:        pointer;
 }
 

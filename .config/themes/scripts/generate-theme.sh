@@ -85,7 +85,7 @@ if [[ "$WAYBAR_SEP_LEFT" == "$WAYBAR_SEP_RIGHT" && "$STYLE_WAYBAR" != "boxy" ]];
         read -r -d '' WAYBAR_SEPARATOR_CSS << 'SEPCSS' || true
 /* Same-direction separator overrides: swap fg/bg on left-position separators.
    Uses window#waybar prefix for higher specificity than style.css rules. */
-window#waybar #custom-left-ws-workspaces { color: @main-bg; background: @workspaces; }
+window#waybar #custom-left-ws-workspaces { color: @main-bg; background: @workspaces; padding-left: 0; }
 window#waybar #custom-left-bar-fans { color: @main-bg; background: @module1-bg; border-radius: 0; }
 window#waybar #custom-left-fans-temp { color: @module1-bg; background: @module2-bg; }
 window#waybar #custom-left-temp-gpu { color: @module2-bg; background: @module3-bg; }

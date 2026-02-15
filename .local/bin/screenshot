@@ -1,11 +1,552 @@
-#!/bin/bash
-# Screenshot wrapper - saves to file and copies to clipboard
+#!/usr/bin/env bash
+# Screenshot and recording tool for Hyprland
+# Usage: screenshot [output|region|window|ocr|record] [--delay N] [--no-audio] [--no-freeze] [--clipboard-only]
 
-mode="${1:-output}"
-dir="${XDG_SCREENSHOTS_DIR:-$HOME/Pictures/Screenshots}"
-mkdir -p "$dir"
+set -euo pipefail
 
-filename="$(date +%Y-%m-%d_%H-%M-%S).png"
+# ============================================================
+# CONFIGURATION
+# ============================================================
 
-# hyprshot handles saving, clipboard, and notifications
-hyprshot -m "$mode" -o "$dir" -f "$filename" 2>/dev/null || true
+[[ -f ~/.config/user-dirs.dirs ]] && source ~/.config/user-dirs.dirs
+SCREENSHOT_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+RECORDING_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/Screencaps"
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+PID_FILE="$RUNTIME_DIR/screenshot-recording.pid"
+INFO_FILE="$RUNTIME_DIR/screenshot-recording.info"
+
+MODE=""
+DELAY=0
+NO_AUDIO=false
+NO_FREEZE=false
+CLIPBOARD_ONLY=false
+
+# track background processes for cleanup
+FREEZE_PID=""
+TEMP_FILES=()
+
+# ============================================================
+# CLEANUP
+# ============================================================
+
+cleanup() {
+    unfreeze_screen
+    for f in "${TEMP_FILES[@]}"; do
+        rm -f "$f"
+    done
+}
+trap cleanup EXIT INT TERM
+
+# ============================================================
+# ARGUMENT PARSING
+# ============================================================
+
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            output|region|window|ocr|record)
+                MODE="$1"
+                ;;
+            --delay)
+                DELAY="${2:?--delay requires a number}"
+                shift
+                ;;
+            --no-audio)
+                NO_AUDIO=true
+                ;;
+            --no-freeze)
+                NO_FREEZE=true
+                ;;
+            --clipboard-only)
+                CLIPBOARD_ONLY=true
+                ;;
+            *)
+                echo "Unknown argument: $1" >&2
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
+# ============================================================
+# DEPENDENCY CHECKS
+# ============================================================
+
+check_deps() {
+    local missing=()
+    for cmd in grim slurp hyprctl wl-copy dunstify jq; do
+        command -v "$cmd" &>/dev/null || missing+=("$cmd")
+    done
+
+    case "$MODE" in
+        record)
+            command -v wf-recorder &>/dev/null || missing+=("wf-recorder")
+            ;;
+        ocr)
+            command -v tesseract &>/dev/null || missing+=("tesseract")
+            ;;
+    esac
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Missing dependencies: ${missing[*]}" >&2
+        dunstify -u critical "Screenshot" "Missing: ${missing[*]}" 2>/dev/null
+        exit 1
+    fi
+}
+
+# ============================================================
+# UTILITIES
+# ============================================================
+
+sanitize_title() {
+    local title="$1"
+    # strip forbidden filesystem characters
+    title="${title//[\/\\:*?\"<>|]/_}"
+    # collapse multiple underscores
+    title="$(echo "$title" | sed 's/__*/_/g; s/^_//; s/_$//')"
+    # truncate to 60 chars
+    echo "${title:0:60}"
+}
+
+timestamp() {
+    date +%Y-%m-%d_%H-%M-%S
+}
+
+# ---- Screen Freeze ----
+
+freeze_screen() {
+    [[ "$NO_FREEZE" == true ]] && return
+    hyprpicker -rzq &
+    FREEZE_PID=$!
+    sleep 0.1
+}
+
+unfreeze_screen() {
+    if [[ -n "$FREEZE_PID" ]]; then
+        kill "$FREEZE_PID" 2>/dev/null || true
+        wait "$FREEZE_PID" 2>/dev/null || true
+        FREEZE_PID=""
+    fi
+}
+
+# ---- Window Geometry ----
+
+get_visible_windows() {
+    # get active workspaces per monitor
+    local active_workspaces
+    active_workspaces="$(hyprctl monitors -j | jq '[.[].activeWorkspace.id]')"
+
+    # filter clients to only those on active workspaces, mapped, and not hidden
+    hyprctl clients -j | jq -r --argjson ws "$active_workspaces" '
+        .[] | select(
+            (.workspace.id as $id | $ws | index($id)) and
+            .mapped == true and
+            .hidden == false
+        ) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"
+    '
+}
+
+get_window_title_at() {
+    local geom="$1"
+    # parse "X,Y WxH" format
+    local x y w h
+    x="$(echo "$geom" | cut -d',' -f1)"
+    y="$(echo "$geom" | cut -d' ' -f1 | cut -d',' -f2)"
+    w="$(echo "$geom" | cut -d' ' -f2 | cut -d'x' -f1)"
+    h="$(echo "$geom" | cut -d' ' -f2 | cut -d'x' -f2)"
+
+    # find the client whose position/size matches (with small tolerance for border trimming)
+    hyprctl clients -j | jq -r --argjson tx "$x" --argjson ty "$y" --argjson tw "$w" --argjson th "$h" '
+        .[] | select(
+            ((.at[0] - $tx) | fabs) <= 5 and
+            ((.at[1] - $ty) | fabs) <= 5 and
+            ((.size[0] - $tw) | fabs) <= 5 and
+            ((.size[1] - $th) | fabs) <= 5
+        ) | .title
+    ' | head -1
+}
+
+# ---- Geometry Helpers ----
+
+trim_slurp_border() {
+    # slurp selection has 1px border — compensate: x+1, y+1, w-2, h-2
+    local geom="$1"
+    echo "$geom" | awk -F'[, x]' '{
+        printf "%d,%d %dx%d", $1+1, $2+1, $3-2, $4-2
+    }'
+}
+
+trim_to_monitor() {
+    # clamp geometry to the bounds of a single monitor (for wf-recorder)
+    local geom="$1"
+    local gx gy gw gh
+    gx="$(echo "$geom" | cut -d',' -f1)"
+    gy="$(echo "$geom" | cut -d' ' -f1 | cut -d',' -f2)"
+    gw="$(echo "$geom" | cut -d' ' -f2 | cut -d'x' -f1)"
+    gh="$(echo "$geom" | cut -d' ' -f2 | cut -d'x' -f2)"
+
+    # find the monitor that contains the center of the selection
+    local cx=$(( gx + gw / 2 ))
+    local cy=$(( gy + gh / 2 ))
+
+    local monitor_geom
+    monitor_geom="$(hyprctl monitors -j | jq -r --argjson cx "$cx" --argjson cy "$cy" '
+        .[] | select(
+            $cx >= .x and $cx < (.x + .width) and
+            $cy >= .y and $cy < (.y + .height)
+        ) | "\(.x),\(.y) \(.width)x\(.height)"
+    ' | head -1)"
+
+    if [[ -z "$monitor_geom" ]]; then
+        echo "$geom"
+        return
+    fi
+
+    local mx my mw mh
+    mx="$(echo "$monitor_geom" | cut -d',' -f1)"
+    my="$(echo "$monitor_geom" | cut -d' ' -f1 | cut -d',' -f2)"
+    mw="$(echo "$monitor_geom" | cut -d' ' -f2 | cut -d'x' -f1)"
+    mh="$(echo "$monitor_geom" | cut -d' ' -f2 | cut -d'x' -f2)"
+
+    # clamp
+    local nx ny nw nh
+    nx=$(( gx < mx ? mx : gx ))
+    ny=$(( gy < my ? my : gy ))
+    local right=$(( gx + gw ))
+    local bottom=$(( gy + gh ))
+    local mright=$(( mx + mw ))
+    local mbottom=$(( my + mh ))
+    right=$(( right > mright ? mright : right ))
+    bottom=$(( bottom > mbottom ? mbottom : bottom ))
+    nw=$(( right - nx ))
+    nh=$(( bottom - ny ))
+
+    echo "${nx},${ny} ${nw}x${nh}"
+}
+
+# ---- Notification ----
+
+send_notification() {
+    local filepath="$1"
+    local title="${2:-Screenshot}"
+    local body="${3:-Saved and copied to clipboard}"
+
+    # run in background subshell so script exits immediately
+    (
+        local action
+        action="$(dunstify "$title" "$body" \
+            -i "$filepath" \
+            -A "edit,Edit" \
+            -A "open,Open folder" \
+            -A "delete,Delete" \
+            --block 2>/dev/null)"
+
+        case "$action" in
+            edit)
+                satty -f "$filepath" -o "$filepath" 2>/dev/null || swappy -f "$filepath" -o "$filepath" 2>/dev/null
+                wl-copy < "$filepath" 2>/dev/null
+                ;;
+            open)
+                xdg-open "$(dirname "$filepath")" 2>/dev/null
+                ;;
+            delete)
+                rm -f "$filepath"
+                dunstify "Screenshot" "Deleted" -t 2000 2>/dev/null
+                ;;
+        esac
+    ) &
+    disown
+}
+
+# ---- Save & Copy ----
+
+save_and_copy() {
+    local filepath="$1"
+
+    wl-copy < "$filepath"
+
+    if [[ "$CLIPBOARD_ONLY" == true ]]; then
+        rm -f "$filepath"
+        dunstify "Screenshot" "Copied to clipboard" 2>/dev/null &
+        disown
+    else
+        send_notification "$filepath" "Screenshot" "Saved and copied to clipboard"
+    fi
+}
+
+# ============================================================
+# CAPTURE MODES
+# ============================================================
+
+# ---- Output (Full Monitor) ----
+
+capture_output() {
+    local ts
+    ts="$(timestamp)"
+    local filepath="$SCREENSHOT_DIR/${ts}.png"
+
+    local monitor
+    monitor="$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')"
+
+    if [[ "$DELAY" -gt 0 ]]; then
+        sleep "$DELAY"
+    fi
+
+    grim -o "$monitor" "$filepath"
+    save_and_copy "$filepath"
+}
+
+# ---- Region ----
+
+capture_region() {
+    freeze_screen
+
+    local geom
+    geom="$(slurp 2>/dev/null)" || { unfreeze_screen; exit 0; }
+    geom="$(trim_slurp_border "$geom")"
+
+    if [[ "$DELAY" -gt 0 ]]; then
+        unfreeze_screen
+        sleep "$DELAY"
+    fi
+
+    local ts
+    ts="$(timestamp)"
+    local filepath="$SCREENSHOT_DIR/${ts}.png"
+
+    grim -g "$geom" "$filepath"
+    unfreeze_screen
+    save_and_copy "$filepath"
+}
+
+# ---- Window ----
+
+capture_window() {
+    freeze_screen
+
+    local windows
+    windows="$(get_visible_windows)"
+
+    if [[ -z "$windows" ]]; then
+        unfreeze_screen
+        dunstify "Screenshot" "No visible windows found" 2>/dev/null
+        exit 1
+    fi
+
+    local geom
+    geom="$(echo "$windows" | slurp -r 2>/dev/null)" || { unfreeze_screen; exit 0; }
+
+    # get window title from the selected geometry before trimming
+    local title
+    title="$(get_window_title_at "$geom")"
+
+    local ts
+    ts="$(timestamp)"
+    local filename
+    if [[ -n "$title" ]]; then
+        local safe_title
+        safe_title="$(sanitize_title "$title")"
+        filename="${safe_title}_${ts}.png"
+    else
+        filename="${ts}.png"
+    fi
+    local filepath="$SCREENSHOT_DIR/$filename"
+
+    if [[ "$DELAY" -gt 0 ]]; then
+        unfreeze_screen
+        sleep "$DELAY"
+    fi
+
+    grim -g "$geom" "$filepath"
+    unfreeze_screen
+    save_and_copy "$filepath"
+}
+
+# ---- OCR ----
+
+capture_ocr() {
+    freeze_screen
+
+    local geom
+    geom="$(slurp 2>/dev/null)" || { unfreeze_screen; exit 0; }
+    geom="$(trim_slurp_border "$geom")"
+
+    local tmpfile
+    tmpfile="$(mktemp /tmp/screenshot-ocr-XXXXXX.png)"
+    TEMP_FILES+=("$tmpfile")
+
+    grim -g "$geom" "$tmpfile"
+    unfreeze_screen
+
+    local text
+    text="$(tesseract "$tmpfile" - 2>/dev/null)"
+
+    if [[ -n "$text" ]]; then
+        echo -n "$text" | wl-copy
+        dunstify "OCR" "Text copied to clipboard" 2>/dev/null &
+        disown
+    else
+        dunstify "OCR" "No text detected" 2>/dev/null &
+        disown
+    fi
+}
+
+# ============================================================
+# RECORDING
+# ============================================================
+
+start_recording() {
+    local geom
+    geom="$(slurp 2>/dev/null)" || exit 0
+    geom="$(trim_slurp_border "$geom")"
+    geom="$(trim_to_monitor "$geom")"
+
+    local ts
+    ts="$(timestamp)"
+    local filepath="$RECORDING_DIR/${ts}.mp4"
+
+    local recorder_args=(-g "$geom" -f "$filepath")
+    if [[ "$NO_AUDIO" == false ]]; then
+        recorder_args+=(--audio)
+    fi
+
+    wf-recorder "${recorder_args[@]}" &
+    local pid=$!
+
+    echo "$pid" > "$PID_FILE"
+    echo "$filepath" > "$INFO_FILE"
+
+    pkill -RTMIN+8 waybar 2>/dev/null
+    dunstify "Recording" "Recording started" 2>/dev/null &
+    disown
+
+    wait "$pid" 2>/dev/null || true
+
+    # recording stopped — clean up pid file and update waybar
+    rm -f "$PID_FILE"
+    pkill -RTMIN+8 waybar 2>/dev/null
+
+    if [[ -f "$filepath" ]]; then
+        local info_path
+        info_path="$(cat "$INFO_FILE" 2>/dev/null)"
+        rm -f "$INFO_FILE"
+
+        wl-copy < "$filepath"
+        # no edit action for recordings
+        (
+            local action
+            action="$(dunstify "Recording" "Saved and copied to clipboard" \
+                -i "$filepath" \
+                -A "open,Open folder" \
+                -A "delete,Delete" \
+                --block 2>/dev/null)"
+            case "$action" in
+                open) xdg-open "$(dirname "$filepath")" 2>/dev/null ;;
+                delete)
+                    rm -f "$filepath"
+                    dunstify "Recording" "Deleted" -t 2000 2>/dev/null
+                    ;;
+            esac
+        ) &
+        disown
+    fi
+}
+
+stop_recording() {
+    if [[ -f "$PID_FILE" ]]; then
+        local pid
+        pid="$(cat "$PID_FILE")"
+        if kill -0 "$pid" 2>/dev/null; then
+            kill -INT "$pid"
+            # let start_recording's wait handle the rest
+        else
+            rm -f "$PID_FILE" "$INFO_FILE"
+        fi
+    fi
+}
+
+toggle_recording() {
+    if [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+        stop_recording
+    else
+        rm -f "$PID_FILE" "$INFO_FILE"
+        start_recording
+    fi
+}
+
+is_recording() {
+    [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
+}
+
+# ============================================================
+# ROFI MENU
+# ============================================================
+
+rofi_menu() {
+    local record_label
+    if is_recording; then
+        record_label="  Stop Recording"
+    else
+        record_label="  Start Recording"
+    fi
+
+    local choice
+    choice="$(printf '%s\n' \
+        "󰆞  Area" \
+        "  Fullscreen" \
+        "  Window" \
+        "󱄽  OCR (copy text)" \
+        "$record_label" \
+        "  Open folder" \
+        | rofi -dmenu -i -p "Screenshot" \
+            -theme ~/.config/rofi/screenshot/style.rasi \
+    )" || exit 0
+
+    case "$choice" in
+        "󰆞  Area")
+            MODE=region
+            ;;
+        "  Fullscreen")
+            MODE=output
+            ;;
+        "  Window")
+            MODE=window
+            ;;
+        "󱄽  OCR (copy text)")
+            MODE=ocr
+            ;;
+        *"Recording"*)
+            MODE=record
+            ;;
+        "  Open folder")
+            xdg-open "$SCREENSHOT_DIR" 2>/dev/null
+            exit 0
+            ;;
+        *)
+            exit 0
+            ;;
+    esac
+}
+
+# ============================================================
+# MAIN
+# ============================================================
+
+parse_args "$@"
+
+# no mode specified — show rofi menu
+if [[ -z "$MODE" ]]; then
+    rofi_menu
+fi
+
+check_deps
+mkdir -p "$SCREENSHOT_DIR" "$RECORDING_DIR"
+
+case "$MODE" in
+    output)  capture_output  ;;
+    region)  capture_region  ;;
+    window)  capture_window  ;;
+    ocr)     capture_ocr     ;;
+    record)  toggle_recording ;;
+esac

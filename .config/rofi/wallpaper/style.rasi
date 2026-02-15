@@ -27,7 +27,7 @@ window {
     width:            600px;
     border:           2px solid;
     border-color:     @g9;
-    border-radius:    12px;
+    border-radius:    @border-radius;
     background-color: @background;
 }
 
@@ -52,14 +52,14 @@ inputbar {
 
 prompt {
     padding:          12px 18px;
-    border-radius:    8px;
+    border-radius:    @border-radius;
     background-color: @g9;
     text-color:       @crust;
 }
 
 entry {
     padding:           12px;
-    border-radius:     8px;
+    border-radius:     @border-radius;
     background-color:  @surface0;
     placeholder:       "Search wallpapers...";
     placeholder-color: @overlay0;
@@ -84,7 +84,7 @@ listview {
 element {
     orientation:   vertical;
     padding:       10px;
-    border-radius: 8px;
+    border-radius: @border-radius;
     cursor:        pointer;
 }
 

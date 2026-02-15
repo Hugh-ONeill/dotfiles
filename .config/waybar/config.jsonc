@@ -333,7 +333,7 @@
     "return-type": "json",
     "format": "{}", // in wifiinfo.sh, change "Wi-Fi" to "${essid}" to display network name
     "tooltip": true,
-    "on-click": "~/.config/waybar/scripts/wifimenu.sh",
+    "on-click": "pkill -x rofi || ~/.config/rofi/network/network.sh",
     "interval": 10,
     "min-length": 8,
     "max-length": 8
@@ -374,7 +374,7 @@
       ]
     },
     "tooltip-format": "{icon} {desc} // {volume}%",
-    "on-click": "pavucontrol -t 3",
+    "on-click": "hyprpwcenter",
     "on-click-right": "~/.local/bin/volumecontrol.sh -s ''",
     "on-click-middle": "~/.local/bin/volumecontrol.sh -o m",
     "on-scroll-up": "~/.local/bin/volumecontrol.sh -o i",
@@ -416,7 +416,7 @@
 
   // Power Menu
   "custom/power": {
-    "format": "󰐥 ",
+    "format": "󰐥",
     "tooltip": false,
     "on-click": "~/.local/bin/logoutlaunch.sh 2",
     "on-click-right": "~/.local/bin/logoutlaunch.sh 1",
@@ -496,10 +496,6 @@
     "format": "",
     "tooltip": false
   },
-  "custom/right-unused1": {
-    "format": "",
-    "tooltip": false
-  },
   // Left Inverse (same glyph direction as left)
   "custom/leftin-cpu-idle": {
     "format": "",
@@ -509,21 +505,9 @@
     "format": "",
     "tooltip": false
   },
-  "custom/leftin-unused1": {
-    "format": "",
-    "tooltip": false
-  },
   // Right Inverse (same glyph direction as right)
   "custom/rightin-clock-time": {
     "format": "",
     "tooltip": false
   },
-  "custom/rightin-unused1": {
-    "format": "",
-    "tooltip": false
-  },
-  "custom/rightin-unused2": {
-    "format": "",
-    "tooltip": false
-  }
 }

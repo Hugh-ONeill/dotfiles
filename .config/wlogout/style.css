@@ -1,4 +1,4 @@
-/* catppuccin wlogout theme */
+/* crystal wlogout theme */
 
 * {
     font-family: "FiraCode Nerd Font";
@@ -13,12 +13,12 @@ window {
 }
 
 button {
-    color: #cdd6f4;
-    background-color: #1e1e2e;
+    color: #f0e8f8;
+    background-color: #1a1424;
     background-repeat: no-repeat;
     background-position: center;
     background-size: 25%;
-    border: 1px solid #585b70;
+    border: 1px solid #3a2e4a;
     border-radius: 3px;
     text-shadow: none;
     box-shadow: none;
@@ -26,16 +26,16 @@ button {
 }
 
 button:focus {
-    color: #45475a;
-    background-color: #b4befe;
+    color: #2e243c;
+    background-color: #ff3090;
     background-size: 35%;
-    border: 1px solid #b4befe;
+    border: 1px solid #ff3090;
 }
 
 button:hover {
-    background-color: #313244;
+    background-color: #241c30;
     background-size: 35%;
-    border: 1px solid #b4befe;
+    border: 1px solid #ff3090;
 }
 
 /* Default icons - white for dark themes */

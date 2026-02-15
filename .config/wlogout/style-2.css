@@ -1,4 +1,4 @@
-/* catppuccin wlogout style-2 */
+/* crystal wlogout style-2 */
 
 * {
   font-family: "FiraCode Nerd Font";
@@ -13,7 +13,7 @@ window {
 }
 
 button {
-  color: #cdd6f4;
+  color: #f0e8f8;
   background-color: transparent;
   background-repeat: no-repeat;
   background-position: center;
@@ -24,15 +24,15 @@ button {
 }
 
 button:focus {
-  color: #45475a;
-  background-color: #b4befe;
+  color: #2e243c;
+  background-color: #ff3090;
   background-size: 30%;
-  outline: 1px solid #b4befe;
+  outline: 1px solid #ff3090;
   border-radius: 3px;
 }
 
 button:hover {
-  background-color: #313244;
+  background-color: #241c30;
   background-size: 30%;
 }
 

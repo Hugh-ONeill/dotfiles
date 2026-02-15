@@ -1,14 +1,18 @@
-[Default Applications]
-x-scheme-handler/rdp=org.remmina.Remmina.desktop
-x-scheme-handler/spice=org.remmina.Remmina.desktop
-x-scheme-handler/vnc=org.remmina.Remmina.desktop
-x-scheme-handler/remmina=org.remmina.Remmina.desktop
-application/x-remmina=org.remmina.Remmina.desktop
-inode/directory=org.kde.dolphin.desktop
-
 [Added Associations]
+application/x-remmina=org.remmina.Remmina.desktop;
+image/gif=gwenview-3.desktop;
+image/png=gwenview-4.desktop;gwenview-2.desktop;gwenview.desktop;
 x-scheme-handler/rdp=org.remmina.Remmina.desktop;
+x-scheme-handler/remmina=org.remmina.Remmina.desktop;
 x-scheme-handler/spice=org.remmina.Remmina.desktop;
 x-scheme-handler/vnc=org.remmina.Remmina.desktop;
-x-scheme-handler/remmina=org.remmina.Remmina.desktop;
-application/x-remmina=org.remmina.Remmina.desktop;
+
+[Default Applications]
+application/x-remmina=org.remmina.Remmina.desktop
+image/gif=gwenview-3.desktop;
+image/png=gwenview-4.desktop;
+inode/directory=org.kde.dolphin.desktop
+x-scheme-handler/rdp=org.remmina.Remmina.desktop
+x-scheme-handler/remmina=org.remmina.Remmina.desktop
+x-scheme-handler/spice=org.remmina.Remmina.desktop
+x-scheme-handler/vnc=org.remmina.Remmina.desktop

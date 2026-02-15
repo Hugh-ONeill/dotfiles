@@ -1093,6 +1093,19 @@ def generate_theme_palette(palette: dict, output_path: str) -> None:
             "ft_executable": colors["color1"],  # red hue
             "ft_build": colors["color4"],    # blue hue
             "ft_ignore": colors["color8"],
+            # ANSI colors (normal + bright)
+            "ansi_red": colors["color1"],
+            "ansi_green": colors["color2"],
+            "ansi_yellow": colors["color3"],
+            "ansi_blue": colors["color4"],
+            "ansi_magenta": colors["color5"],
+            "ansi_cyan": colors["color6"],
+            "ansi_red_bright": colors["color9"],
+            "ansi_green_bright": colors["color10"],
+            "ansi_yellow_bright": colors["color11"],
+            "ansi_blue_bright": colors["color12"],
+            "ansi_magenta_bright": colors["color13"],
+            "ansi_cyan_bright": colors["color14"],
         },
         "gradient": [gradient[f"g{i}"] for i in range(10)],
     }
