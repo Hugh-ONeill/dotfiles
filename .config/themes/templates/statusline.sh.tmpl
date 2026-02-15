@@ -64,11 +64,15 @@ else
   context_percent=0
 fi
 
-# Format duration (convert ms to minutes:seconds)
-duration_sec=$((duration_ms / 1000))
-duration_min=$((duration_sec / 60))
-duration_sec=$((duration_sec % 60))
-duration=$(printf "%dm%02ds" $duration_min $duration_sec)
+# Format duration (convert ms to days/hours/minutes)
+duration_total_min=$((duration_ms / 60000))
+duration_days=$((duration_total_min / 1440))
+duration_hours=$(( (duration_total_min % 1440) / 60 ))
+duration_min=$((duration_total_min % 60))
+duration=""
+[ "$duration_days" -gt 0 ] && duration+="${duration_days}d"
+[ "$duration_hours" -gt 0 ] && duration+="${duration_hours}h"
+duration+="${duration_min}m"
 
 # ${THEME_NAME} colors
 # Structural colors

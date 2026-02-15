@@ -6,9 +6,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-THEMES_DIR="$(dirname "$SCRIPT_DIR")"
-TEMPLATES_DIR="$THEMES_DIR/templates"
-PALETTES_DIR="$THEMES_DIR/palettes"
+source "$(dirname "$SCRIPT_DIR")/lib/config.sh"
+source "$LIB_DIR/utils.sh"
 
 if [[ -z "$1" ]]; then
     echo "Usage: $0 <theme-name>"
@@ -31,41 +30,9 @@ fi
 # Create output directory
 mkdir -p "$OUTPUT_DIR"
 
-# Function to convert hex color to RGB (e.g., #ff0000 -> 255;0;0)
-hex_to_rgb() {
-    local hex="${1#\#}"
-    local r=$((16#${hex:0:2}))
-    local g=$((16#${hex:2:2}))
-    local b=$((16#${hex:4:2}))
-    echo "$r;$g;$b"
-}
-
-# Function to calculate perceived luminance (0-255) from hex color
-hex_luminance() {
-    local hex="${1#\#}"
-    local r=$((16#${hex:0:2}))
-    local g=$((16#${hex:2:2}))
-    local b=$((16#${hex:4:2}))
-    echo $(( (299 * r + 587 * g + 114 * b) / 1000 ))
-}
-
 # Load JSON palette and resolve color references
 declare -A COLORS
-
-# First pass: load all hex values directly
-while IFS='=' read -r key value; do
-    COLORS["$key"]="$value"
-done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#")) | "\(.key)=\(.value)"' "$PALETTE_FILE")
-
-# Second pass: resolve references (values without #)
-while IFS='=' read -r key ref; do
-    resolved="${COLORS[$ref]}"
-    if [[ -n "$resolved" ]]; then
-        COLORS["$key"]="$resolved"
-    else
-        echo "Warning: unresolved reference '$ref' for '$key'" >&2
-    fi
-done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#") | not) | "\(.key)=\(.value)"' "$PALETTE_FILE")
+load_palette_colors COLORS "$PALETTE_FILE"
 
 # Load style settings with defaults
 export STYLE_CORNER_RADIUS=$(jq -r '.style.corner_radius // 3' "$PALETTE_FILE")
@@ -167,7 +134,7 @@ MODULE_FG_LIGHT="${COLORS[module_fg_light]}"
 get_contrast_fg() {
     local bg_color="$1"
     local lum=$(hex_luminance "$bg_color")
-    if [[ $lum -gt 140 ]]; then
+    if [[ $lum -gt $LUMINANCE_THRESHOLD ]]; then
         echo "$MODULE_FG"
     else
         echo "$MODULE_FG_LIGHT"

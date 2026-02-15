@@ -5,8 +5,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-THEMES_DIR="$(dirname "$SCRIPT_DIR")"
-PALETTES_DIR="$THEMES_DIR/palettes"
+source "$(dirname "$SCRIPT_DIR")/lib/config.sh"
+source "$LIB_DIR/utils.sh"
 STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 
 if [[ ! -f "$STARSHIP_CONFIG" ]]; then
@@ -14,22 +14,13 @@ if [[ ! -f "$STARSHIP_CONFIG" ]]; then
     exit 1
 fi
 
-# Calculate perceived luminance (0-255) from hex color
-hex_luminance() {
-    local hex="${1#\#}"
-    local r=$((16#${hex:0:2}))
-    local g=$((16#${hex:2:2}))
-    local b=$((16#${hex:4:2}))
-    echo $(( (299 * r + 587 * g + 114 * b) / 1000 ))
-}
-
 # Get contrasting foreground based on background luminance
 get_contrast_fg() {
     local bg_color="$1"
     local dark_fg="$2"
     local light_fg="$3"
     local lum=$(hex_luminance "$bg_color")
-    if [[ $lum -gt 140 ]]; then
+    if [[ $lum -gt $LUMINANCE_THRESHOLD ]]; then
         echo "$dark_fg"
     else
         echo "$light_fg"
@@ -43,16 +34,7 @@ generate_palette_block() {
 
     # Load colors into associative array, resolving references
     declare -A colors
-
-    # First pass: hex values
-    while IFS='=' read -r key value; do
-        colors["$key"]="$value"
-    done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#")) | "\(.key)=\(.value)"' "$palette_file")
-
-    # Second pass: resolve references
-    while IFS='=' read -r key ref; do
-        colors["$key"]="${colors[$ref]}"
-    done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#") | not) | "\(.key)=\(.value)"' "$palette_file")
+    load_palette_colors colors "$palette_file"
 
     # Load gradient
     readarray -t gradient_refs < <(jq -r '.gradient[]' "$palette_file")

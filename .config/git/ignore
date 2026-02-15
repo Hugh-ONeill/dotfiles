@@ -1,0 +1,94 @@
+# Dotfiles .gitignore - Prevents committing sensitive/temporary files
+
+# ============================================================================
+# SECRETS & CREDENTIALS (CRITICAL!)
+# ============================================================================
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+*secret*
+*password*
+*token*
+*credentials*
+.ssh/id_*
+.ssh/*_rsa*
+.ssh/known_hosts
+.ssh/authorized_keys
+.gnupg/*.key
+.gnupg/private-keys-v1.d/
+.aws/credentials
+.kube/config
+.docker/config.json
+.config/gh/hosts.yml
+
+# ============================================================================
+# BACKUP & TEMPORARY FILES
+# ============================================================================
+*.bak
+*.bak[0-9]
+*.backup
+*.backup-*
+*~
+*.tmp
+*.temp
+*.swp
+*.swo
+.*.sw?
+
+# ============================================================================
+# CACHE & STATE
+# ============================================================================
+.cache/
+*.cache
+.zcompdump*
+.zsh_history
+.bash_history
+.lesshst
+.viminfo
+.local/state/
+.config/zsh/.zcompdump*
+.config/dolphinrc
+.config/baloofileinformationrc
+.config/pavucontrol.ini
+.config/QtProject.conf
+session/
+
+# ============================================================================
+# HARDWARE/SYSTEM SPECIFIC
+# ============================================================================
+.config/nvidia/
+.config/git/config.local
+.config/systemd/*
+!.config/systemd/user/
+.Xauthority
+.ICEauthority
+
+# ============================================================================
+# APPLICATION DATA
+# ============================================================================
+# Remote desktop (may contain server IPs/credentials)
+.config/remmina/*.remmina
+.config/remmina/remmina_mru.csv
+
+# Browser data
+.mozilla/firefox/*/storage/
+.mozilla/firefox/*/cache2/
+.mozilla/firefox/*/cookies.sqlite
+.mozilla/firefox/*/sessionstore*
+
+# ============================================================================
+# LOG FILES
+# ============================================================================
+*.log
+.local/share/pomodoro/media-player.log
+
+# ============================================================================
+# ALLOW ESSENTIAL DOTFILES
+# ============================================================================
+!.gitignore
+!.gitconfig
+!.zshenv

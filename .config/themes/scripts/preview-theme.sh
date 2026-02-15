@@ -1,32 +1,17 @@
 #!/bin/bash
 # Preview theme colors for fzf-tab
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$(dirname "$SCRIPT_DIR")/lib/config.sh"
+source "$LIB_DIR/utils.sh"
+
 theme="$1"
-palette="$HOME/.config/themes/palettes/$theme.json"
+palette="$PALETTES_DIR/$theme.json"
 
 [[ ! -f "$palette" ]] && echo "Theme not found" && exit 1
 
-# Function to print a colored block
-color_block() {
-    local hex="${1#\#}"
-    [[ -z "$hex" || "$hex" == "null" ]] && return
-    local r=$((16#${hex:0:2}))
-    local g=$((16#${hex:2:2}))
-    local b=$((16#${hex:4:2}))
-    printf "\033[48;2;%d;%d;%dm  \033[0m" "$r" "$g" "$b"
-}
-
-# Get a color, resolving references
-get_color() {
-    local key="$1"
-    local val=$(jq -r ".colors.$key // empty" "$palette")
-    if [[ "$val" == \#* ]]; then
-        echo "$val"
-    elif [[ -n "$val" ]]; then
-        # It's a reference to another color
-        jq -r ".colors.$val // empty" "$palette"
-    fi
-}
+# Shorthand: resolve a single color from the palette
+get_color() { resolve_color "$1" "$palette"; }
 
 # Description
 desc=$(jq -r '.description // empty' "$palette")

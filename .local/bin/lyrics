@@ -1,0 +1,761 @@
+#!/usr/bin/env python3
+# Lightweight terminal lyrics viewer using MPRIS + lrclib
+# Usage: lyrics
+# Keys: q=quit, /=cycle annotations, space=pause, >/<=skip, j/k=scroll
+
+import curses
+import json
+import os
+import re
+import subprocess
+import textwrap
+import urllib.parse
+import urllib.request
+
+GENIUS_TOKEN_FILE = os.path.expanduser("~/.config/lyrics/genius_token")
+
+# annotation modes
+ANN_OFF = 0
+ANN_RUNNING = 1
+ANN_TOTAL = 2
+
+
+def playerctl(*args):
+    """Run playerctl command and return stdout"""
+    try:
+        r = subprocess.run(
+            ["playerctl", *args], capture_output=True, text=True, timeout=2
+        )
+        return r.stdout.strip() if r.returncode == 0 else None
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return None
+
+
+def get_metadata():
+    """Get current track metadata in a single playerctl call"""
+    fmt = "{{artist}}\t{{title}}\t{{album}}\t{{mpris:length}}\t{{status}}"
+    out = playerctl("metadata", "--format", fmt)
+    if not out:
+        return None
+    parts = out.split("\t")
+    if len(parts) < 5 or not parts[1]:
+        return None
+    length = parts[3]
+    return {
+        "artist": parts[0],
+        "title": parts[1],
+        "album": parts[2],
+        "duration": int(length) // 1_000_000 if length.isdigit() else 0,
+        "status": parts[4],
+    }
+
+
+def get_position():
+    """Get playback position in seconds"""
+    out = playerctl("position")
+    return float(out) if out else 0.0
+
+
+# ============================================================
+# LRCLIB
+# ============================================================
+
+def lrclib_request(url):
+    """Make a request to lrclib.net"""
+    req = urllib.request.Request(url, headers={"User-Agent": "lyrics/1.0"})
+    with urllib.request.urlopen(req, timeout=5) as resp:
+        return json.loads(resp.read())
+
+
+def fetch_lyrics(title, artist, album, duration):
+    """Fetch synced lyrics from lrclib.net with search fallback"""
+    params = urllib.parse.urlencode({
+        "track_name": title,
+        "artist_name": artist,
+        "album_name": album,
+        "duration": duration,
+    })
+    try:
+        data = lrclib_request(f"https://lrclib.net/api/get?{params}")
+        if data.get("syncedLyrics"):
+            return data["syncedLyrics"], data.get("instrumental", False)
+    except Exception:
+        pass
+
+    params = urllib.parse.urlencode({
+        "track_name": title,
+        "artist_name": artist,
+    })
+    try:
+        results = lrclib_request(f"https://lrclib.net/api/search?{params}")
+        for r in results:
+            if r.get("syncedLyrics"):
+                return r["syncedLyrics"], r.get("instrumental", False)
+    except Exception:
+        pass
+
+    return None, False
+
+
+def parse_lrc(lrc_text):
+    """Parse LRC format into [(seconds, text), ...]"""
+    lines = []
+    strip_ts = re.compile(r"[\[<]\d+:\d+\.\d+[\]>]\s*")
+    for line in lrc_text.strip().split("\n"):
+        timestamps = [(int(m.group(1)) * 60 + float(m.group(2)))
+                      for m in re.finditer(r"\[(\d+):(\d+\.\d+)\]", line)]
+        text = strip_ts.sub("", line).strip()
+        for ts in timestamps:
+            lines.append((ts, text))
+    lines.sort(key=lambda x: x[0])
+    return lines
+
+
+def find_current(lyrics, position):
+    """Find index of the current lyric line"""
+    idx = 0
+    for i, (ts, _) in enumerate(lyrics):
+        if ts <= position:
+            idx = i
+        else:
+            break
+    return idx
+
+
+# ============================================================
+# GENIUS
+# ============================================================
+
+def load_genius_token():
+    """Read Genius API token from file"""
+    try:
+        with open(GENIUS_TOKEN_FILE) as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return None
+
+
+def genius_request(endpoint, token, params=None):
+    """Make an authenticated request to the Genius API"""
+    base = "https://api.genius.com"
+    url = f"{base}{endpoint}"
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={
+        "Authorization": f"Bearer {token}",
+        "User-Agent": "lyrics/1.0",
+    })
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        return json.loads(resp.read())
+
+
+def genius_search(title, artist, token):
+    """Search Genius for a song, return song ID or None"""
+    query = f"{artist} {title}"
+    try:
+        data = genius_request("/search", token, {"q": query})
+        hits = data.get("response", {}).get("hits", [])
+        artist_lower = artist.lower()
+        title_lower = title.lower()
+        for hit in hits:
+            result = hit.get("result", {})
+            if (title_lower in result.get("title", "").lower()
+                    and artist_lower in result.get("primary_artist", {}).get("name", "").lower()):
+                return result.get("id")
+        if hits:
+            return hits[0].get("result", {}).get("id")
+    except Exception:
+        pass
+    return None
+
+
+def genius_fetch_annotations(song_id, token):
+    """Fetch referents (annotated fragments) for a song"""
+    annotations = []
+    try:
+        data = genius_request("/referents", token, {
+            "song_id": song_id,
+            "text_format": "plain",
+            "per_page": 20,
+        })
+        referents = data.get("response", {}).get("referents", [])
+        for ref in referents:
+            fragment = ref.get("fragment", "").strip()
+            if not fragment:
+                continue
+            annots = ref.get("annotations", [])
+            for a in annots:
+                body = a.get("body", {}).get("plain", "").strip()
+                if body:
+                    annotations.append({"fragment": fragment, "body": body})
+    except Exception:
+        pass
+    return annotations
+
+
+def find_annotation_for_line(annotations, lyric_text):
+    """Find the best matching annotation for a lyric line"""
+    if not lyric_text or not annotations:
+        return None
+    lyric_lower = lyric_text.lower().strip()
+    if not lyric_lower:
+        return None
+    # check if lyric line appears in any fragment
+    for ann in annotations:
+        frag_lower = ann["fragment"].lower()
+        if lyric_lower in frag_lower or frag_lower in lyric_lower:
+            return ann
+    # fuzzy: check if most words from the lyric appear in a fragment
+    words = [w for w in lyric_lower.split() if len(w) > 2]
+    if words:
+        for ann in annotations:
+            frag_lower = ann["fragment"].lower()
+            matches = sum(1 for w in words if w in frag_lower)
+            if matches >= len(words) * 0.6:
+                return ann
+    return None
+
+
+def wrap_annotations(annotations, width):
+    """Pre-wrap annotation text into display lines"""
+    lines = []
+    for i, ann in enumerate(annotations):
+        if i > 0:
+            lines.append(("sep", "\u2500" * min(width, 30)))
+
+        lines.append(("label", "\u275d"))
+        for wl in textwrap.wrap(ann["fragment"], width):
+            lines.append(("fragment", wl))
+        lines.append(("label", "\u275e"))
+        lines.append(("blank", ""))
+
+        for wl in textwrap.wrap(ann["body"], width):
+            lines.append(("body", wl))
+    return lines
+
+
+def wrap_single_annotation(ann, width):
+    """Wrap a single annotation into display lines"""
+    lines = []
+    lines.append(("label", "\u275d"))
+    for wl in textwrap.wrap(ann["fragment"], width):
+        lines.append(("fragment", wl))
+    lines.append(("label", "\u275e"))
+    lines.append(("blank", ""))
+    for wl in textwrap.wrap(ann["body"], width):
+        lines.append(("body", wl))
+    return lines
+
+
+# ============================================================
+# THEME
+# ============================================================
+
+def hex_to_curses(hex_color):
+    """Convert #rrggbb to curses RGB scale (0-1000)"""
+    h = hex_color.lstrip("#")
+    return (int(h[0:2], 16) * 1000 // 255,
+            int(h[2:4], 16) * 1000 // 255,
+            int(h[4:6], 16) * 1000 // 255)
+
+
+def load_theme_colors():
+    """Read accent, subtext, surface, mantle, and gradient colors from current theme palette"""
+    theme_file = os.path.expanduser("~/.config/themes/.current")
+    try:
+        with open(theme_file) as f:
+            theme = f.read().strip()
+    except FileNotFoundError:
+        return None, None, None, None, []
+
+    for path in [
+        os.path.expanduser(f"~/.config/themes/{theme}/palette.json"),
+        os.path.expanduser(f"~/.config/themes/palettes/{theme}.json"),
+    ]:
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            colors = data.get("colors", {})
+
+            def resolve(key):
+                val = colors.get(key, "")
+                return val if val.startswith("#") else colors.get(val, "")
+
+            gradient_refs = data.get("gradient", [])
+            gradient = []
+            for ref in gradient_refs:
+                if ref.startswith("#"):
+                    gradient.append(ref)
+                else:
+                    resolved = colors.get(ref, "")
+                    if resolved:
+                        gradient.append(resolved)
+
+            return (resolve("accent"), resolve("subtext0"), resolve("surface0"),
+                    resolve("mantle"), gradient)
+        except (FileNotFoundError, json.JSONDecodeError):
+            continue
+    return None, None, None, None, []
+
+
+# ============================================================
+# DRAWING
+# ============================================================
+
+def draw_box(stdscr, y, x, h, w, style="round", attr=0):
+    """Draw a border box"""
+    chars = {
+        "round":  ("\u256d", "\u256e", "\u2570", "\u256f", "\u2500", "\u2502"),
+        "double": ("\u2554", "\u2557", "\u255a", "\u255d", "\u2550", "\u2551"),
+        "heavy":  ("\u250f", "\u2513", "\u2517", "\u251b", "\u2501", "\u2503"),
+    }
+    tl, tr, bl, br, hz, vt = chars.get(style, chars["round"])
+    try:
+        stdscr.addstr(y, x, tl + hz * (w - 2) + tr, attr)
+        for row in range(y + 1, y + h - 1):
+            stdscr.addstr(row, x, vt, attr)
+            stdscr.addstr(row, x + w - 1, vt, attr)
+        stdscr.addstr(y + h - 1, x, bl + hz * (w - 2) + br, attr)
+    except curses.error:
+        pass
+
+
+def centered_in(stdscr, y, x, w, text, attr):
+    """Draw text centered within a region"""
+    if len(text) > w - 2:
+        text = text[: w - 5] + "..."
+    tx = x + max(0, (w - len(text)) // 2)
+    try:
+        stdscr.addstr(y, tx, text, attr)
+    except curses.error:
+        pass
+
+
+def fill_outer_bg(stdscr, term_h, term_w):
+    """Fill the entire screen with the outer (mantle) background"""
+    fill = " " * term_w
+    attr = curses.color_pair(7)
+    for row in range(term_h):
+        try:
+            stdscr.addstr(row, 0, fill, attr)
+        except curses.error:
+            pass
+
+
+def draw_header_footer(stdscr, meta, term_h, term_w, mode_label, hint):
+    """Draw outer border with track info and hints"""
+    draw_box(stdscr, 0, 0, term_h, term_w, "double", curses.color_pair(5))
+
+    info = f" \u266b {meta['artist']} \u2014 {meta['title']} \u266b "
+    if mode_label:
+        info = f" \u266b {meta['artist']} \u2014 {meta['title']} \u2502 {mode_label} \u266b "
+    if len(info) > term_w - 4:
+        info = info[: term_w - 7] + "... \u266b "
+    try:
+        stdscr.addstr(
+            0, max(1, (term_w - len(info)) // 2), info,
+            curses.A_BOLD | curses.color_pair(6)
+        )
+    except curses.error:
+        pass
+
+    try:
+        stdscr.addstr(
+            term_h - 1, max(1, (term_w - len(hint)) // 2), hint,
+            curses.color_pair(5)
+        )
+    except curses.error:
+        pass
+
+
+def format_time(seconds):
+    """Format seconds as M:SS"""
+    m, s = divmod(int(seconds), 60)
+    return f"{m}:{s:02d}"
+
+
+def draw_progress_bar(stdscr, y, x, w, position, duration, n_gradients):
+    """Draw a gradient progress bar with fractional-block fill edge"""
+    if duration <= 0 or w < 10:
+        return
+
+    time_l = format_time(position)
+    time_r = format_time(duration)
+    label_w = len(time_l) + len(time_r) + 2
+    bar_w = w - label_w
+
+    if bar_w < 4:
+        return
+
+    try:
+        stdscr.addstr(y, x, time_l, curses.color_pair(5))
+        stdscr.addstr(y, x + len(time_l) + bar_w + 1, time_r, curses.color_pair(5))
+    except curses.error:
+        pass
+
+    bar_x = x + len(time_l) + 1
+    progress = min(position, duration) / duration
+    # sub-cell position: which eighth of the edge cell is filled
+    filled_exact = bar_w * progress
+    filled = int(filled_exact)
+    frac = filled_exact - filled
+    # fractional blocks: ▏▎▍▌▋▊▉█ (1/8 through 8/8)
+    frac_chars = " \u258f\u258e\u258d\u258c\u258b\u258a\u2589\u2588"
+    n = max(n_gradients, 1)
+
+    for col in range(bar_w):
+        cx = bar_x + col
+        gi = col * n // bar_w
+        if col < filled:
+            prev_gi = (col - 1) * n // bar_w if col > 0 else gi
+            next_gi = (col + 1) * n // bar_w if col < bar_w - 1 else gi
+            if gi != prev_gi and col > 0 and n_gradients > 1:
+                # just entered new color: dark shade (75% new, 25% old)
+                ti = min(prev_gi, n_gradients - 2)
+                char = "\u2593"
+                attr = curses.color_pair(20 + ti)
+            elif gi != next_gi and n_gradients > 1:
+                # approaching next color: light shade (25% next, 75% current)
+                ti = min(gi, n_gradients - 2)
+                char = "\u2591"
+                attr = curses.color_pair(20 + ti)
+            else:
+                char = "\u2588"
+                attr = curses.color_pair(10 + gi) if n_gradients > 0 else curses.color_pair(1)
+        elif col == filled:
+            # fractional block at fill edge (8 levels of precision)
+            fi = int(frac * 8)
+            char = frac_chars[fi]
+            attr = curses.color_pair(40 + gi) if n_gradients > 0 else curses.color_pair(6)
+        else:
+            char = "\U0001FB8C"  # left half medium shade (legacy computing)
+            attr = curses.color_pair(5)
+        try:
+            stdscr.addstr(y, cx, char, attr)
+        except curses.error:
+            pass
+
+
+def fill_panel_bg(stdscr, box_y, box_x, box_h, box_w):
+    """Fill a panel interior with default (base) background"""
+    fill = " " * (box_w - 2)
+    attr = curses.color_pair(2)
+    for row in range(box_y + 1, box_y + box_h - 1):
+        try:
+            stdscr.addstr(row, box_x + 1, fill, attr)
+        except curses.error:
+            pass
+
+
+def draw_lyrics_panel(stdscr, lyrics, idx, message, box_y, box_x, box_h, box_w):
+    """Draw lyrics inside a given box region"""
+    fill_panel_bg(stdscr, box_y, box_x, box_h, box_w)
+    draw_box(stdscr, box_y, box_x, box_h, box_w, "round", curses.color_pair(3))
+
+    cx = box_x + 2
+    cw = box_w - 4
+    cy = box_y + 1
+    ch = box_h - 2
+    mid = cy + ch // 2
+
+    if message:
+        centered_in(stdscr, mid, cx, cw, message, curses.color_pair(2))
+        return
+
+    if not lyrics:
+        return
+
+    context = ch // 2
+    for offset in range(-context, context + 1):
+        i = idx + offset
+        if i < 0 or i >= len(lyrics):
+            continue
+        y = mid + offset
+        if y < cy or y >= cy + ch:
+            continue
+        text = lyrics[i][1]
+        if not text:
+            continue
+
+        if offset == 0:
+            attr = curses.A_BOLD | curses.color_pair(4)
+        elif offset < 0:
+            attr = curses.A_DIM | curses.color_pair(2)
+        else:
+            attr = curses.A_ITALIC | curses.color_pair(2)
+
+        centered_in(stdscr, y, cx, cw, text, attr)
+
+
+def draw_ann_panel(stdscr, ann_display_lines, box_y, box_x, box_h, box_w, scroll=0):
+    """Draw annotation content inside a given box region"""
+    fill_panel_bg(stdscr, box_y, box_x, box_h, box_w)
+    draw_box(stdscr, box_y, box_x, box_h, box_w, "round", curses.color_pair(3))
+
+    cx = box_x + 2
+    cw = box_w - 4
+    cy = box_y + 1
+    ch = box_h - 2
+
+    if not ann_display_lines:
+        centered_in(stdscr, cy + ch // 2, cx, cw, "No annotation", curses.color_pair(2))
+        return
+
+    total = len(ann_display_lines)
+    max_scroll = max(0, total - ch)
+
+    # scrollbar for total mode
+    if max_scroll > 0:
+        bar_h = max(1, ch * ch // total)
+        bar_pos = cy + (scroll * (ch - bar_h) // max_scroll) if max_scroll else cy
+        for row in range(cy, cy + ch):
+            char = "\u2588" if bar_pos <= row < bar_pos + bar_h else "\u2502"
+            try:
+                stdscr.addstr(row, box_x + box_w - 2, char, curses.color_pair(3))
+            except curses.error:
+                pass
+
+    for row_i in range(ch):
+        li = scroll + row_i
+        if li >= total:
+            break
+        y = cy + row_i
+        kind, text = ann_display_lines[li]
+
+        if kind == "sep":
+            centered_in(stdscr, y, cx, cw, text, curses.color_pair(3))
+        elif kind == "label":
+            centered_in(stdscr, y, cx, cw, text, curses.A_DIM | curses.color_pair(1))
+        elif kind == "fragment":
+            centered_in(stdscr, y, cx, cw, text, curses.A_BOLD | curses.A_ITALIC | curses.color_pair(1))
+        elif kind == "body":
+            try:
+                stdscr.addstr(y, cx, text[:cw], curses.color_pair(2))
+            except curses.error:
+                pass
+
+
+def setup_colors():
+    """Initialize curses colors from theme palette"""
+    curses.start_color()
+    curses.use_default_colors()
+
+    accent, subtext, surface, mantle, gradient = load_theme_colors()
+
+    if curses.can_change_color() and accent and subtext and surface and mantle:
+        curses.init_color(20, *hex_to_curses(accent))
+        curses.init_color(21, *hex_to_curses(subtext))
+        curses.init_color(22, *hex_to_curses(surface))
+        curses.init_color(23, *hex_to_curses(mantle))
+        # inner panel pairs (default/base bg)
+        curses.init_pair(1, 20, -1)   # accent
+        curses.init_pair(2, 21, -1)   # subtext
+        curses.init_pair(3, 21, -1)   # inner borders
+        curses.init_pair(4, 20, 22)   # accent on surface (current line)
+        # outer area pairs (mantle bg)
+        curses.init_pair(5, 21, 23)   # subtext on mantle (outer borders/text)
+        curses.init_pair(6, 20, 23)   # accent on mantle (outer header)
+        curses.init_pair(7, 23, 23)   # mantle on mantle (background fill)
+        # gradient colors for progress bar (pairs 10-19, default bg)
+        for i, hex_color in enumerate(gradient[:10]):
+            curses.init_color(30 + i, *hex_to_curses(hex_color))
+            curses.init_pair(10 + i, 30 + i, -1)
+        # gradient transition pairs (pairs 20-28)
+        for i in range(min(len(gradient) - 1, 9)):
+            curses.init_pair(20 + i, 30 + i + 1, 30 + i)
+        # gradient on mantle (pairs 40-49, for progress bar fractional blocks)
+        for i, hex_color in enumerate(gradient[:10]):
+            curses.init_pair(40 + i, 30 + i, 23)
+    else:
+        curses.init_pair(1, 5, -1)
+        curses.init_pair(2, 8, -1)
+        curses.init_pair(3, 8, -1)
+        curses.init_pair(4, 5, 8)
+        curses.init_pair(5, 8, -1)
+        curses.init_pair(6, 5, -1)
+        curses.init_pair(7, -1, -1)
+
+    return len(gradient)
+
+
+# ============================================================
+# MAIN LOOP
+# ============================================================
+
+def ensure_annotations(state, meta, term_w, genius_token):
+    """Fetch genius annotations if not already loaded"""
+    if state["annotations"] is not None:
+        return
+    if not genius_token:
+        state["annotations"] = []
+        return
+    if state["genius_song_id"] is None:
+        state["genius_song_id"] = genius_search(
+            meta["title"], meta["artist"], genius_token
+        )
+    if state["genius_song_id"]:
+        state["annotations"] = genius_fetch_annotations(
+            state["genius_song_id"], genius_token
+        )
+    else:
+        state["annotations"] = []
+
+
+def run(stdscr):
+    curses.curs_set(0)
+    stdscr.timeout(200)
+    n_gradients = setup_colors()
+
+    genius_token = load_genius_token()
+
+    track_id = None
+    lyrics = None
+    message = None
+    ann_mode = ANN_OFF
+    ann_scroll = 0
+
+    state = {
+        "genius_song_id": None,
+        "annotations": None,      # raw list from genius
+        "ann_all_lines": None,     # wrapped lines for total mode
+    }
+
+    while True:
+        meta = get_metadata()
+
+        if not meta:
+            stdscr.erase()
+            h, w = stdscr.getmaxyx()
+            fill_outer_bg(stdscr, h, w)
+            draw_box(stdscr, 0, 0, h, w, "double", curses.color_pair(5))
+            centered_in(stdscr, h // 2, 0, w, "Waiting for player...", curses.color_pair(5))
+            stdscr.refresh()
+            if stdscr.getch() == ord("q"):
+                break
+            continue
+
+        tid = f"{meta['artist']}\t{meta['title']}"
+        if tid != track_id:
+            track_id = tid
+            lyrics = None
+            message = "Fetching lyrics..."
+            ann_mode = ANN_OFF
+            ann_scroll = 0
+            state = {
+                "genius_song_id": None,
+                "annotations": None,
+                "ann_all_lines": None,
+            }
+
+            stdscr.erase()
+            term_h, term_w = stdscr.getmaxyx()
+            fill_outer_bg(stdscr, term_h, term_w)
+            draw_header_footer(stdscr, meta, term_h, term_w, None,
+                               " q:quit  \u2423:pause  >/<:skip  /:annotations ")
+            draw_lyrics_panel(stdscr, None, 0, message, 3, 3, term_h - 4, term_w - 6)
+            stdscr.refresh()
+
+            lrc, instrumental = fetch_lyrics(
+                meta["title"], meta["artist"], meta["album"], meta["duration"]
+            )
+            if instrumental:
+                message = "\u266a Instrumental \u266a"
+            elif lrc:
+                lyrics = parse_lrc(lrc)
+                message = None if lyrics else "No synced lyrics"
+            else:
+                message = "No lyrics found"
+
+        term_h, term_w = stdscr.getmaxyx()
+        stdscr.erase()
+        fill_outer_bg(stdscr, term_h, term_w)
+
+        pos = get_position()
+        idx = find_current(lyrics, pos) if lyrics else 0
+
+        bar_y = 1
+        inner_y = 3
+        inner_h = term_h - 4
+
+        if ann_mode == ANN_OFF:
+            draw_header_footer(stdscr, meta, term_h, term_w, None,
+                               " q:quit  \u2423:pause  >/<:skip  /:annotations ")
+            draw_lyrics_panel(stdscr, lyrics, idx, message,
+                              inner_y, 3, inner_h, term_w - 6)
+
+        elif ann_mode == ANN_RUNNING:
+            draw_header_footer(stdscr, meta, term_h, term_w, "live",
+                               " q:quit  \u2423:pause  >/<:skip  /:all annotations ")
+
+            # split: lyrics left, annotation right
+            left_w = (term_w - 6) // 2
+            right_w = term_w - 6 - left_w
+            left_x = 3
+            right_x = left_x + left_w
+
+            draw_lyrics_panel(stdscr, lyrics, idx, message,
+                              inner_y, left_x, inner_h, left_w)
+
+            # find annotation for current line
+            current_text = lyrics[idx][1] if lyrics and idx < len(lyrics) else ""
+            matched = find_annotation_for_line(state["annotations"] or [], current_text)
+            if matched:
+                lines = wrap_single_annotation(matched, max(10, right_w - 6))
+            else:
+                lines = []
+            draw_ann_panel(stdscr, lines, inner_y, right_x, inner_h, right_w)
+
+        elif ann_mode == ANN_TOTAL:
+            draw_header_footer(stdscr, meta, term_h, term_w, "all",
+                               " q:quit  /:off  j/k:\u2191\u2193  g/G:top/bottom ")
+            if state["ann_all_lines"] is None:
+                content_w = term_w - 14
+                state["ann_all_lines"] = wrap_annotations(
+                    state["annotations"] or [], max(20, content_w)
+                )
+            draw_ann_panel(stdscr, state["ann_all_lines"],
+                           inner_y, 3, inner_h, term_w - 6, ann_scroll)
+
+        draw_progress_bar(stdscr, bar_y, 4, term_w - 8, pos,
+                          meta["duration"], n_gradients)
+
+        stdscr.refresh()
+
+        key = stdscr.getch()
+        if key == ord("q"):
+            break
+        elif key == ord("/"):
+            next_mode = (ann_mode + 1) % 3
+            if next_mode != ANN_OFF and not genius_token:
+                message = "No Genius token (~/.config/lyrics/genius_token)"
+                ann_mode = ANN_OFF
+                continue
+            if next_mode != ANN_OFF:
+                ensure_annotations(state, meta, term_w, genius_token)
+            if next_mode == ANN_TOTAL:
+                ann_scroll = 0
+                state["ann_all_lines"] = None
+            ann_mode = next_mode
+        elif key == ord(" "):
+            playerctl("play-pause")
+        elif key == ord(">") or key == curses.KEY_RIGHT:
+            playerctl("next")
+        elif key == ord("<") or key == curses.KEY_LEFT:
+            playerctl("previous")
+        elif ann_mode == ANN_TOTAL and state["ann_all_lines"]:
+            max_scroll = max(0, len(state["ann_all_lines"]) - (inner_h - 2))
+            if key == ord("j") or key == curses.KEY_DOWN:
+                ann_scroll = min(ann_scroll + 3, max_scroll)
+            elif key == ord("k") or key == curses.KEY_UP:
+                ann_scroll = max(ann_scroll - 3, 0)
+            elif key == ord("g"):
+                ann_scroll = 0
+            elif key == ord("G"):
+                ann_scroll = max_scroll
+
+
+if __name__ == "__main__":
+    try:
+        curses.wrapper(run)
+    except KeyboardInterrupt:
+        pass

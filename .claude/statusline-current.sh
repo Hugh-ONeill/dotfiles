@@ -1,0 +1,1 @@
+/home/wiz/.config/themes/current/statusline.sh

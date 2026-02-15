@@ -3,7 +3,8 @@
 # Usage: ./regenerate-all.sh [--cursors]
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-THEMES_DIR="$(dirname "$SCRIPT_DIR")"
+source "$(dirname "$SCRIPT_DIR")/lib/config.sh"
+source "$LIB_DIR/utils.sh"
 cd "$SCRIPT_DIR"
 
 BUILD_CURSORS=false
@@ -38,15 +39,6 @@ for i in "${!pids[@]}"; do
     fi
 done
 
-# Convert hex to ANSI true color block
-hex_block() {
-    local hex="${1#\#}"
-    local r=$((16#${hex:0:2}))
-    local g=$((16#${hex:2:2}))
-    local b=$((16#${hex:4:2}))
-    printf "\033[48;2;%d;%d;%dm  \033[0m" "$r" "$g" "$b"
-}
-
 # Print gradient blocks for a theme
 print_gradient() {
     local palette="$THEMES_DIR/palettes/$1.json"
@@ -57,7 +49,7 @@ print_gradient() {
         if [[ ! "$color" =~ ^# ]]; then
             color=$(jq -r ".colors.$color // \"$color\"" "$palette" 2>/dev/null)
         fi
-        [[ "$color" =~ ^# ]] && hex_block "$color"
+        [[ "$color" =~ ^# ]] && color_block "$color"
     done
 }
 

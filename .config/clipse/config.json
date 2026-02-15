@@ -1,0 +1,8 @@
+{
+    "allowDuplicates": false,
+    "historyFile": "~/.local/state/clipse/clipboard_history.json",
+    "maxHistory": 100,
+    "logFile": "~/.local/state/clipse/clipse.log",
+    "themeFile": "custom_theme.json",
+    "tempDir": "~/.cache/clipse"
+}

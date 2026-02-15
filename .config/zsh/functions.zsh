@@ -222,9 +222,10 @@ fcd() {
 }
 
 frg() {
+  [[ $# -eq 0 ]] && { echo "usage: frg <pattern>" >&2; return 1; }
   local file line
   read -r file line <<<"$(
-    rg --color=always --line-number --no-heading --smart-case "${*:-}" |
+    rg --no-messages --color=always --line-number --no-heading --smart-case "$*" |
     fzf --ansi \
         --delimiter=: \
         --preview='bat --color=always --highlight-line {2} {1}' \
@@ -236,7 +237,7 @@ frg() {
 }
 
 frgi() {
-  local RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case"
+  local RG_PREFIX="rg --no-messages --column --line-number --no-heading --color=always --smart-case"
   fzf --ansi --disabled --query "$1" \
       --bind "start:reload:$RG_PREFIX {q}" \
       --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
@@ -251,7 +252,7 @@ fman() {
   man -k . 2>/dev/null | fzf \
     --preview="echo {} | awk '{print \$1}' | xargs man 2>/dev/null | bat --color=always -l man" \
     --header="enter:view man page" \
-    --bind="enter:execute(echo {} | awk '{print \$1}' | xargs man)"
+    --bind="enter:execute(echo {} | awk '{print \$1}' | xargs man 2>/dev/null)"
 }
 
 fenv() {

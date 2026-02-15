@@ -1,5 +1,5 @@
 #!/bin/bash
-# Firefox theme handler - applies on restart
+# Firefox theme handler — copies color CSS + ensures @import in userChrome
 
 apply_firefox() {
     local theme="$1"
@@ -15,7 +15,20 @@ apply_firefox() {
     # Apply to all Firefox profiles with a chrome directory
     for profile in "$profile_dir"/*.default*; do
         [[ -d "$profile/chrome" ]] || continue
-        cp "$src" "$profile/chrome/theme-colors.css"
+        local chrome_dir="$profile/chrome"
+        cp "$src" "$chrome_dir/theme-colors.css"
+
+        # Ensure userChrome.css imports the theme colors
+        local userchrome="$chrome_dir/userChrome.css"
+        if [[ ! -f "$userchrome" ]] || ! grep -q "theme-colors.css" "$userchrome" 2>/dev/null; then
+            if [[ -f "$userchrome" ]]; then
+                local existing=$(cat "$userchrome")
+                echo -e '@import "theme-colors.css";\n'"$existing" > "$userchrome"
+            else
+                echo '@import "theme-colors.css";' > "$userchrome"
+            fi
+        fi
+
         ((applied++))
     done
 

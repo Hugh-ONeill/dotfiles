@@ -125,9 +125,6 @@ cmd_set() {
     apply_firefox "$theme"
     apply_wlogout "$theme"
 
-    # Update palette symlink
-    [[ -f "$PALETTES_DIR/$theme.sh" ]] && ln -sf "$theme.sh" "$PALETTES_DIR/current.sh"
-
     # Save current theme
     echo "$theme" > "$CURRENT_THEME_FILE"
 
@@ -223,10 +220,6 @@ cmd_edit() {
 
 cmd_rofi() {
     local current=$(get_current)
-    local options=""
-    for theme in $(get_themes); do
-        [[ "$theme" == "$current" ]] && options+="$theme (current)\n" || options+="$theme\n"
-    done
 
     if ! command -v rofi &>/dev/null; then
         echo -e "${YELLOW}rofi not found, showing list instead${NC}"
@@ -234,8 +227,47 @@ cmd_rofi() {
         return
     fi
 
-    local selected=$(echo -e "$options" | rofi -dmenu -p "Theme" -i)
-    [[ -n "$selected" ]] && cmd_set "${selected% (current)}"
+    # Build entries with gradient + ansi color swatches
+    local options=""
+    for theme in $(get_themes); do
+        local palette_path=$(get_palette_path "$theme")
+        local gradient="" ansi="" bg="" txt=""
+        if [[ -n "$palette_path" ]]; then
+            read -r bg txt < <(jq -r '
+                .colors as $c |
+                [.colors.base, .colors.text]
+                | map(if startswith("#") then . else $c[.] // . end)
+                | join(" ")
+            ' "$palette_path")
+            while IFS= read -r hex; do
+                gradient+="<span background='${hex}'>  </span>"
+            done < <(jq -r '
+                .colors as $c | .gradient[] as $ref |
+                if ($ref | startswith("#")) then $ref
+                else $c[$ref] // $ref end
+            ' "$palette_path")
+            while IFS= read -r hex; do
+                ansi+="<span background='${hex}'>  </span>"
+            done < <(jq -r '
+                .colors as $c |
+                [.colors.ansi_red, .colors.ansi_green, .colors.ansi_yellow,
+                 .colors.ansi_blue, .colors.ansi_magenta, .colors.ansi_cyan]
+                | map(if startswith("#") then . else $c[.] // . end) | .[]
+            ' "$palette_path")
+        fi
+        local label="$theme"
+        [[ "$theme" == "$current" ]] && label="$theme (current)"
+        local name="<span background='${bg}' color='${txt}'>  ${label}  </span>"
+        options+="${gradient} ${name} ${ansi}\n"
+    done
+
+    local selected=$(echo -e "$options" | rofi -dmenu -markup-rows -p "Theme" -i)
+    [[ -n "$selected" ]] && {
+        # Strip markup tags and extract theme name
+        selected=$(echo "$selected" | sed 's/<[^>]*>//g' | xargs)
+        selected="${selected% (current)}"
+        cmd_set "$selected"
+    }
 }
 
 # ══════════════════════════════════════════════════════════════════════════════

@@ -10,6 +10,9 @@ SCRIPTS_DIR="$THEMES_DIR/scripts"
 LIB_DIR="$THEMES_DIR/lib"
 APPS_DIR="$LIB_DIR/apps"
 
+# Luminance threshold for light/dark detection
+LUMINANCE_THRESHOLD=140
+
 # Output colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'

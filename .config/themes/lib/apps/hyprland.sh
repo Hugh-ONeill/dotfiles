@@ -25,21 +25,6 @@ apply_hyprland() {
     fi
 }
 
-apply_hyprlock() {
-    local theme="$1"
-    if copy_to_current "$theme" "hyprlock-colors.conf"; then
-        report_ok "hyprlock"
-    else
-        report_skip "hyprlock (no theme file)"
-    fi
-}
-
-apply_hyprtoolkit() {
-    local theme="$1"
-    if copy_to_current "$theme" "hyprtoolkit.conf"; then
-        report_ok "hyprtoolkit"
-    else
-        report_skip "hyprtoolkit (no theme file)"
-    fi
-}
+apply_hyprlock()    { apply_simple "$1" "hyprlock-colors.conf" "hyprlock"; }
+apply_hyprtoolkit() { apply_simple "$1" "hyprtoolkit.conf"     "hyprtoolkit"; }
 

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Clean dmenu wrapper for dunst context menu
+# Strips "#Label (App) [id,key]" → "Label"
+
+mapfile -t lines
+
+labels=()
+for line in "${lines[@]}"; do
+    label="${line#\#}"
+    label="${label%% (*}"
+    labels+=("$label")
+done
+
+selected="$(printf '%s\n' "${labels[@]}" | rofi -dmenu -p "Action")"
+[[ -z "$selected" ]] && exit 1
+
+for i in "${!labels[@]}"; do
+    if [[ "${labels[$i]}" == "$selected" ]]; then
+        echo "${lines[$i]}"
+        exit 0
+    fi
+done

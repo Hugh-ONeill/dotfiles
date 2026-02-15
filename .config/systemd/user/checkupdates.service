@@ -1,0 +1,6 @@
+[Unit]
+Description=Check for package updates
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/checkupdates-refresh

@@ -1,41 +1,10 @@
 #!/bin/bash
 # Shell tools theme handler (fzf, shell-colors, bat, etc.)
 
-apply_fzf() {
-    local theme="$1"
-    if copy_to_current "$theme" "fzf.sh"; then
-        report_ok "fzf"
-    else
-        report_skip "fzf (no theme file)"
-    fi
-}
-
-apply_fzf_tab() {
-    local theme="$1"
-    if copy_to_current "$theme" "fzf-tab-flags.zsh"; then
-        report_ok "fzf-tab"
-    else
-        report_skip "fzf-tab (no theme file)"
-    fi
-}
-
-apply_shell_colors() {
-    local theme="$1"
-    if copy_to_current "$theme" "shell-colors.sh"; then
-        report_ok "shell-colors"
-    else
-        report_skip "shell-colors (no theme file)"
-    fi
-}
-
-apply_dircolors() {
-    local theme="$1"
-    if copy_to_current "$theme" "dircolors.db"; then
-        report_ok "dircolors"
-    else
-        report_skip "dircolors (no theme file)"
-    fi
-}
+apply_fzf()          { apply_simple "$1" "fzf.sh"            "fzf"; }
+apply_fzf_tab()      { apply_simple "$1" "fzf-tab-flags.zsh" "fzf-tab"; }
+apply_shell_colors() { apply_simple "$1" "shell-colors.sh"   "shell-colors"; }
+apply_dircolors()    { apply_simple "$1" "dircolors.db"       "dircolors"; }
 
 apply_eza() {
     local theme="$1"

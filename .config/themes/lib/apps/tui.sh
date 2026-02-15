@@ -1,67 +1,54 @@
 #!/bin/bash
 # TUI apps theme handler (lazygit, gitui, btop, ranger, etc.)
 
-apply_lazygit() {
-    local theme="$1"
-    if copy_to_current "$theme" "lazygit.yml"; then
-        report_ok "lazygit"
-    else
-        report_skip "lazygit (no theme file)"
-    fi
-}
-
-apply_gitui() {
-    local theme="$1"
-    if copy_to_current "$theme" "gitui.ron"; then
-        report_ok "gitui"
-    else
-        report_skip "gitui (no theme file)"
-    fi
-}
-
-apply_btop() {
-    local theme="$1"
-    if copy_to_current "$theme" "btop.theme"; then
-        report_ok "btop"
-    else
-        report_skip "btop (no theme file)"
-    fi
-}
-
-apply_ranger() {
-    local theme="$1"
-    if copy_to_current "$theme" "ranger.py"; then
-        report_ok "ranger"
-    else
-        report_skip "ranger (no theme file)"
-    fi
-}
-
-apply_glow() {
-    local theme="$1"
-    if copy_to_current "$theme" "glow.json"; then
-        report_ok "glow"
-    else
-        report_skip "glow (no theme file)"
-    fi
-}
-
-apply_youtube_tui() {
-    local theme="$1"
-    if copy_to_current "$theme" "youtube-tui.yml"; then
-        report_ok "youtube-tui"
-    else
-        report_skip "youtube-tui (no theme file)"
-    fi
-}
-
+apply_lazygit()     { apply_simple "$1" "lazygit.yml"     "lazygit"; }
+apply_gitui()       { apply_simple "$1" "gitui.ron"       "gitui"; }
+apply_btop()        { apply_simple "$1" "btop.theme"      "btop"; }
+apply_ranger()      { apply_simple "$1" "ranger.py"       "ranger"; }
+apply_glow()        { apply_simple "$1" "glow.json"       "glow"; }
+apply_youtube_tui() { apply_simple "$1" "youtube-tui.yml" "youtube-tui"; }
 apply_sptlrx() {
-    local theme="$1"
-    if copy_to_current "$theme" "sptlrx.yaml"; then
+    if copy_to_current "$1" "sptlrx.yaml"; then
+        # inject persistent cookie from local file
+        local cookie_file="$HOME/.config/sptlrx/cookie"
+        if [[ -f "$cookie_file" ]]; then
+            local cookie
+            cookie=$(<"$cookie_file")
+            awk -v c="$cookie" '{
+                if ($0 ~ /^cookie: "/) print "cookie: \"" c "\""
+                else print
+            }' "$CURRENT_DIR/sptlrx.yaml" > "$CURRENT_DIR/sptlrx.yaml.tmp" \
+                && mv "$CURRENT_DIR/sptlrx.yaml.tmp" "$CURRENT_DIR/sptlrx.yaml"
+        fi
         report_ok "sptlrx"
     else
         report_skip "sptlrx (no theme file)"
     fi
+}
+apply_fastfetch()   { apply_simple "$1" "fastfetch.jsonc"  "fastfetch"; }
+
+apply_cava() {
+    local theme="$1"
+    local colors_file="$THEMES_DIR/$theme/cava-colors.conf"
+    if [[ ! -f "$colors_file" ]]; then
+        report_skip "cava (no theme file)"
+        return
+    fi
+    copy_to_current "$theme" "cava-colors.conf"
+
+    # splice color section into both cava configs
+    local configs=("$HOME/.config/cava/config" "$HOME/.config/cava/config-waybar")
+    for cfg in "${configs[@]}"; do
+        [[ -f "$cfg" ]] || continue
+        awk -v colorfile="$colors_file" '
+            /^\[color\]/ { in_color=1; while((getline line < colorfile) > 0) print line; next }
+            /^\[/ { in_color=0 }
+            !in_color { print }
+        ' "$cfg" > "$cfg.tmp" && mv "$cfg.tmp" "$cfg"
+    done
+    # signal running cava instances to reload config
+    pkill -USR1 cava 2>/dev/null || true
+    report_ok "cava"
 }
 
 apply_claude() {
@@ -72,14 +59,5 @@ apply_claude() {
         report_ok "claude"
     else
         report_skip "claude (no theme file)"
-    fi
-}
-
-apply_fastfetch() {
-    local theme="$1"
-    if copy_to_current "$theme" "fastfetch.jsonc"; then
-        report_ok "fastfetch"
-    else
-        report_skip "fastfetch (no theme file)"
     fi
 }
