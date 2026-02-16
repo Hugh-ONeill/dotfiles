@@ -1,4 +1,4 @@
-/* catppuccin wlogout style-2 */
+/* cardiac wlogout style-2 */
 
 * {
   font-family: "FiraCode Nerd Font";
@@ -13,7 +13,7 @@ window {
 }
 
 button {
-  color: #cdd6f4;
+  color: #f0eced;
   background-color: transparent;
   background-repeat: no-repeat;
   background-position: center;
@@ -24,15 +24,15 @@ button {
 }
 
 button:focus {
-  color: #45475a;
-  background-color: #b4befe;
+  color: #261e21;
+  background-color: #a82d42;
   background-size: 30%;
-  outline: 1px solid #b4befe;
+  outline: 1px solid #a82d42;
   border-radius: 3px;
 }
 
 button:hover {
-  background-color: #313244;
+  background-color: #1c1618;
   background-size: 30%;
 }
 
