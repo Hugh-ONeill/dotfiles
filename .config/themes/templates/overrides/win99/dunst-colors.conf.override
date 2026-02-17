@@ -1,0 +1,24 @@
+# ${THEME_NAME} Dunst Colors — Win98 Dialog Box Style
+
+[global]
+frame_color = "${OVERLAY2}"
+background = "${CRUST}"
+foreground = "${TEXT}"
+highlight = "${BSOD},${SEM_OK}"
+corner_radius = 0
+frame_width = 2
+font = "Tahoma 11"
+format = "<b>%a</b>\n%s\n%b"
+separator_color = "${OVERLAY0}"
+
+[urgency_low]
+foreground = "${TEXT}"
+frame_color = "${OVERLAY0}"
+
+[urgency_normal]
+foreground = "${TEXT}"
+frame_color = "${OVERLAY2}"
+
+[urgency_critical]
+foreground = "${SEM_ERR}"
+frame_color = "${SEM_ERR}"

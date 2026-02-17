@@ -42,6 +42,8 @@ $mantle = rgb(${MANTLE_NOHASH})
 $mantleAlpha = ${MANTLE_NOHASH}
 $crust = rgb(${CRUST_NOHASH})
 $crustAlpha = ${CRUST_NOHASH}
+$bpp1 = rgb(${BASE_NOHASH})
+$bpp1Alpha = ${BASE_NOHASH}
 
 # Gradient colors (for varied UI elements)
 $g0 = rgb(${GRADIENT_0_NOHASH})

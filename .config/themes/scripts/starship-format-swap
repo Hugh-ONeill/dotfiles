@@ -4,7 +4,7 @@ import os
 import sys
 import re
 
-VALID_STYLES = ("rounded", "boxy", "angular", "flame", "pixels", "slashes")
+VALID_STYLES = ("rounded", "boxy", "angular", "flame", "pixels", "slashes", "waveform")
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in VALID_STYLES:

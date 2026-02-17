@@ -30,16 +30,43 @@ local function is_light(hex)
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) > 0.5
 end
 
+-- stylua: ignore
+local separator_map = {
+  angular = { left = "\u{e0b0}", right = "\u{e0b2}" },
+  flame   = { left = "\u{e0c0}", right = "\u{e0c2} " },
+  pixels  = { left = "\u{e0c4}", right = "\u{e0c5} " },
+  slashes = { left = "\u{e0bc}", right = "\u{e0be}" },
+  rounded = { left = "\u{e0b4}", right = "\u{e0b6}" },
+  boxy    = { left = "",         right = ""         },
+}
+
+local function refresh_lualine()
+  local ok, lualine = pcall(require, "lualine")
+  if not ok then
+    return
+  end
+  local style = vim.g.theme_separator_style or "rounded"
+  local seps = separator_map[style] or separator_map.rounded
+  local cfg = lualine.get_config()
+  cfg.options.section_separators = seps
+  lualine.setup(cfg)
+end
+
 local function apply_theme(opts)
   if not opts then
     return
   end
+  -- extract custom fields before passing to catppuccin
+  vim.g.theme_separator_style = opts.separator_style or "rounded"
+  opts.separator_style = nil
+
   local base = opts.color_overrides and opts.color_overrides.all and opts.color_overrides.all.base
   if base then
     vim.o.background = is_light(base) and "light" or "dark"
   end
   require("catppuccin").setup(opts)
   vim.cmd.colorscheme("catppuccin")
+  refresh_lualine()
 end
 
 local function reload_if_changed()
@@ -60,6 +87,7 @@ end
 
 local theme_opts = load_theme_opts()
 if theme_opts then
+  vim.g.theme_separator_style = theme_opts.separator_style or "rounded"
   local stat = vim.uv.fs_stat(theme_file)
   if stat then
     last_mtime = stat.mtime.sec

@@ -130,6 +130,10 @@ zstyle ':fzf-tab:complete:printenv:*' fzf-preview 'echo $word=${(P)word}'
 zstyle ':fzf-tab:complete:npm:*' fzf-preview 'npm info $word 2>/dev/null | head -50'
 zstyle ':fzf-tab:complete:yarn:*' fzf-preview 'npm info $word 2>/dev/null | head -50'
 
+# Toilet/Figlet fonts
+zstyle ':fzf-tab:complete:toilet:*' fzf-preview 'toilet -f $word -- $word 2>/dev/null || toilet -d /usr/share/figlet/fonts -f $word -- $word 2>/dev/null || echo $word'
+zstyle ':fzf-tab:complete:figlet:*' fzf-preview 'figlet -f $word -- $word 2>/dev/null || figlet -d /usr/share/figlet/fonts -f $word -- $word 2>/dev/null || echo $word'
+
 # Directories
 zstyle ':fzf-tab:complete:cd:*' tag-order local-directories directory-stack path-directories
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --color=always --all --group-directories-first --tree --level=2 $realpath'

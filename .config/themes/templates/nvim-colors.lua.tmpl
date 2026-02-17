@@ -3,6 +3,8 @@
 -- Do not edit -- regenerate with: theme generate <name>
 
 return {
+  separator_style = "${STYLE_WAYBAR}",
+
   color_overrides = {
     all = {
       -- structural
@@ -52,6 +54,31 @@ return {
         DiagnosticUnderlineInfo  = { sp = "${SEM_INFO}", style = { "undercurl" } },
         DiagnosticUnderlineHint  = { sp = "${SEM_INFO}", style = { "undercurl" } },
         DiagnosticUnderlineOk    = { sp = "${SEM_OK}", style = { "undercurl" } },
+
+        -- dashboard gradient
+        DashGrad0  = { fg = "${GRADIENT_0}" },
+        DashGrad1  = { fg = "${GRADIENT_1}" },
+        DashGrad2  = { fg = "${GRADIENT_2}" },
+        DashGrad3  = { fg = "${GRADIENT_3}" },
+        DashGrad4  = { fg = "${GRADIENT_4}" },
+        DashGrad5  = { fg = "${GRADIENT_5}" },
+        DashGrad6  = { fg = "${GRADIENT_6}" },
+        DashGrad7  = { fg = "${GRADIENT_7}" },
+        DashGrad8  = { fg = "${GRADIENT_8}" },
+        DashGrad9  = { fg = "${GRADIENT_9}" },
+
+        -- indent guide gradient (reuses gradient, subtle on thin chars)
+        IndentGrad0  = { fg = "${GRADIENT_0}" },
+        IndentGrad1  = { fg = "${GRADIENT_1}" },
+        IndentGrad2  = { fg = "${GRADIENT_2}" },
+        IndentGrad3  = { fg = "${GRADIENT_3}" },
+        IndentGrad4  = { fg = "${GRADIENT_4}" },
+        IndentGrad5  = { fg = "${GRADIENT_5}" },
+        IndentGrad6  = { fg = "${GRADIENT_6}" },
+        IndentGrad7  = { fg = "${GRADIENT_7}" },
+        IndentGrad8  = { fg = "${GRADIENT_8}" },
+        IndentGrad9  = { fg = "${GRADIENT_9}" },
+        IndentScope  = { fg = "${ACCENT}" },
       }
     end,
   },

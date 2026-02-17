@@ -3,20 +3,20 @@
 add_newline = false
 
 format = """
-[\ue0b6](fg:surface0 bg:base)\
+[](fg:surface0 bg:base)\
 [\U000f011b](fg:text bg:surface0)\
-[\ue0b4](fg:surface0 bg:g0)\
+[](fg:surface0 bg:g0)\
 ${custom.dir_first}\
-[\ue0c0 ](fg:g0 bg:g1)\
+[](fg:g0 bg:g1)\
 ${custom.dir_second}\
-[\ue0c0 ](fg:g1 bg:g2)\
+[](fg:g1 bg:g2)\
 $jobs\
-[\ue0c0 ](fg:g2 bg:g3)\
+[](fg:g2 bg:g3)\
 $git_branch\
 $git_status\
-[\ue0c0 ](fg:g3 bg:g4)\
+[](fg:g3 bg:g4)\
 $cmd_duration\
-[\ue0c0 ](fg:g4 bg:g5)\
+[](fg:g4 bg:g5)\
 $c\
 $rust\
 $golang\
@@ -26,22 +26,22 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[\ue0c0 ](fg:g5 bg:g6)\
+[](fg:g5 bg:g6)\
 $status\
-[\ue0c0 ](fg:g6 bg:g7)\
+[](fg:g6 bg:g7)\
 $docker_context\
-[\ue0c0 ](fg:g7 bg:g8)\
+[](fg:g7 bg:g8)\
 ${custom.updates}\
-[\ue0c0 ](fg:g8 bg:g9)\
+[](fg:g8 bg:g9)\
 ${custom.uptime}\
-[\ue0c0 ](fg:g9 bg:text)\
-[\ue0b4](fg:text bg:base)\
+[ ](fg:g9 bg:text)\
+[](fg:text bg:base)\
 $line_break\
 $character
 
 """
 
-palette = 'cardiac'
+palette = 'catppuccin_mocha'
 
 [custom.dir_first]
 command = "~/.local/bin/directory-split first"
@@ -423,6 +423,50 @@ g7_fg = "#e2c9af"
 g8_fg = "#e2c9af"
 g9_fg = "#e2c9af"
 
+[palettes.colorless]
+# Structural
+text = "#e8e8e8"
+subtext1 = "#bbbbbb"
+subtext0 = "#999999"
+overlay2 = "#666666"
+overlay1 = "#555555"
+overlay0 = "#444444"
+surface2 = "#333333"
+surface1 = "#262626"
+surface0 = "#191919"
+base = "#111111"
+mantle = "#0a0a0a"
+crust = "#050505"
+# Gradient
+g0 = "#383838"
+g1 = "#484848"
+g2 = "#585858"
+g3 = "#686868"
+g4 = "#787878"
+g5 = "#888888"
+g6 = "#989898"
+g7 = "#a8a8a8"
+g8 = "#b8b8b8"
+g9 = "#c8c8c8"
+# Semantic
+sem_ok = "#c4d0c4"
+sem_warn = "#d0ccc0"
+sem_err = "#d0c4c4"
+sem_info = "#c0cccc"
+module_fg = "#0a0a0a"
+module_fg_light = "#e8e8e8"
+# Auto-contrast foreground for each gradient
+g0_fg = "#e8e8e8"
+g1_fg = "#e8e8e8"
+g2_fg = "#e8e8e8"
+g3_fg = "#e8e8e8"
+g4_fg = "#e8e8e8"
+g5_fg = "#e8e8e8"
+g6_fg = "#0a0a0a"
+g7_fg = "#0a0a0a"
+g8_fg = "#0a0a0a"
+g9_fg = "#0a0a0a"
+
 [palettes.confetti]
 # Structural
 text = "#f4e0e8"
@@ -466,6 +510,50 @@ g6_fg = "#0c0404"
 g7_fg = "#0c0404"
 g8_fg = "#0c0404"
 g9_fg = "#0c0404"
+
+[palettes.crocus]
+# Structural
+text = "#ece8f0"
+subtext1 = "#8870a0"
+subtext0 = "#c4b8d0"
+overlay2 = "#5c4c70"
+overlay1 = "#4c3e60"
+overlay0 = "#3c3050"
+surface2 = "#2e283a"
+surface1 = "#24202e"
+surface0 = "#1a1622"
+base = "#131018"
+mantle = "#0c0a10"
+crust = "#060508"
+# Gradient
+g0 = "#2a1840"
+g1 = "#382450"
+g2 = "#483060"
+g3 = "#583c70"
+g4 = "#684880"
+g5 = "#785890"
+g6 = "#8868a0"
+g7 = "#9878b0"
+g8 = "#a888c0"
+g9 = "#b898d0"
+# Semantic
+sem_ok = "#7870b8"
+sem_warn = "#c0a0b0"
+sem_err = "#b898d0"
+sem_info = "#785890"
+module_fg = "#0c0a10"
+module_fg_light = "#ece8f0"
+# Auto-contrast foreground for each gradient
+g0_fg = "#ece8f0"
+g1_fg = "#ece8f0"
+g2_fg = "#ece8f0"
+g3_fg = "#ece8f0"
+g4_fg = "#ece8f0"
+g5_fg = "#ece8f0"
+g6_fg = "#ece8f0"
+g7_fg = "#ece8f0"
+g8_fg = "#0c0a10"
+g9_fg = "#0c0a10"
 
 [palettes.crystal]
 # Structural
@@ -598,4 +686,48 @@ g6_fg = "#ffffff"
 g7_fg = "#000000"
 g8_fg = "#000000"
 g9_fg = "#000000"
+
+[palettes.win99]
+# Structural
+text = "#3f31c4"
+subtext1 = "#685088"
+subtext0 = "#8868a0"
+overlay2 = "#786088"
+overlay1 = "#9878a0"
+overlay0 = "#b898b8"
+surface2 = "#d8c0d8"
+surface1 = "#e8d0e8"
+surface0 = "#f8e0f0"
+base = "#fff8fa"
+mantle = "#f0d0e8"
+crust = "#f3e0f0"
+# Gradient
+g0 = "#fcd0d8"
+g1 = "#f8c0d8"
+g2 = "#f0b0e0"
+g3 = "#e0b8e8"
+g4 = "#d0b8f0"
+g5 = "#c0c0f4"
+g6 = "#a8d0f4"
+g7 = "#98d8f4"
+g8 = "#90d8f0"
+g9 = "#90e0e0"
+# Semantic
+sem_ok = "#37bd58"
+sem_warn = "#f6be48"
+sem_err = "#fc4a6d"
+sem_info = "#199ffd"
+module_fg = "#3f31c4"
+module_fg_light = "#fff8fa"
+# Auto-contrast foreground for each gradient
+g0_fg = "#3f31c4"
+g1_fg = "#3f31c4"
+g2_fg = "#3f31c4"
+g3_fg = "#3f31c4"
+g4_fg = "#3f31c4"
+g5_fg = "#3f31c4"
+g6_fg = "#3f31c4"
+g7_fg = "#3f31c4"
+g8_fg = "#3f31c4"
+g9_fg = "#3f31c4"
 

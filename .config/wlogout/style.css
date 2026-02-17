@@ -1,4 +1,4 @@
-/* cardiac wlogout theme */
+/* catppuccin wlogout theme */
 
 * {
     font-family: "FiraCode Nerd Font";
@@ -13,12 +13,12 @@ window {
 }
 
 button {
-    color: #f0eced;
-    background-color: #101012;
+    color: #cdd6f4;
+    background-color: #1e1e2e;
     background-repeat: no-repeat;
     background-position: center;
     background-size: 25%;
-    border: 1px solid #30262a;
+    border: 1px solid #585b70;
     border-radius: 3px;
     text-shadow: none;
     box-shadow: none;
@@ -26,16 +26,16 @@ button {
 }
 
 button:focus {
-    color: #261e21;
-    background-color: #a82d42;
+    color: #45475a;
+    background-color: #b4befe;
     background-size: 35%;
-    border: 1px solid #a82d42;
+    border: 1px solid #b4befe;
 }
 
 button:hover {
-    background-color: #1c1618;
+    background-color: #313244;
     background-size: 35%;
-    border: 1px solid #a82d42;
+    border: 1px solid #b4befe;
 }
 
 /* Default icons - white for dark themes */

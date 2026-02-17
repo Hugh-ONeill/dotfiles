@@ -1,0 +1,12 @@
+# ${THEME_NAME} Hyprlock Colors — Win98 Login Style
+
+$base = rgba(${BASE_NOHASH}FF)
+$surface0 = rgba(${SURFACE0_NOHASH}FF)
+$surface1 = rgba(${SURFACE1_NOHASH}FF)
+$text = rgba(${TEXT_NOHASH}FF)
+$subtext0 = rgba(${SUBTEXT0_NOHASH}FF)
+$lavender = rgba(${BSOD_NOHASH}FF)
+$green = rgba(${SEM_OK_NOHASH}FF)
+$red = rgba(${SEM_ERR_NOHASH}FF)
+$yellow = rgba(${SEM_WARN_NOHASH}FF)
+$crust = rgba(${DESKTOP_TEAL_NOHASH}FF)

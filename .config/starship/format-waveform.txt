@@ -1,0 +1,35 @@
+[\ue0b6](fg:surface0 bg:base)\
+[\U000f011b](fg:text bg:surface0)\
+[\ue0b4](fg:surface0 bg:g0)\
+${custom.dir_first}\
+[\ue0c8 ](fg:g0 bg:g1)\
+${custom.dir_second}\
+[\ue0c8 ](fg:g1 bg:g2)\
+$jobs\
+[\ue0c8 ](fg:g2 bg:g3)\
+$git_branch\
+$git_status\
+[\ue0c8 ](fg:g3 bg:g4)\
+$cmd_duration\
+[\ue0c8 ](fg:g4 bg:g5)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[\ue0c8 ](fg:g5 bg:g6)\
+$status\
+[\ue0c8 ](fg:g6 bg:g7)\
+$docker_context\
+[\ue0c8 ](fg:g7 bg:g8)\
+${custom.updates}\
+[\ue0c8 ](fg:g8 bg:g9)\
+${custom.uptime}\
+[\ue0c8 ](fg:g9 bg:text)\
+[\ue0b4](fg:text bg:base)\
+$line_break\
+$character

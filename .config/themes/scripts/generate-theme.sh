@@ -57,6 +57,10 @@ case "$STYLE_WAYBAR" in
         export WAYBAR_SEP_LEFT=$'\ue0c5 '
         export WAYBAR_SEP_RIGHT=$'\ue0c4 '
         ;;
+    waveform)
+        export WAYBAR_SEP_LEFT=$'\ue0ca '
+        export WAYBAR_SEP_RIGHT=$'\ue0c8 '
+        ;;
     slashes)
         export WAYBAR_SEP_LEFT=$'\ue0bc'
         export WAYBAR_SEP_RIGHT=$'\ue0bc'

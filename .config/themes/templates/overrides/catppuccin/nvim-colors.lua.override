@@ -52,6 +52,18 @@ return {
         DiagnosticUnderlineInfo  = { sp = "${SEM_INFO}", style = { "undercurl" } },
         DiagnosticUnderlineHint  = { sp = "${SEM_INFO}", style = { "undercurl" } },
         DiagnosticUnderlineOk    = { sp = "${SEM_OK}", style = { "undercurl" } },
+
+        -- dashboard gradient
+        DashGrad0  = { fg = "${GRADIENT_0}" },
+        DashGrad1  = { fg = "${GRADIENT_1}" },
+        DashGrad2  = { fg = "${GRADIENT_2}" },
+        DashGrad3  = { fg = "${GRADIENT_3}" },
+        DashGrad4  = { fg = "${GRADIENT_4}" },
+        DashGrad5  = { fg = "${GRADIENT_5}" },
+        DashGrad6  = { fg = "${GRADIENT_6}" },
+        DashGrad7  = { fg = "${GRADIENT_7}" },
+        DashGrad8  = { fg = "${GRADIENT_8}" },
+        DashGrad9  = { fg = "${GRADIENT_9}" },
       }
     end,
   },

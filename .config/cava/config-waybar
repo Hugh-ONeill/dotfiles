@@ -19,14 +19,14 @@ ascii_max_range = 7
 [color]
 gradient = 1
 gradient_count = 8
-gradient_color_1 = '#5a1525'
-gradient_color_2 = '#6b1a2c'
-gradient_color_3 = '#881e30'
-gradient_color_4 = '#982a3c'
-gradient_color_5 = '#a82d42'
-gradient_color_6 = '#c83850'
-gradient_color_7 = '#d84058'
-gradient_color_8 = '#e84860'
+gradient_color_1 = '#eba0ac'
+gradient_color_2 = '#fab387'
+gradient_color_3 = '#a6e3a1'
+gradient_color_4 = '#74c7ec'
+gradient_color_5 = '#89b4fa'
+gradient_color_6 = '#b4befe'
+gradient_color_7 = '#cba6f7'
+gradient_color_8 = '#f5c2e7'
 
 [smoothing]
 noise_reduction = 77

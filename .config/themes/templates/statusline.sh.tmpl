@@ -142,6 +142,11 @@ case "${STYLE_BAR}" in
     sep_right=$'\ue0b4'  # U+E0B4 right-facing semicircle (end cap)
     sep_mod=$'\ue0c6'    # U+E0C6 pixelated squares big (between modules)
     ;;
+  waveform)
+    sep_left=$'\ue0b6'   # U+E0B6 left-facing semicircle (start cap)
+    sep_right=$'\ue0b4'  # U+E0B4 right-facing semicircle (end cap)
+    sep_mod=$'\ue0c8'    # U+E0C8 waveform (between modules)
+    ;;
   slashes)
     sep_left=$'\ue0b8'   # U+E0B8 lower left triangle (start cap, reversed)
     sep_right=$'\ue0be'  # U+E0BE upper right triangle (end cap, reversed)
@@ -193,8 +198,8 @@ else
     sep_end="${fg_text}${bg_base}"
 fi
 
-# Build statusline with spread out values
-# Start with surface0 section (Arch icon) - icon uses subtext0 color
+# Build statusline
+# Start cap: surface0 section (Arch icon)
 echo -ne "${sep_start}${sep_left}${reset}"
 echo -ne "${fg_text}${bg_surface0}\U000f011b${reset}"
 
@@ -245,6 +250,6 @@ echo -ne "${sep_g8_g9}${sep_mod}${reset}"
 # Section 10: Duration - gradient[9]
 echo -ne "${fg_g9_text}${bg_g9} \U0000f017 ${duration} ${reset}"
 
-# Final cap (into text bg, space, then endcap)
+# Final cap
 echo -ne "${sep_g9_text}${sep_mod}${reset}"
 echo -ne "${bg_text} ${sep_end}${sep_right}${reset}"
