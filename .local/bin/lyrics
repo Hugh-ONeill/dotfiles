@@ -269,7 +269,7 @@ def load_theme_colors():
         return None, None, None, None, []
 
     for path in [
-        os.path.expanduser(f"~/.config/themes/{theme}/palette.json"),
+        os.path.expanduser(f"~/.config/themes/generated/{theme}/palette.json"),
         os.path.expanduser(f"~/.config/themes/palettes/{theme}.json"),
     ]:
         try:

@@ -2,8 +2,7 @@
 # Theme system utility functions
 
 get_themes() {
-    find "$THEMES_DIR" -maxdepth 1 -mindepth 1 -type d \
-        ! -name "palettes" ! -name "templates" ! -name "lib" ! -name "current" ! -name "scripts" ! -name "stylus" \
+    find "$GENERATED_DIR" -maxdepth 1 -mindepth 1 -type d \
         -printf "%f\n" | sort
 }
 
@@ -13,13 +12,13 @@ get_current() {
 
 has_palette() {
     local theme="$1"
-    [[ -f "$PALETTES_DIR/$theme.json" ]] || [[ -f "$THEMES_DIR/$theme/palette.json" ]]
+    [[ -f "$PALETTES_DIR/$theme.json" ]] || [[ -f "$GENERATED_DIR/$theme/palette.json" ]]
 }
 
 get_palette_path() {
     local theme="$1"
-    if [[ -f "$THEMES_DIR/$theme/palette.json" ]]; then
-        echo "$THEMES_DIR/$theme/palette.json"
+    if [[ -f "$GENERATED_DIR/$theme/palette.json" ]]; then
+        echo "$GENERATED_DIR/$theme/palette.json"
     elif [[ -f "$PALETTES_DIR/$theme.json" ]]; then
         echo "$PALETTES_DIR/$theme.json"
     fi
@@ -29,7 +28,7 @@ get_palette_path() {
 copy_to_current() {
     local theme="$1"
     local filename="$2"
-    local src="$THEMES_DIR/$theme/$filename"
+    local src="$GENERATED_DIR/$theme/$filename"
     if [[ -e "$src" ]]; then
         rm -rf "$CURRENT_DIR/$filename"
         cp -r "$src" "$CURRENT_DIR/$filename"

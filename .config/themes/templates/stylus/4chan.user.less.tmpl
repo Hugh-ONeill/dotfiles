@@ -1,0 +1,895 @@
+/* ==UserStyle==
+@name 4chan Custom
+@namespace github.com/wiz/userstyles/4chan
+@homepageURL https://github.com/wiz/userstyles
+@version 2026.02.19
+@description Custom theme for 4chan
+@author wiz
+@license MIT
+
+@preprocessor less
+@var select lightFlavor "Light Flavor" ["latte:Latte*", "frappe:Frappé", "macchiato:Macchiato", "mocha:Mocha"]
+@var select darkFlavor "Dark Flavor" ["latte:Latte", "frappe:Frappé", "macchiato:Macchiato", "mocha:Mocha*"]
+@var select accentColor "Accent" ["rosewater:Rosewater", "flamingo:Flamingo", "pink:Pink", "mauve:Mauve*", "red:Red", "maroon:Maroon", "peach:Peach", "yellow:Yellow", "green:Green", "teal:Teal", "blue:Blue", "sapphire:Sapphire", "sky:Sky", "lavender:Lavender", "subtext0:Gray"]
+==/UserStyle== */
+
+
+// Custom palette colors
+@rosewater: ${ACCENT};
+@flamingo: ${ACCENT_SECONDARY};
+@pink: ${ACCENT};
+@mauve: ${ACCENT};
+@red: ${SEM_ERR};
+@maroon: ${SEM_ERR};
+@peach: ${SEM_WARN};
+@yellow: ${SEM_WARN};
+@green: ${SEM_OK};
+@teal: ${ACCENT_TERTIARY};
+@sky: ${SEM_INFO};
+@sapphire: ${SEM_INFO};
+@blue: ${SEM_LINK};
+@lavender: ${ACCENT_BRIGHT};
+@text: ${TEXT};
+@subtext1: ${SUBTEXT1};
+@subtext0: ${SUBTEXT0};
+@overlay2: ${OVERLAY2};
+@overlay1: ${OVERLAY1};
+@overlay0: ${OVERLAY0};
+@surface2: ${SURFACE2};
+@surface1: ${SURFACE1};
+@surface0: ${SURFACE0};
+@base: ${BASE};
+@mantle: ${MANTLE};
+@crust: ${CRUST};
+@accent: @mauve;
+
+// extra colors
+@accent2: ${ACCENT_SECONDARY};
+@accent3: ${ACCENT_TERTIARY};
+@link: ${SEM_LINK};
+@err: ${SEM_ERR};
+@ok: ${SEM_OK};
+@warn: ${SEM_WARN};
+@info: ${SEM_INFO};
+@match: ${SEM_MATCH};
+@selection: ${SEM_SELECTION};
+@border-clr: ${SEM_BORDER};
+@gradient0: ${GRADIENT_0};
+@gradient1: ${GRADIENT_1};
+@gradient2: ${GRADIENT_2};
+@gradient3: ${GRADIENT_3};
+@gradient4: ${GRADIENT_4};
+
+#lib {
+  .palette() {}
+  .defaults() {
+    color-scheme: dark;
+    ::selection {
+      background-color: fade(@accent, 30%);
+      color: @text;
+    }
+  }
+  .css-variables() {}
+}
+
+
+@-moz-document domain("4chan.org"),
+  domain("4channel.org") {
+
+  // ============================================================
+  // PAGE FOUNDATION
+  // ============================================================
+
+  html,
+  body {
+    background: @crust !important;
+    color: @text !important;
+    font-family: inherit;
+  }
+
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+
+  // native top/bottom board nav
+  #boardNavDesktop,
+  #boardNavDesktopFoot,
+  .pagelist {
+    background: @mantle !important;
+    color: @subtext0 !important;
+    border-color: @surface0 !important;
+    font-size: inherit;
+  }
+
+  #boardNavDesktop a,
+  #boardNavDesktopFoot a,
+  .pagelist a {
+    color: @accent !important;
+  }
+
+  .pages strong a {
+    color: @text !important;
+  }
+
+  // 4chan-x header bar
+  #header-bar {
+    background: @mantle !important;
+    color: @subtext0 !important;
+    border-bottom: 1px solid @surface0 !important;
+    box-shadow: 0 1px 4px fade(@crust, 40%);
+  }
+
+  #header-bar a,
+  #board-list a,
+  #custom-board-list a,
+  #full-board-list a,
+  .shortcut a {
+    color: @accent !important;
+  }
+
+  #header-bar .current a {
+    color: @text !important;
+    font-weight: bold;
+  }
+
+  .brackets-wrap::before,
+  .brackets-wrap::after {
+    color: @overlay0 !important;
+  }
+
+  // nav links between threads
+  .navLinks a {
+    color: @accent !important;
+  }
+
+  // ============================================================
+  // BOARD BANNER
+  // ============================================================
+
+  .boardBanner {
+    color: @text !important;
+  }
+
+  .boardTitle {
+    color: @accent !important;
+  }
+
+  .boardSubtitle {
+    color: @subtext0 !important;
+  }
+
+  // ============================================================
+  // THREADS & POSTS
+  // ============================================================
+
+  .board {
+    border: none !important;
+  }
+
+  // op posts
+  .post.op {
+    background: transparent !important;
+  }
+
+  // reply posts
+  .post.reply,
+  .inline .post {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 3px;
+  }
+
+  // highlighted post (hovered backlink)
+  .postContainer.highlight .post.reply,
+  .post.reply.highlight {
+    background: @surface0 !important;
+    border-color: @accent !important;
+  }
+
+  // your own post
+  .postContainer.replyContainer.yourPost > .post.reply {
+    border-left: 3px solid @accent2 !important;
+  }
+
+  // post quoting you
+  .postContainer.replyContainer.quotesYou > .post.reply {
+    border-left: 3px solid @warn !important;
+  }
+
+  // inline expanded posts
+  .inline .post.reply {
+    background: @mantle !important;
+    border-color: @surface1 !important;
+  }
+
+  // ============================================================
+  // POST CONTENT
+  // ============================================================
+
+  // post text
+  .postMessage {
+    color: @text !important;
+  }
+
+  // greentext
+  .quote {
+    color: @ok !important;
+  }
+
+  // quote links
+  .quotelink {
+    color: @link !important;
+    text-decoration: underline;
+  }
+
+  .quotelink:hover {
+    color: @accent !important;
+  }
+
+  // backlinks
+  .backlink a,
+  .container a.quotelink {
+    color: @accent !important;
+    font-size: 0.85em;
+  }
+
+  // dead links
+  .deadlink {
+    color: @err !important;
+    text-decoration: line-through;
+  }
+
+  // spoiler text
+  .spoiler {
+    color: transparent !important;
+    background: @overlay0 !important;
+    border-radius: 2px;
+    transition: color 0.15s;
+  }
+
+  .spoiler:hover {
+    color: @text !important;
+    background: @overlay0 !important;
+  }
+
+  // subject line
+  .subject {
+    color: @accent2 !important;
+    font-weight: bold;
+  }
+
+  // poster name
+  .name {
+    color: @accent !important;
+    font-weight: bold;
+  }
+
+  // tripcode
+  .postertrip {
+    color: @accent3 !important;
+  }
+
+  // capcode
+  .capcodeMod,
+  .capcodeAdmin {
+    color: @err !important;
+  }
+
+  // poster id
+  .posteruid .hand {
+    color: @subtext0 !important;
+  }
+
+  // date / post number
+  .dateTime {
+    color: @subtext0 !important;
+  }
+
+  .postNum a {
+    color: @subtext0 !important;
+  }
+
+  .postNum a:hover {
+    color: @accent !important;
+  }
+
+  // general links
+  a:link {
+    color: @link !important;
+  }
+
+  a:visited {
+    color: fade(@link, 75%) !important;
+  }
+
+  a:hover {
+    color: @accent !important;
+  }
+
+  // ============================================================
+  // FILE INFO
+  // ============================================================
+
+  .file .fileText,
+  .file .fileText a {
+    color: @subtext0 !important;
+  }
+
+  .file .fileText a:hover {
+    color: @accent !important;
+  }
+
+  // thumbnail borders
+  .fileThumb img {
+    border: none !important;
+    border-radius: 2px;
+  }
+
+  // ============================================================
+  // CODE BLOCKS
+  // ============================================================
+
+  .prettyprint {
+    background: @mantle !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 3px;
+    color: @text !important;
+    padding: 6px 8px;
+  }
+
+  .prettyprint .pln { color: @text !important; }
+  .prettyprint .str { color: @ok !important; }
+  .prettyprint .kwd { color: @accent !important; }
+  .prettyprint .com { color: @overlay2 !important; }
+  .prettyprint .typ { color: @accent2 !important; }
+  .prettyprint .lit { color: @warn !important; }
+  .prettyprint .pun { color: @subtext0 !important; }
+  .prettyprint .tag { color: @err !important; }
+  .prettyprint .atn { color: @accent3 !important; }
+  .prettyprint .atv { color: @ok !important; }
+  .prettyprint .dec { color: @warn !important; }
+
+  pre {
+    color: @text !important;
+  }
+
+  // ============================================================
+  // FORMS & INPUTS
+  // ============================================================
+
+  .field,
+  input[type="text"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    background: @surface0 !important;
+    color: @text !important;
+    border: 1px solid @surface1 !important;
+    border-radius: 3px;
+    outline: none;
+  }
+
+  .field:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: @accent !important;
+    box-shadow: 0 0 0 1px fade(@accent, 30%);
+  }
+
+  .field::placeholder,
+  input::placeholder,
+  textarea::placeholder {
+    color: @overlay1 !important;
+  }
+
+  input[type="submit"],
+  button {
+    background: @surface0 !important;
+    color: @text !important;
+    border: 1px solid @surface1 !important;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  input[type="submit"]:hover,
+  button:hover {
+    background: @surface1 !important;
+    border-color: @accent !important;
+  }
+
+  // ============================================================
+  // QUICK REPLY (4chan-X)
+  // ============================================================
+
+  #qr {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px fade(@crust, 50%);
+  }
+
+  #qr .move {
+    background: @mantle !important;
+    color: @text !important;
+    border-bottom: 1px solid @surface0 !important;
+  }
+
+  #qr input.field,
+  #qr textarea,
+  #qr select {
+    background: @surface0 !important;
+    color: @text !important;
+    border-color: @surface1 !important;
+  }
+
+  #qr input.field:focus,
+  #qr textarea:focus {
+    border-color: @accent !important;
+  }
+
+  #qr input[type="submit"] {
+    background: @accent !important;
+    color: @crust !important;
+    border-color: @accent !important;
+    font-weight: bold;
+  }
+
+  #qr input[type="submit"]:hover {
+    background: @lavender !important;
+    border-color: @lavender !important;
+  }
+
+  #qr .close {
+    color: @subtext0 !important;
+  }
+
+  #qr .close:hover {
+    color: @err !important;
+  }
+
+  #qr-filename {
+    color: @subtext0 !important;
+  }
+
+  // captcha
+  .captcha-container,
+  .captcha-root,
+  .captchainput {
+    background: @surface0 !important;
+    border-color: @surface1 !important;
+  }
+
+  // native post form
+  #postForm {
+    background: @base !important;
+  }
+
+  #togglePostFormLink a {
+    color: @accent !important;
+  }
+
+  // ============================================================
+  // DIALOGS & MENUS
+  // ============================================================
+
+  .dialog {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px fade(@crust, 50%);
+  }
+
+  // context menu
+  #menu {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 4px;
+  }
+
+  #menu .entry {
+    color: @text !important;
+    padding: 4px 12px;
+  }
+
+  #menu .entry:hover,
+  #menu .entry.focused {
+    background: @surface0 !important;
+    color: @accent !important;
+  }
+
+  .submenu,
+  .subMenu {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+  }
+
+  // quote preview
+  #qp {
+    background: @base !important;
+    border: 1px solid @surface1 !important;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px fade(@crust, 50%);
+  }
+
+  #qp .post.reply {
+    background: @base !important;
+    border: none !important;
+  }
+
+  // ============================================================
+  // THREAD WATCHER
+  // ============================================================
+
+  #thread-watcher {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 4px;
+  }
+
+  #thread-watcher .move {
+    background: @mantle !important;
+    border-bottom: 1px solid @surface0 !important;
+    color: @text !important;
+  }
+
+  #thread-watcher a {
+    color: @accent !important;
+  }
+
+  #thread-watcher .close {
+    color: @subtext0 !important;
+  }
+
+  .last-page {
+    color: @err !important;
+  }
+
+  .replies-quoting-you {
+    color: @warn !important;
+  }
+
+  // ============================================================
+  // 4CHAN-X SETTINGS
+  // ============================================================
+
+  #fourchanx-settings {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+  }
+
+  #fourchanx-settings .tab-selected {
+    background: @surface0 !important;
+    color: @accent !important;
+  }
+
+  #fourchanx-settings .field,
+  #fourchanx-settings textarea,
+  #fourchanx-settings select {
+    background: @surface0 !important;
+    color: @text !important;
+    border-color: @surface1 !important;
+  }
+
+  #fourchanx-settings button {
+    background: @surface0 !important;
+    color: @text !important;
+    border-color: @surface1 !important;
+  }
+
+  #fourchanx-settings .description {
+    color: @subtext0 !important;
+  }
+
+  // ============================================================
+  // CATALOG
+  // ============================================================
+
+  .catalog-thread {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 3px;
+  }
+
+  .catalog-thread:hover {
+    border-color: @accent !important;
+  }
+
+  .catalog-thread .subject {
+    color: @accent2 !important;
+  }
+
+  .catalog-thread .catalog-post .postMessage,
+  .catalog-thread .teaser {
+    color: @subtext0 !important;
+  }
+
+  .catalog-stats {
+    color: @overlay2 !important;
+  }
+
+  .catalog-thread .catalog-thumb {
+    border-radius: 2px;
+  }
+
+  // catalog controls
+  #order-ctrl,
+  #size-ctrl,
+  #teaser-ctrl,
+  #qf-box {
+    background: @surface0 !important;
+    color: @text !important;
+    border: 1px solid @surface1 !important;
+    border-radius: 3px;
+  }
+
+  // ============================================================
+  // NOTIFICATIONS & WARNINGS
+  // ============================================================
+
+  .warning {
+    color: @err !important;
+  }
+
+  font[color="#ff0000"] b {
+    color: @err !important;
+  }
+
+  #globalMessage {
+    background: @mantle !important;
+    color: @subtext0 !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 3px;
+  }
+
+  #globalMessage a {
+    color: @accent !important;
+  }
+
+  .notification {
+    background: @base !important;
+    color: @text !important;
+    border: 1px solid @surface0 !important;
+  }
+
+  // ============================================================
+  // SEPARATORS & BORDERS
+  // ============================================================
+
+  hr {
+    border: none !important;
+    border-top: 1px solid @surface0 !important;
+  }
+
+  #unread-line {
+    border-color: @accent !important;
+  }
+
+  // ============================================================
+  // INFO BOXES
+  // ============================================================
+
+  .top-box,
+  .box-outer {
+    background: @base !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 3px;
+  }
+
+  .boxbar {
+    background: @mantle !important;
+    color: @text !important;
+    border-bottom: 1px solid @surface0 !important;
+  }
+
+  .boxcontent {
+    background: @base !important;
+    color: @text !important;
+  }
+
+  // ============================================================
+  // BOTTOM CONTROLS
+  // ============================================================
+
+  .bottomCtrl {
+    color: @subtext0 !important;
+  }
+
+  #copyright,
+  #ft {
+    color: @overlay0 !important;
+  }
+
+  #copyright a,
+  #ft a {
+    color: @overlay2 !important;
+  }
+
+  // ============================================================
+  // HIDDEN POSTS & STUBS
+  // ============================================================
+
+  .stub {
+    background: @mantle !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 3px;
+  }
+
+  .stub a {
+    color: @subtext0 !important;
+  }
+
+  // side arrows
+  .sideArrows {
+    color: @overlay0 !important;
+  }
+
+  // post menu button
+  .menu-button {
+    color: @overlay1 !important;
+  }
+
+  .menu-button:hover {
+    color: @accent !important;
+  }
+
+  // watch/star
+  .watch-thread-link {
+    color: @overlay1 !important;
+  }
+
+  .watch-thread-link.watched {
+    color: @warn !important;
+  }
+
+  // ============================================================
+  // OVERLAY & GALLERY
+  // ============================================================
+
+  #overlay {
+    background: fade(@crust, 80%) !important;
+  }
+
+  #a-gallery {
+    background: @crust !important;
+  }
+
+  .gal-buttons {
+    background: @mantle !important;
+    color: @text !important;
+  }
+
+  // ============================================================
+  // UPDATER & STATS
+  // ============================================================
+
+  #updater,
+  #stats,
+  #thread-stats {
+    background: @mantle !important;
+    color: @subtext0 !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 3px;
+  }
+
+  // ============================================================
+  // SCROLLBAR
+  // ============================================================
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: @crust;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: @surface1;
+    border-radius: 5px;
+    border: 2px solid @crust;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: @surface2;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: @crust;
+  }
+
+  // firefox scrollbar
+  * {
+    scrollbar-color: @surface1 @crust;
+    scrollbar-width: thin;
+  }
+
+  // ============================================================
+  // ADVERTISEMENTS (HIDE)
+  // ============================================================
+
+  .middlead,
+  .adc-resp-bg,
+  .adg-rects,
+  .danbo-slot,
+  .adl,
+  [id^="ad-"],
+  .ad-bg {
+    display: none !important;
+  }
+
+  // ============================================================
+  // MISC
+  // ============================================================
+
+  // image expand controls
+  #imgControls {
+    background: @mantle !important;
+    color: @subtext0 !important;
+  }
+
+  #imgControls label {
+    color: @subtext0 !important;
+  }
+
+  // checkbox styling
+  input[type="checkbox"] {
+    accent-color: @accent;
+  }
+
+  // blotter
+  #blotter {
+    color: @subtext0 !important;
+  }
+
+  #blotter a {
+    color: @accent !important;
+  }
+
+  // omitted posts summary
+  .summary,
+  .abbr {
+    color: @overlay2 !important;
+  }
+
+  .abbr a {
+    color: @accent !important;
+  }
+
+  // closed/archived markers
+  .closed::after {
+    color: @err !important;
+  }
+
+  .archived::after {
+    color: @overlay2 !important;
+  }
+
+  // sauce links
+  .sauce {
+    color: @overlay1 !important;
+    font-size: 0.85em;
+  }
+
+  .sauce a {
+    color: @link !important;
+  }
+
+  // exif data
+  .exif {
+    color: @subtext0 !important;
+    background: @mantle !important;
+  }
+
+  // id colors - make them blend better
+  .posteruid {
+    font-size: 0.85em;
+  }
+
+  // fortune (red text on /s4s/)
+  .fortune {
+    color: @accent !important;
+  }
+}

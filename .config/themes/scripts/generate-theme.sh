@@ -20,7 +20,7 @@ fi
 
 THEME_NAME="$1"
 PALETTE_FILE="$PALETTES_DIR/$THEME_NAME.json"
-OUTPUT_DIR="$THEMES_DIR/$THEME_NAME"
+OUTPUT_DIR="$GENERATED_DIR/$THEME_NAME"
 
 if [[ ! -f "$PALETTE_FILE" ]]; then
     echo "Error: Palette file not found: $PALETTE_FILE"
@@ -265,7 +265,7 @@ if [[ -f "$TEMPLATES_DIR/fsh.ini.tmpl" ]]; then
 fi
 
 # Generate dunst icons from templates
-DUNST_ICONS_TMPL="$TEMPLATES_DIR/dunst-icons-tmpl"
+DUNST_ICONS_TMPL="$TEMPLATES_DIR/dunst-icons"
 if [[ -d "$DUNST_ICONS_TMPL" ]]; then
     ICONS_OUTPUT="$OUTPUT_DIR/dunst-icons"
     mkdir -p "$ICONS_OUTPUT"
@@ -279,7 +279,7 @@ if [[ -d "$DUNST_ICONS_TMPL" ]]; then
 fi
 
 # Generate Stylus userstyles
-STYLUS_TMPL="$THEMES_DIR/stylus/templates"
+STYLUS_TMPL="$TEMPLATES_DIR/stylus"
 if [[ -d "$STYLUS_TMPL" ]]; then
     STYLUS_OUTPUT="$OUTPUT_DIR/stylus"
     mkdir -p "$STYLUS_OUTPUT"
@@ -291,9 +291,9 @@ if [[ -d "$STYLUS_TMPL" ]]; then
         fi
     done
     # Bundle into importable JSON
-    if [[ -x "$THEMES_DIR/stylus/bundle-styles.py" ]]; then
+    if [[ -x "$SCRIPTS_DIR/bundle-styles.py" ]]; then
         echo "  -> stylus-bundle.json"
-        "$THEMES_DIR/stylus/bundle-styles.py" "$THEME_NAME" > /dev/null
+        "$SCRIPTS_DIR/bundle-styles.py" "$THEME_NAME" > /dev/null
     fi
 fi
 

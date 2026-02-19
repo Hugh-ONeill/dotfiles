@@ -7,7 +7,7 @@ import urllib.request
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-TEMPLATES_DIR = SCRIPT_DIR / "templates"
+TEMPLATES_DIR = SCRIPT_DIR.parent / "templates" / "stylus"
 
 STYLES = {
     "google": "https://raw.githubusercontent.com/catppuccin/userstyles/main/styles/google/catppuccin.user.less",

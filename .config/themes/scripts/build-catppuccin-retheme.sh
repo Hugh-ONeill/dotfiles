@@ -306,7 +306,7 @@ esac
 echo "  Done! Theme installed to: $THEME_OUTPUT"
 
 # Update theme.conf
-THEME_CONF="$THEMES_DIR/$THEME_NAME/theme.conf"
+THEME_CONF="$GENERATED_DIR/$THEME_NAME/theme.conf"
 if [[ -f "$THEME_CONF" ]]; then
     case "$TARGET" in
         gtk)     conf_key="gtk_theme" ;;

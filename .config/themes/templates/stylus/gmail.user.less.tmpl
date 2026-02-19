@@ -1,0 +1,1067 @@
+/* ==UserStyle==
+@name Gmail Custom
+@namespace github.com/wiz/userstyles/gmail
+@homepageURL https://github.com/wiz/userstyles
+@version 2026.02.19
+@description Custom theme for Gmail
+@author wiz
+@license MIT
+
+@preprocessor less
+@var select lightFlavor "Light Flavor" ["latte:Latte*", "frappe:Frappé", "macchiato:Macchiato", "mocha:Mocha"]
+@var select darkFlavor "Dark Flavor" ["latte:Latte", "frappe:Frappé", "macchiato:Macchiato", "mocha:Mocha*"]
+@var select accentColor "Accent" ["rosewater:Rosewater", "flamingo:Flamingo", "pink:Pink", "mauve:Mauve*", "red:Red", "maroon:Maroon", "peach:Peach", "yellow:Yellow", "green:Green", "teal:Teal", "blue:Blue", "sapphire:Sapphire", "sky:Sky", "lavender:Lavender", "subtext0:Gray"]
+==/UserStyle== */
+
+
+// Custom palette colors
+@rosewater: ${ACCENT};
+@flamingo: ${ACCENT_SECONDARY};
+@pink: ${ACCENT};
+@mauve: ${ACCENT};
+@red: ${SEM_ERR};
+@maroon: ${SEM_ERR};
+@peach: ${SEM_WARN};
+@yellow: ${SEM_WARN};
+@green: ${SEM_OK};
+@teal: ${ACCENT_TERTIARY};
+@sky: ${SEM_INFO};
+@sapphire: ${SEM_INFO};
+@blue: ${SEM_LINK};
+@lavender: ${ACCENT_BRIGHT};
+@text: ${TEXT};
+@subtext1: ${SUBTEXT1};
+@subtext0: ${SUBTEXT0};
+@overlay2: ${OVERLAY2};
+@overlay1: ${OVERLAY1};
+@overlay0: ${OVERLAY0};
+@surface2: ${SURFACE2};
+@surface1: ${SURFACE1};
+@surface0: ${SURFACE0};
+@base: ${BASE};
+@mantle: ${MANTLE};
+@crust: ${CRUST};
+@accent: @mauve;
+
+// icon recolor filters (applied to black source icons)
+// light: makes black icons near-white for dark backgrounds
+@text-filter: brightness(0) invert(1);
+// dark: makes icons dark for light accent backgrounds
+@crust-filter: brightness(0);
+// warm: makes icons yellow-ish for star/important indicators
+@yellow-filter: brightness(0) invert(0.8) sepia(1) saturate(5) hue-rotate(15deg);
+
+#lib {
+  .palette() {}
+  .defaults() {
+    color-scheme: dark;
+    ::selection {
+      background-color: fade(@accent, 30%);
+      color: @text;
+    }
+  }
+  .css-variables() {}
+}
+
+
+@-moz-document domain("mail.google.com") {
+
+  // ============================================================
+  // GLOBAL
+  // ============================================================
+
+  * {
+    text-shadow: none !important;
+  }
+
+  input,
+  textarea {
+    caret-color: @text;
+  }
+
+  #input-styling {
+    input,
+    select,
+    button {
+      background-color: @mantle;
+      color: @text;
+      border-color: @surface0;
+      border-style: solid;
+      border-width: 1px;
+      box-shadow: none;
+    }
+  }
+
+  // ============================================================
+  // GMAIL LOGO
+  // ============================================================
+
+  [src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_default_1x_r5.png"],
+  [src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_dark_1x_r5.png"] {
+    height: unset !important;
+    width: unset !important;
+    @svg: escape(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="17.727 14.319 30 22.5" width="30" height="22.5"><path fill="@{blue}" d="M19.773 36.819h4.773V25.227l-6.819-5.114v14.659a2.044 2.044 0 0 0 2.045 2.045"/><path fill="@{green}" d="M40.909 36.819h4.773a2.044 2.044 0 0 0 2.045-2.045v-14.66l-6.819 5.114"/><path fill="@{yellow}" d="M40.909 16.364v8.864l6.819-5.114v-2.727c0-2.529-2.888-3.971-4.909-2.455"/><path fill="@{red}" d="M24.545 25.227v-8.863l8.181 6.136 8.181-6.136v8.864l-8.181 6.136m-15-13.977v2.727l6.819 5.114v-8.864l-1.909-1.431c-2.025-1.517-4.91-.075-4.91 2.455"/></svg>'
+    );
+    content: url("data:image/svg+xml,@{svg}");
+  }
+
+  // ============================================================
+  // TOOLTIPS
+  // ============================================================
+
+  .T-ays-iP,
+  .gb_Ac {
+    background-color: @crust;
+    color: @text;
+  }
+
+  // ============================================================
+  // BUTTONS
+  // ============================================================
+
+  // solid primary
+  .T-I-atl {
+    background-color: @accent;
+    color: @crust;
+  }
+
+  // transparent primary
+  .l0,
+  div.b8 .a8k,
+  .bAo > .ad {
+    color: @accent;
+
+    &::before {
+      background-color: @accent;
+    }
+  }
+
+  // transparent secondary
+  .bs0 > .acM,
+  .bti > .btg,
+  .a8Y > .T-I-ax7 {
+    color: @text;
+
+    &.acN {
+      color: @subtext0;
+    }
+
+    &:hover::before {
+      background-color: @overlay2;
+    }
+  }
+
+  // ============================================================
+  // HEADER & SIDEBARS
+  // ============================================================
+
+  .w-asV,
+  .bkL,
+  .bhZ.bym,
+  .bhZ.bjB,
+  .bhZ.bym.baA {
+    background-color: @mantle;
+  }
+
+  // header icons
+  .gb_Kc svg,
+  .gb_Pc.gb_Uc svg,
+  .gb_Lc .gb_rd .gb_sd,
+  .gb_Lc .gb_rd .gb_Kc,
+  .gb_Lc .gb_rd .gb_ud,
+  .gb_Pc.gb_Uc .gb_sd {
+    color: @text;
+  }
+
+  // search input
+  .gb_Kc .gb_hd {
+    background-color: @surface1;
+
+    .gb_je,
+    .gb_qe,
+    .gsan_a,
+    .gsas_a,
+    svg {
+      color: @text;
+    }
+  }
+
+  // search input focused
+  .gb_hd.gb_id {
+    background-color: @base;
+  }
+
+  // ============================================================
+  // SEARCH MODAL
+  // ============================================================
+
+  .gssb_c {
+    // icons
+    button svg,
+    .asor {
+      filter: @text-filter;
+    }
+
+    // recent searches
+    .aRp,
+    .gssb_e,
+    .gssb_m {
+      background-color: @base;
+      color: @text;
+    }
+
+    // hovered recent search
+    .gssb_i {
+      background-color: @surface0;
+
+      > .gssb_a {
+        border-left-color: @accent;
+      }
+
+      .gsaq_b {
+        filter: @text-filter;
+      }
+    }
+
+    .aSP,
+    .gssb_e {
+      border-color: @surface2;
+    }
+
+    .gssb_l {
+      background-color: @surface0;
+    }
+
+    // search result icons
+    .gsoi_0,
+    .asor_o,
+    .gsoi_msra {
+      filter: @text-filter;
+    }
+
+    .asor_e {
+      color: @subtext0;
+    }
+  }
+
+  // ============================================================
+  // PILL FILTERS
+  // ============================================================
+
+  .H2 {
+    background-color: @base;
+    border-color: @surface0;
+    color: @subtext1;
+    fill: @subtext1;
+
+    &:hover {
+      background-color: @mantle;
+    }
+
+    &.bws {
+      background-color: @accent;
+      color: @crust;
+      fill: @crust;
+
+      .HV {
+        filter: @crust-filter;
+      }
+
+      &:hover .H1 {
+        background-color: darken(@accent, 5%);
+      }
+    }
+  }
+
+  .aqc .H2 {
+    border-color: @text;
+    color: @text;
+
+    &.bws {
+      background-color: @surface2;
+      color: @mantle;
+    }
+  }
+
+  // ============================================================
+  // ADVANCED SEARCH MODAL
+  // ============================================================
+
+  .ZF-z6,
+  .ZF-zT,
+  .ZF-Av .lJ,
+  .ZF-Av .lN {
+    background-color: @base;
+
+    &,
+    .boo > .ZG,
+    .boo .aQl > .J-JN-M-I-Jm,
+    .boo .aaa > .J-JN-M-I-Jm,
+    .boo .ZE > .J-JN-M-I-Jm {
+      color: @text;
+    }
+
+    .btl.acK,
+    .btn::before {
+      filter: @text-filter;
+    }
+
+    // text inputs
+    .nr {
+      background-color: @base;
+      color: @text;
+
+      &:focus {
+        box-shadow: inset 0 -1px 0 0 @accent;
+      }
+    }
+
+    // calendar input
+    .bs5::after {
+      filter: @text-filter;
+    }
+
+    .J-JB-KA,
+    .J-JB-KA-JS,
+    .J-JB-KA-Jk,
+    .J-JB-KA-LG {
+      background-color: @base;
+      color: @text;
+      border-color: @surface0;
+
+      // past days
+      .J-JB-KA-Ku-Kk {
+        color: @subtext0;
+      }
+
+      // future days
+      .J-JB-KA-a1R-JB.J-JB-KA-LH,
+      .J-JB-KA-a1R-JB.J-JB-KA-Ku-Kk,
+      .J-JB-KA-JB.J-JB-KA-a1R-JB {
+        color: @subtext1;
+      }
+
+      // hovered day
+      .J-JB-KA-JB:not(.J-JB-KA-K8, .J-JB-KA-KO):hover {
+        color: @crust;
+
+        &::before {
+          background-color: fade(@accent, 70%);
+        }
+      }
+
+      // selected day
+      .J-JB-KA-KO {
+        color: @crust;
+
+        &::before {
+          background-color: @accent;
+        }
+      }
+
+      // unselected today
+      .J-JB-KA-K8 {
+        color: @crust;
+
+        &::before {
+          background-color: @overlay2;
+        }
+      }
+    }
+
+    // checkbox inputs
+    .bs1 + .bs3,
+    .btj + .aD {
+      color: @text;
+
+      &::before {
+        filter: @text-filter;
+      }
+    }
+
+    // dropdown inputs
+    .J-JN-M-I {
+      color: @text;
+    }
+  }
+
+  // ============================================================
+  // SIDEBAR
+  // ============================================================
+
+  // selected item
+  .TK .TO.nZ:active,
+  .TK .TO.ol:active,
+  .TK .TO.nZ,
+  .TK .TO.ol,
+  .byl .TK .nZ.aBP,
+  .byl .TK .nZ.aS3,
+  .byl .TK .nZ.aS4,
+  .byl .TK .nZ.aS5,
+  .byl .TK .nZ.aS6,
+  .VDSZAf.H5o3mc {
+    background-color: @surface0;
+  }
+
+  // hovered item
+  .TO.NQ,
+  .n6 .ah9:hover,
+  .n6 .ah9.aiu:hover,
+  .n6 .ah9:focus,
+  .TK .TO:active,
+  .n6 .ah9.aiu:active,
+  .CL:hover,
+  .H5o3mc:not(.VDSZAf):hover,
+  .CL.NQ,
+  .H5o3mc:not(.VDSZAf).NQ {
+    background-color: @surface1;
+  }
+
+  // sidebar text
+  .byl .TK .TO.nZ > .aHS-bnt .n0,
+  .TK .nZ > .aHS-bnt .bsU,
+  .byl .TK .nZ.aS3 .nU > .n0,
+  .TK .nZ.aS3 .bsU,
+  .byl .TK .nZ.aS4 .nU > .n0,
+  .TK .nZ.aS4 .bsU,
+  .byl .TK .nZ.aS5 .nU > .n0,
+  .TK .nZ.aS5 .bsU,
+  .byl .TK .nZ.aS6 .nU > .n0,
+  .TK .nZ.aS6 .bsU,
+  .TK .TO.nZ .nU > .n0,
+  .TK .ol.NQ .nU > .n0,
+  .TK .TO.ol .nU > .n0,
+  .TK .nZ .bsU,
+  .TK .ol .bsU,
+  .VDSZAf.H5o3mc > .Q7,
+  .TO .nU > .n0,
+  .TO.NQ .nU > .n0,
+  .TO.nZ .nU > .n0,
+  .ah9 > .CJ,
+  .n3 > .CL > .CK,
+  .aAv,
+  .bsU {
+    color: @text;
+  }
+
+  // sidebar icons
+  .nZ > .TN.aHS-bnt .qj,
+  .TO:not(.nZ) > .TN > .qj:not([style*="background-color"]),
+  .n6 .n4 .G-asx,
+  .aAw .aAu,
+  .pM,
+  .TO.nZ > .TN > .qj,
+  .n3 .CL::before {
+    filter: @text-filter;
+  }
+
+  // ============================================================
+  // COMPOSE BUTTON
+  // ============================================================
+
+  .z0 > .L3 {
+    background-color: @accent;
+    color: @crust;
+
+    &:focus {
+      background-color: @text;
+    }
+  }
+
+  .WR .z0 > .L3::before,
+  .WR.anZ .z0 > .L3::before {
+    filter: @crust-filter;
+  }
+
+  // ============================================================
+  // INBOX TOP SECTION
+  // ============================================================
+
+  .bkK > .nH {
+    background-color: @surface0;
+
+    // icons
+    .bzn,
+    .aqJ .amJ,
+    .adg .adk {
+      filter: @text-filter;
+    }
+  }
+
+  // inbox categories
+  .aKx > .aKz {
+    color: @text;
+  }
+
+  // category icons
+  .aAy > div {
+    filter: @text-filter;
+  }
+
+  // selected category underline
+  .J-KU-KO::before {
+    background-color: @text;
+  }
+
+  // category hover
+  .aRz.J-KU:hover {
+    background-color: @surface1;
+  }
+
+  // ============================================================
+  // EMAIL LIST
+  // ============================================================
+
+  // email count / pagination
+  div[aria-label="Show more messages"] {
+    .Dj {
+      color: @subtext1;
+    }
+
+    &::before {
+      background-color: @text;
+    }
+  }
+
+  .h0 {
+    color: @subtext1;
+  }
+
+  // inbox footer
+  .md.mj,
+  .aeU .ma,
+  .ma .mb,
+  .ae3 .l6,
+  .l9,
+  .l8,
+  .aiD {
+    color: @subtext1;
+  }
+
+  // storage progress bar
+  .aiC {
+    background-color: @overlay0;
+
+    .aiA {
+      background-color: @subtext0;
+    }
+  }
+
+  // external link icon
+  .aiz {
+    filter: @text-filter;
+  }
+
+  // read emails
+  .yO {
+    background-color: @base;
+    color: @text;
+    box-shadow: inset 0 -1px 0 0 @surface0;
+
+    &:hover {
+      box-shadow:
+        inset 1px 0 0 @surface0,
+        inset -1px 0 0 @surface0,
+        0 0 4px 0 @surface1,
+        0 0 6px 2px @surface1;
+    }
+  }
+
+  // read email text
+  .zE {
+    color: @text;
+  }
+
+  // email list icons (select, important, delete, hover actions)
+  .xY > .T-Jo,
+  td.apU > .T-KT.aXw::before,
+  .pG .a9q,
+  .aqN,
+  .bqY li {
+    filter: @text-filter;
+  }
+
+  // important/star icon filled
+  .ha .a9q.pH,
+  .a9q.pH,
+  .aoj,
+  td.apU > .T-KT.T-KT-Jp::before {
+    filter: @yellow-filter;
+  }
+
+  .pG:hover > .a9q::before {
+    background-color: fade(@yellow, 30%);
+  }
+
+  // read email dates
+  .yO > .xW {
+    color: @subtext0;
+  }
+
+  // read email summary
+  .y2 {
+    color: @subtext1;
+  }
+
+  // selected emails
+  .x7 {
+    background-color: @accent;
+    color: @mantle;
+
+    .xW {
+      color: @crust;
+    }
+
+    .xY > .T-Jo,
+    td.apU > .T-KT.aXw::before,
+    .pG .a9q,
+    .aqN,
+    .bqY li {
+      filter: @crust-filter;
+    }
+  }
+
+  // unsubscribe button
+  .aOd.T-I {
+    color: @text;
+    box-shadow: inset 0 0 0 1px @surface2;
+  }
+
+  // draft text
+  .boq {
+    color: @red;
+  }
+
+  // empty state messages
+  .TD,
+  .Tm .ya {
+    background-color: @surface1;
+    color: @text;
+  }
+
+  // empty tab message
+  .aRs {
+    background-color: @base;
+    color: @subtext0;
+
+    .aRv {
+      color: @text;
+    }
+    .aRq {
+      color: @accent;
+    }
+  }
+
+  // ============================================================
+  // BANNERS
+  // ============================================================
+
+  .GR {
+    background-color: @base;
+
+    .GX {
+      color: @text;
+    }
+    .GT {
+      color: @subtext1;
+    }
+
+    .GW {
+      color: @text;
+
+      &::before {
+        background-color: @text;
+      }
+    }
+    .GV {
+      color: @accent;
+
+      &::before {
+        background-color: @accent;
+      }
+    }
+  }
+
+  // attachment chips
+  .brc {
+    box-shadow: inset 0 0 0 1px @surface0;
+    color: @text;
+
+    &:hover {
+      background-color: @surface0;
+    }
+  }
+
+  // ============================================================
+  // FLOATING MENUS
+  // ============================================================
+
+  .J-M,
+  .OO.Pa {
+    background-color: @surface1;
+
+    // section header
+    .J-awr,
+    .asc {
+      color: @subtext1;
+    }
+
+    // menu items
+    .J-N,
+    .J-Ks-KO .J-N-Jz,
+    .J-N-JT .J-N-Jz,
+    .J-N-JW .J-N-Jz,
+    .J-LC,
+    .J-JK,
+    .bmz {
+      color: @text;
+    }
+
+    // disabled items
+    .J-N-JE .J-N-atj,
+    .J-N-JE .J-N-Jz {
+      color: @subtext0 !important;
+    }
+
+    // menu icons (checkmark, arrow, checkbox, star, calendar)
+    .J-Ks-KO .J-N-Jo,
+    .asi .J-Ks-KO::before,
+    .J-Ph-hFsbo,
+    .J-LC-Jo,
+    .bi4 > .T-KT:not(.T-KT-Jp, .byM)::before,
+    .aaA.mYVwse,
+    .J-N-JX {
+      filter: @text-filter;
+    }
+
+    .bmz.bjF::before {
+      border-color: @subtext0;
+    }
+
+    // hovered menu item
+    .J-N-JT,
+    .J-N-JW,
+    .J-LC-JT,
+    .J-LC-JW,
+    .J-JK-JT,
+    .J-JK-JW,
+    .bmz.bk5 {
+      background-color: @surface2;
+      border-color: @overlay1;
+    }
+
+    // section divider
+    .J-Kh {
+      border-top-color: @surface2;
+    }
+  }
+
+  // modal search input
+  .agd .J-M-JJ input {
+    background-color: @surface1;
+    color: @text;
+  }
+
+  .bqf {
+    box-shadow: inset 0 -2px 0 0 @surface2;
+
+    &:focus {
+      box-shadow: inset 0 -2px 0 0 @accent;
+    }
+  }
+
+  // magnifying glass icon
+  .A0 {
+    filter: @text-filter;
+  }
+
+  // ============================================================
+  // EDIT LABEL MODAL
+  // ============================================================
+
+  div.Kj-JD {
+    background-color: @base;
+
+    span.Kj-JD-K7-K0 {
+      color: @text;
+    }
+
+    // close icon
+    span.Kj-JD-K7-Jq::after {
+      filter: @text-filter;
+    }
+
+    #input-styling();
+
+    div.Kj-JD-Jz {
+      color: @subtext1;
+    }
+
+    // cancel button
+    div.Kj-JD-Jl > button,
+    .bBh .Kj-JD-Jl > .J-at1-auR {
+      color: @subtext1;
+    }
+
+    // save button
+    div.Kj-JD-Jl > button.J-at1-atl,
+    div.Kj-JD-Jl > button.J-at1-auR {
+      background-color: @accent;
+      color: @crust;
+    }
+  }
+
+  // ============================================================
+  // TOAST NOTIFICATIONS
+  // ============================================================
+
+  .bAp.b8.UC .vh {
+    background-color: @crust;
+    color: @text;
+  }
+
+  // close icon
+  .b8 .bBe .bBf {
+    filter: @text-filter;
+  }
+
+  // ============================================================
+  // COMPOSE WINDOW
+  // ============================================================
+
+  // header bar
+  .Hy.Hy .m,
+  .IG {
+    background-color: @mantle;
+
+    .Hp,
+    .zu,
+    .H,
+    .Iy .az9 {
+      color: @text;
+    }
+
+    .Hm img,
+    .SB,
+    .b7 .mK,
+    .bAm .aaq .mK,
+    .Un .mK,
+    .HX .mK,
+    .HQ .Un::after {
+      filter: @text-filter;
+    }
+  }
+
+  // compose body
+  .aaZ,
+  .Ap,
+  .Am,
+  .aDg > .aDj,
+  .aoP .Ar,
+  .wO,
+  .aoT,
+  .agP,
+  .aGb,
+  .GQ {
+    color: @text;
+    caret-color: @text;
+
+    &,
+    &::before {
+      background: @base;
+    }
+  }
+
+  .gQ,
+  .gO,
+  .oL {
+    color: @subtext0;
+  }
+
+  // bottom toolbar icons
+  .aaA,
+  .btC .dv,
+  .btC .og.T-I-J3,
+  .btC .J-N-JX.og.T-I-J3,
+  .btC .Y1,
+  .btC .Xv.T-I.J-JN-M-I > .J-JN-M-I-JG,
+  .J-JN-M-I-JG,
+  .J-Z-M-I-J6-H > .J-Z-M-I-JG {
+    filter: @text-filter;
+  }
+
+  // floating toolbar (expanded window)
+  .J-Z {
+    background-color: @mantle;
+
+    .J-Z-I,
+    .J-Z-M-I {
+      color: @subtext1;
+    }
+  }
+
+  // send button
+  .gU .v7.T-I:not(.btz),
+  .gU .hG:not(.v6) {
+    background-color: @accent;
+    color: @crust;
+  }
+
+  .hG > .G-asx,
+  .SI .hG > .G-asx {
+    filter: @crust-filter;
+  }
+
+  // contact autofill
+  .afC,
+  .bvx {
+    background: @mantle;
+
+    .agJ {
+      .aL8,
+      .aXS {
+        color: @text;
+      }
+
+      &:hover {
+        background: @base;
+      }
+    }
+  }
+
+  --pkw-background: @mantle;
+  --pkw-outline: @surface0;
+  --pkw-outline-variant: @surface0;
+  --pkw-on-surface-variant: @text;
+
+  // contact chips
+  .agh,
+  .bbV {
+    background: @base;
+
+    .afV {
+      background: @base;
+      color: @text;
+
+      &:hover {
+        background: @surface0;
+        color: @text;
+      }
+    }
+  }
+
+  // ============================================================
+  // SETTINGS
+  // ============================================================
+
+  .dt {
+    color: @text;
+  }
+
+  // settings tabs
+  .v {
+    .fY,
+    .f1 {
+      background-color: @surface0;
+
+      .f0 {
+        color: @text;
+      }
+    }
+
+    .fZ {
+      box-shadow: inset 0 -2px 0 0 @accent;
+    }
+  }
+
+  // settings main panel
+  .r4 {
+    background-color: @base;
+    color: @text;
+
+    // dividers
+    .r7 td,
+    .Jb .J0:not(:last-child) {
+      border-bottom-color: @surface0;
+    }
+
+    // links
+    .r7 .e,
+    .sA,
+    .r4 .e,
+    .el {
+      color: @accent;
+    }
+
+    #input-styling();
+
+    .qK,
+    .qL {
+      background-color: @mantle;
+    }
+    .nr,
+    .Ar {
+      background-color: @base;
+      color: @text;
+      border-color: @surface0 !important;
+    }
+
+    .Uu {
+      box-shadow: inset 0 0 0 1px @surface0;
+      color: @accent;
+    }
+  }
+
+  // labels page
+  .alO {
+    background-color: @base;
+    color: @text;
+
+    .rb {
+      color: @subtext1;
+    }
+
+    .To.Ze {
+      background-color: @surface0;
+    }
+
+    .alP {
+      color: @accent;
+    }
+
+    .rZ {
+      background-color: @surface0;
+    }
+  }
+
+  // ============================================================
+  // CONFIRM MODAL
+  // ============================================================
+
+  div[aria-modal="true"] {
+    --gm3-dialog-refactored-container-color: @base;
+    --gm3-dialog-refactored-supporting-text-color: @text;
+    --gm3-dialog-refactored-headline-color: @text;
+
+    [data-mdc-dialog-action="ok"] {
+      background-color: @accent;
+      --gm3-button-text-label-text-color: @crust;
+      --gm3-button-text-hover-label-text-color: @crust;
+      --gm3-button-text-pressed-label-text-color: @crust;
+    }
+
+    [data-mdc-dialog-action="cancel"] {
+      --gm3-button-text-label-text-color: @subtext1;
+      --gm3-button-text-hover-label-text-color: @text;
+      --gm3-button-text-focus-label-text-color: @text;
+      --gm3-button-text-pressed-label-text-color: @text;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: @surface0;
+      }
+    }
+  }
+}

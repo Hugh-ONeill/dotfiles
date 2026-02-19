@@ -152,6 +152,7 @@ def main():
         sys.exit(1)
 
     themes_dir = Path(__file__).parent.parent
+    generated_dir = themes_dir / "generated"
 
     if sys.argv[1] == "--current":
         current_file = themes_dir / ".current"
@@ -162,7 +163,7 @@ def main():
     else:
         theme_name = sys.argv[1]
 
-    theme_dir = themes_dir / theme_name
+    theme_dir = generated_dir / theme_name
     if not theme_dir.exists():
         print(f"Error: Theme '{theme_name}' not found", file=sys.stderr)
         sys.exit(1)

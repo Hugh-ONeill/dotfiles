@@ -170,7 +170,7 @@ _theme() {
         'edit:Edit theme palette'
         'rofi:Interactive theme picker'
     )
-    themes=($(find ~/.config/themes -maxdepth 1 -mindepth 1 -type d ! -name "palettes" ! -name "templates" ! -name "lib" ! -name "current" ! -name "scripts" ! -name "stylus" -printf "%f\n" 2>/dev/null | sort))
+    themes=($(find ~/.config/themes/generated -maxdepth 1 -mindepth 1 -type d -printf "%f\n" 2>/dev/null | sort))
 
     if (( CURRENT == 2 )); then
         _describe 'commands' commands

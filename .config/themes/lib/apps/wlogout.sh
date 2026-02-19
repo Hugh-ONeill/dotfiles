@@ -3,8 +3,8 @@
 
 apply_wlogout() {
     local theme="$1"
-    local theme_css="$THEMES_DIR/$theme/wlogout.css"
-    local theme_css2="$THEMES_DIR/$theme/wlogout-style-2.css"
+    local theme_css="$GENERATED_DIR/$theme/wlogout.css"
+    local theme_css2="$GENERATED_DIR/$theme/wlogout-style-2.css"
     local applied=false
 
     if [[ -f "$theme_css" ]]; then

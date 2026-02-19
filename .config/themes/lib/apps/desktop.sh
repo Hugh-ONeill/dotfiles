@@ -15,7 +15,7 @@ apply_dunst() {
 
 apply_gtk_qt() {
     local theme="$1"
-    local theme_dir="$THEMES_DIR/$theme"
+    local theme_dir="$GENERATED_DIR/$theme"
     local theme_conf="$theme_dir/theme.conf"
 
     [[ ! -f "$theme_conf" ]] && { report_skip "gtk/qt (no theme.conf)"; return; }
@@ -72,17 +72,6 @@ apply_gtk_qt() {
     fi
 }
 
-apply_spicetify() {
-    local theme="$1"
-    if [[ -d "$HOME/.config/spicetify/Themes/$theme" ]]; then
-        spicetify config current_theme "$theme" 2>/dev/null
-        spicetify apply 2>/dev/null &
-        report_ok "spicetify"
-    else
-        report_skip "spicetify (no theme)"
-    fi
-}
-
 apply_pywal() {
     local theme="$1"
     if [[ -f "$HOME/.config/wal/colorschemes/dark/$theme.json" ]]; then
@@ -95,14 +84,14 @@ apply_pywal() {
 
 apply_stylus() {
     local theme="$1"
-    local theme_dir="$THEMES_DIR/$theme"
+    local theme_dir="$GENERATED_DIR/$theme"
     local stylus_dir="$theme_dir/stylus"
 
     [[ ! -d "$stylus_dir" ]] && { report_skip "stylus (no styles)"; return; }
 
     # Copy to current for easy access
     if copy_to_current "$theme" "stylus"; then
-        report_ok "stylus (import from ~/.config/themes/current/stylus/)"
+        report_ok "stylus (import from $CURRENT_DIR/stylus/)"
     else
         report_skip "stylus"
     fi

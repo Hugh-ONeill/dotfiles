@@ -11,7 +11,7 @@ apply_waybar() {
     fi
 
     # Copy themed waybar config if it exists
-    local theme_config="$THEMES_DIR/$theme/waybar-config.jsonc"
+    local theme_config="$GENERATED_DIR/$theme/waybar-config.jsonc"
     if [[ -f "$theme_config" ]]; then
         cp "$theme_config" "$HOME/.config/waybar/config.jsonc"
         applied=true

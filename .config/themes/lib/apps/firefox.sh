@@ -3,7 +3,7 @@
 
 apply_firefox() {
     local theme="$1"
-    local src="$THEMES_DIR/$theme/firefox-colors.css"
+    local src="$GENERATED_DIR/$theme/firefox-colors.css"
     local profile_dir="$HOME/.mozilla/firefox"
     local applied=0
 

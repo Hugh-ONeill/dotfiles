@@ -1,11 +1,10 @@
 /* ==UserStyle==
 @name LinkedIn Custom
-@namespace github.com/catppuccin/userstyles/styles/linkedin
-@homepageURL https://github.com/catppuccin/userstyles/tree/main/styles/linkedin
-@version 2025.09.06
-@supportURL https://github.com/catppuccin/userstyles/issues?q=is%3Aopen+is%3Aissue+label%3Alinkedin
-@description Soothing pastel theme for LinkedIn
-@author Catppuccin
+@namespace github.com/wiz/userstyles/linkedin
+@homepageURL https://github.com/wiz/userstyles
+@version 2026.02.19
+@description Custom theme for LinkedIn
+@author wiz
 @license MIT
 
 @preprocessor less
@@ -44,10 +43,6 @@
 @crust: ${CRUST};
 @accent: @mauve;
 
-// For styles that use flavor conditionals (YouTube)
-@white: @text;
-@black: @base;
-
 #lib {
   .palette() {}
   .defaults() {
@@ -62,17 +57,12 @@
 
 
 @-moz-document domain("www.linkedin.com") {
-  :root:not(.theme--dark, .theme--mercado-dark) {
-    #catppuccin(@lightFlavor);
-  }
-  :root.theme--dark,
-  :root.theme--mercado-dark {
-    #catppuccin(@darkFlavor);
-  }
 
-  #catppuccin(@flavor) {
-    #lib.palette();
-    #lib.defaults();
+  // apply to all root states (light and dark) so every tab gets themed
+  :root,
+  :root.theme--dark,
+  :root.theme--mercado-dark,
+  :root:not(.theme--dark):not(.theme--mercado-dark) {
 
     --black: @crust;
     --black-a90: @crust;
@@ -459,82 +449,29 @@
     --system-orange-60-a30: fade(@peach, 30%);
     --system-orange-60-a35: fade(@peach, 35%);
 
-    /* quality of life changes */
+    // quality of life
     --color-border-low-emphasis: @surface0;
+    --color-element: @crust;
+    --color-text-on-dark: @text;
 
-    /* Codeblock fixes */
+    // codeblock fixes
     pre {
       --color-text-on-dark: @text;
       --color-background-container-dark-tint: @crust;
     }
 
-    /* more accent */
+    // more accent
     --voyager-color-background-badge-notification: @accent;
     --color-signal-positive: @accent;
     --color-checked: @accent;
     --color-checked-hover: @accent;
     --color-checked-active: @accent;
 
-    /* fix for hover buttons */
+    // hover button fix
     --artdeco-button-secondary-default-hover-background-color: fade(
       @blue,
       20%
     );
-
-    /* text on dark */
-    --color-text-on-dark: @text;
-
-    & when not(@flavor = latte) {
-      --color-element: @crust;
-    }
-
-    & when (@flavor = latte) {
-      --black: @text;
-      --black-a90: @text;
-      --black-a75: @text;
-      --black-a45: @text;
-      --black-a30: @text;
-      --black-a60: @subtext0;
-      --black-a15: @text;
-      --black-a04: @text;
-      --black-a100: @text;
-
-      --color-scrim: fade(@crust, 40%);
-      --color-icon-on-dark: @text;
-
-      --white: @mantle;
-      --white-a06: @surface0;
-      --white-a12: @surface0;
-      --white-a18: @surface0;
-      --white-a25: @surface0;
-      --white-a30: @mantle;
-      --white-a40: @mantle;
-      --white-a45: @mantle;
-      --white-a55: @mantle;
-      --white-a60: @subtext0;
-      --white-a70: @mantle;
-      --white-a75: @mantle;
-      --white-a85: @mantle;
-      --white-a90: @mantle;
-      --white-a100: @mantle;
-
-      --warm-gray-10: @base;
-      --warm-gray-20: @base;
-      --warm-gray-30: @base;
-      --warm-gray-40: @base;
-      --warm-gray-50: @base;
-      --warm-gray-60: @base;
-      --warm-gray-70: @base;
-      --warm-gray-80: @base;
-      --warm-gray-90: @base;
-      --warm-gray-100: @base;
-      --warm-gray-60-a10: fade(@base, 10%);
-      --warm-gray-60-a15: fade(@base, 15%);
-      --warm-gray-60-a20: fade(@base, 20%);
-      --warm-gray-60-a25: fade(@base, 25%);
-      --warm-gray-60-a30: fade(@base, 30%);
-      --warm-gray-60-a35: fade(@base, 35%);
-    }
 
     .share-promoted-detour-button-legacy {
       background-color: @accent !important;

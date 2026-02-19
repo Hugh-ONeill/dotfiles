@@ -58,7 +58,7 @@ cmd_current() {
 
 cmd_set() {
     local theme="$1"
-    local theme_dir="$THEMES_DIR/$theme"
+    local theme_dir="$GENERATED_DIR/$theme"
 
     if [[ -z "$theme" ]]; then
         echo -e "${RED}Error: Please specify a theme${NC}"
@@ -110,6 +110,7 @@ cmd_set() {
     apply_glow "$theme"
     apply_youtube_tui "$theme"
     apply_sptlrx "$theme"
+    apply_spotify_player "$theme"
     apply_claude "$theme"
     apply_nvim "$theme"
     apply_fastfetch "$theme"
@@ -124,7 +125,6 @@ cmd_set() {
     apply_starship "$theme" "$palette_path"
     apply_dunst "$theme"
     apply_gtk_qt "$theme"
-    # apply_spicetify "$theme"  # disabled: segfaults with Spotify 1.2.82
     apply_pywal "$theme"
     apply_stylus "$theme"
     apply_firefox "$theme"
@@ -187,7 +187,7 @@ cmd_validate() {
     local theme="$1"
     [[ -z "$theme" ]] && { echo -e "${RED}Error: Please specify a theme${NC}"; exit 1; }
 
-    local theme_dir="$THEMES_DIR/$theme"
+    local theme_dir="$GENERATED_DIR/$theme"
     [[ ! -d "$theme_dir" ]] && { echo -e "${RED}Error: Theme not found${NC}"; exit 1; }
 
     echo -e "${CYAN}Validating theme: ${MAGENTA}$theme${NC}\n"
@@ -291,6 +291,6 @@ case "${1:-}" in
         command -v rofi &>/dev/null && cmd_rofi || cmd_list
         ;;
     *)
-        [[ -d "$THEMES_DIR/$1" ]] && cmd_set "$1" || { echo -e "${RED}Unknown: $1${NC}"; cmd_help; exit 1; }
+        [[ -d "$GENERATED_DIR/$1" ]] && cmd_set "$1" || { echo -e "${RED}Unknown: $1${NC}"; cmd_help; exit 1; }
         ;;
 esac

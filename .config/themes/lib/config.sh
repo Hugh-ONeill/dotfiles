@@ -2,6 +2,7 @@
 # Theme system configuration
 
 THEMES_DIR="$HOME/.config/themes"
+GENERATED_DIR="$THEMES_DIR/generated"
 PALETTES_DIR="$THEMES_DIR/palettes"
 TEMPLATES_DIR="$THEMES_DIR/templates"
 CURRENT_DIR="$THEMES_DIR/current"
