@@ -17,28 +17,27 @@ button {
     background-color: ${BASE};
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 25%;
-    border: ${STYLE_BORDER_WIDTH}px solid ${SURFACE2};
+    background-size: 40%;
+    border: 2px solid ${SURFACE2};
     border-radius: ${STYLE_CORNER_RADIUS}px;
     text-shadow: none;
     box-shadow: none;
-    margin: 10px;
 }
 
 button:focus {
     color: ${SURFACE1};
     background-color: ${ACCENT};
-    background-size: 35%;
-    border: ${STYLE_BORDER_WIDTH}px solid ${ACCENT};
+    background-size: 50%;
+    border-color: ${ACCENT};
 }
 
 button:hover {
     background-color: ${SURFACE0};
-    background-size: 35%;
-    border: ${STYLE_BORDER_WIDTH}px solid ${ACCENT};
+    background-size: 50%;
+    border-color: ${ACCENT};
 }
 
-/* Default icons - white for dark themes */
+/* Default icons */
 #lock {
     background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
 }
@@ -51,12 +50,12 @@ button:hover {
     background-image: url("${HOME}/.config/wlogout/icons/suspend-white.png");
 }
 
-#shutdown {
-    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
-}
-
 #hibernate {
     background-image: url("${HOME}/.config/wlogout/icons/hibernate-white.png");
+}
+
+#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
 }
 
 #reboot {
@@ -76,12 +75,12 @@ button:focus#suspend {
     background-image: url("${HOME}/.config/wlogout/icons/suspend-white.png");
 }
 
-button:focus#shutdown {
-    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
-}
-
 button:focus#hibernate {
     background-image: url("${HOME}/.config/wlogout/icons/hibernate-white.png");
+}
+
+button:focus#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
 }
 
 button:focus#reboot {

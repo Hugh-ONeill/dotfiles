@@ -1,5 +1,5 @@
 {
-  // NOTE: This is a template file. Run generate-theme.sh to create config.jsonc
+  // NOTE: This is a template file. Run generate-config.sh to create config.jsonc
   // ============================================================
   // WAYBAR CONFIGURATION
   // ============================================================
@@ -24,50 +24,49 @@
   // Left: Workspaces & Window Title
   "modules-left": [
     "custom/ws",
-    "custom/left-ws-workspaces",
+    "custom/left1",
     "hyprland/workspaces",
-    "custom/right-workspaces-window",
+    "custom/right1",
     "hyprland/window"
   ],
   // Center: System Stats, Clock, Network
   "modules-center": [
-    "custom/left-bar-fans",
+    "custom/left2",
     "custom/fans",
-    "custom/left-fans-temp",
+    "custom/left9",
     "custom/temp",
-    "custom/left-temp-gpu",
+    "custom/left3",
     "custom/gpu",
-    "custom/left-gpu-memory",
+    "custom/left10",
     "memory",
-    "custom/left-memory-cpu",
+    "custom/left4",
     "cpu",
-    "custom/leftin-cpu-idle",
-    "custom/left-idle-center",
+    "custom/leftin1",
+    "custom/left5",
     "idle_inhibitor",
-    "custom/right-center-clock",
-    "custom/rightin-clock-time",
+    "custom/right2",
+    "custom/rightin1",
     "clock#time",
-    "custom/right-time-date",
+    "custom/right3",
     "clock#date",
-    "custom/right-date-pomodoro",
+    "custom/right4",
     "custom/pomodoro",
-    "custom/right-pomodoro-bluetooth",
+    "custom/right6",
     "bluetooth",
-    "custom/right-bluetooth-wifi",
+    "custom/right7",
     "custom/wifi",
-    "custom/right-wifi-end"
+    "custom/right5"
   ],
   // Right: Audio, Brightness, Battery, Power
   "modules-right": [
     //"custom/media",
-    "custom/cava",
-    "custom/left-cava-audio",
+    "custom/left6",
     "pulseaudio",
-    "custom/left-audio-backlight",
+    "custom/left7",
     "backlight",
-    "custom/left-backlight-battery",
+    "custom/left8",
     "custom/battery",
-    "custom/leftin-battery-power",
+    "custom/leftin2",
     "custom/power"
   ],
 
@@ -115,71 +114,55 @@
 
   // Window Title with App Icons
   "hyprland/window": {
-    "format": " {}",
+    "format": "{}",
     "separate-outputs": true,
     "rewrite": {
       // desktop
-      "": "<span foreground='#5c4874'> </span> Hyprland",
-      // terminals
-      "(.*)kitty": "<span foreground='#5c4874'> </span> kitty",
-      // editors
-      "(.*) - Visual Studio Code": "<span foreground='#5c4874'> </span> $1",
-      "(.*)Visual Studio Code": "<span foreground='#5c4874'> </span> Visual Studio Code",
-      "(.*) - N?VIM": "<span foreground='#57a143'> </span> $1",
-      "(.*)N?VIM": "<span foreground='#57a143'> </span> Neovim",
-      // browsers
-      "(.*) — Mozilla Firefox": "<span foreground='#e45b30'> </span> $1",
-      "(.*)Mozilla Firefox": "<span foreground='#e45b30'> </span> Firefox",
-      // media
-      "(.*)Spotify(.*)": "<span foreground='#1db954'> </span> Spotify",
-      "(.*)mpv": "<span foreground='#5c4874'> </span> mpv",
-      // communication
-      "vesktop": "<span foreground='#5865f2'> </span> Discord",
+      "": "<span foreground='{{icon-blue}}'> </span> Hyprland",
+      // terminal
+      "wiz@grimoire:(.*)": "  $1",
+      "(.*)wiz@grimoire:~": "  wiz@grimoire",
+      // Firefox
+      "(.*) — Mozilla Firefox": "<span foreground='{{icon-red}}'>󰈹 </span> $1",
+      "(.*)Mozilla Firefox": "<span foreground='{{icon-red}}'>󰈹 </span> Firefox",
+      // VSCode
+      "(.*) - Visual Studio Code": "<span foreground='{{icon-blue}}'>󰨞 </span> $1",
+      "(.*)Visual Studio Code": "<span foreground='{{icon-blue}}'>󰨞 </span> Visual Studio Code",
+      // Spotify
+      "(.*)Spotify": "<span foreground='{{icon-green}}'> </span> Spotify",
+      "(.*)Spotify Premium": "<span foreground='{{icon-green}}'> </span> Spotify Premium",
+      // Discord
+      "vesktop": "<span foreground='{{icon-blue}}'> </span> Discord",
       "• Discord(.*)": "Discord$1",
-      "(.*)Discord(.*)": "<span foreground='#5865f2'> </span> $1Discord$2",
-      // creative
-      "OBS(.*)": "<span foreground='#f8f0e8'> </span> OBS Studio",
-      "VLC media player": "<span foreground='#e09070'> </span> VLC Media Player",
-      "(.*) - VLC media player": "<span foreground='#e09070'> </span> $1",
-      "GNU Image Manipulation Program": "<span foreground='#f8f0e8'> </span> GIMP",
-      "Godot": "<span foreground='#478cbf'> </span> Godot Engine",
-      "Godot Engine - (.*)": "<span foreground='#478cbf'> </span> $1",
-      "(.*) - Godot Engine": "<span foreground='#478cbf'> </span> $1",
-      // office
-      "Office": "<span foreground='${RED}'> </span> Desktop Editor",
-      "(.*).docx": "<span foreground='#2b579a'> </span> $1.docx",
-      "(.*).xlsx": "<span foreground='#217346'> </span> $1.xlsx",
-      "(.*).pptx": "<span foreground='#d24726'> </span> $1.pptx",
-      "(.*).pdf": "<span foreground='${RED}'> </span> $1.pdf",
+      "(.*)Discord(.*)": "<span foreground='{{icon-blue}}'> </span> $1Discord$2",
+      // OBS Studio
+      "OBS(.*)": "<span foreground='{{icon-muted}}'>󰐌 </span> OBS Studio",
+      // VLC Media Player
+      "VLC media player": "<span foreground='{{icon-orange}}'>󰕼 </span> VLC Media Player",
+      "(.*) - VLC media player": "<span foreground='{{icon-orange}}'>󰕼 </span> $1",
+      // GIMP
+      "GNU Image Manipulation Program": "<span foreground='{{icon-muted}}'> </span> GNU Image Manipulation Program",
+      // Godot
+      "Godot": "<span foreground='{{icon-blue}}'> </span> Godot Engine",
+      "Godot Engine - (.*)": "<span foreground='{{icon-blue}}'> </span> $1",
+      "(.*) - Godot Engine": "<span foreground='{{icon-blue}}'> </span> $1",
+      // Office Desktop Editors
+      "Office": "<span foreground='{{icon-red}}'> </span> Desktop Editor",
+      "(.*).docx": "<span foreground='{{icon-blue}}'> </span> $1.docx",
+      "(.*).xlsx": "<span foreground='{{icon-green}}'> </span> $1.xlsx",
+      "(.*).pptx": "<span foreground='{{icon-orange}}'> </span> $1.pptx",
+      "(.*).pdf": "<span foreground='{{icon-red}}'> </span> $1.pdf",
       // file manager
-      "/": "<span foreground='${YELLOW}'> </span> File Manager",
-      // images
-      "(.*).jpg": "<span foreground='#f03888'>󰈟 </span> $1.jpg",
-      "(.*).png": "<span foreground='#f03888'>󰈟 </span> $1.png",
-      "(.*).svg": "<span foreground='#f03888'>󰈟 </span> $1.svg",
-      "(.*).webp": "<span foreground='#f03888'>󰈟 </span> $1.webp",
-      "(.*).gif": "<span foreground='#f03888'>󰈟 </span> $1.gif",
-      // archives
-      "(.*).zip": "<span foreground='#8050c0'> </span> $1.zip",
-      "(.*).tar(.*)": "<span foreground='#8050c0'> </span> $1.tar$2",
-      "(.*).7z": "<span foreground='#8050c0'> </span> $1.7z",
-      "(.*).rar": "<span foreground='#8050c0'> </span> $1.rar",
-      // code - brand colors
-      "(.*).py": "<span foreground='#3776ab'> </span> $1.py",
-      "(.*).js": "<span foreground='#f7df1e'> </span> $1.js",
-      "(.*).ts": "<span foreground='#3178c6'> </span> $1.ts",
-      "(.*).rs": "<span foreground='#dea584'> </span> $1.rs",
-      "(.*).go": "<span foreground='#00add8'> </span> $1.go",
-      "(.*).c": "<span foreground='#a8b9cc'> </span> $1.c",
-      "(.*).cpp": "<span foreground='#00599c'> </span> $1.cpp",
-      "(.*).lua": "<span foreground='#000080'> </span> $1.lua",
-      "(.*).sh": "<span foreground='#4eaa25'> </span> $1.sh",
-      // text
-      "(.*).txt": "<span foreground='#5c4874'> </span> $1.txt",
-      "(.*).md": "<span foreground='#5c4874'> </span> $1.md",
-      "(.*).json": "<span foreground='#6058c0'> </span> $1.json",
-      "(.*).yaml": "<span foreground='#6058c0'> </span> $1.yaml",
-      "(.*).toml": "<span foreground='#6058c0'> </span> $1.toml"
+      "/": "  File Manager",
+      // qView
+      //"qView": "  qView",
+      "(.*).jpg": "  $1.jpg",
+      "(.*).png": "  $1.png",
+      "(.*).svg": "  $1.svg"
+      // Timeshift
+      //"Timeshift-gtk": "<span foreground='{{icon-green}}'> </span> Timeshift",
+      // security
+      //"Authenticate": "  Authenticate"
     },
     "min-length": 5,
     "max-length": 45
@@ -190,7 +173,7 @@
   "custom/fans": {
     "exec": "~/.config/waybar/scripts/fanspeed.sh",
     "return-type": "json",
-    "format": "󰈐 {}",
+    "format": " {}",
     "tooltip": true,
     "on-scroll-up": "~/.config/waybar/scripts/fancontrol.sh up",
     "on-scroll-down": "~/.config/waybar/scripts/fancontrol.sh down",
@@ -228,8 +211,8 @@
       "warning": 75,
       "critical": 90
     },
-    "format": "󰘚 {percentage:>2}%",
-    "format-critical": " {percentage:>2}%",
+    "format": "󰍛 {percentage:>2}%",
+    "format-critical": " {percentage:>2}%",
     "tooltip": true,
     "tooltip-format": "Memory Used: {used:0.1f} GB / {total:0.1f} GB",
     "interval": 5,
@@ -239,7 +222,7 @@
 
   // CPU Usage
   "cpu": {
-    "format": " {usage:>2}%",
+    "format": " {usage:>2}%",
     "format-icons": [
       "▁",
       "▂",
@@ -290,7 +273,7 @@
       "mode-mon-col": 6,
       "on-click-right": "mode",
       "format": {
-        "today": "<span color='#2e203e'><b>{}</b></span>"
+        "today": "<span color='{{icon-red}}'><b>{}</b></span>"
       }
     },
     "actions": {
@@ -333,23 +316,13 @@
     "return-type": "json",
     "format": "{}", // in wifiinfo.sh, change "Wi-Fi" to "${essid}" to display network name
     "tooltip": true,
-    "on-click": "pkill -x rofi || ~/.config/rofi/network/network.sh",
+    "on-click": "~/.config/waybar/scripts/wifimenu.sh",
     "interval": 10,
     "min-length": 8,
     "max-length": 8
   },
 
   // -------------------- Right Panel --------------------
-  // Audio Visualizer (Cava)
-  "custom/cava": {
-    "exec": "~/.config/waybar/scripts/cava.sh",
-    "format": "{}",
-    "tooltip": false,
-    "on-click": "pkill -f cava || ~/.config/waybar/scripts/cava.sh",
-    "min-length": 10,
-    "max-length": 10
-  },
-
   // Media Player (optional)
   //"custom/media": {
   //  "exec": "/usr/bin/python3 ~/.config/waybar/scripts/mediaplayer.py",
@@ -374,7 +347,7 @@
       ]
     },
     "tooltip-format": "{icon} {desc} // {volume}%",
-    "on-click": "hyprpwcenter",
+    "on-click": "pavucontrol -t 3",
     "on-click-right": "~/.local/bin/volumecontrol.sh -s ''",
     "on-click-middle": "~/.local/bin/volumecontrol.sh -o m",
     "on-scroll-up": "~/.local/bin/volumecontrol.sh -o i",
@@ -388,15 +361,15 @@
     "device": "intel_backlight",
     "format": "{icon} {percent}%",
     "format-icons": [
-      "󱩎",
-      "󱩏",
-      "󱩐",
-      "󱩑",
-      "󱩒",
-      "󱩓",
-      "󱩔",
-      "󱩕",
-      "󱩖"
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
     ],
     "on-scroll-up": "brightnessctl set 1%+",
     "on-scroll-down": "brightnessctl set 1%-",
@@ -416,7 +389,7 @@
 
   // Power Menu
   "custom/power": {
-    "format": "󰐥",
+    "format": " ",
     "tooltip": false,
     "on-click": "~/.local/bin/logoutlaunch.sh",
     "interval": 86400
@@ -425,88 +398,104 @@
   // ============================================================
   // VISUAL SEPARATORS (Powerline Arrows)
   // ============================================================
-  // Left Separators — fg color fills right side of glyph
-  "custom/left-ws-workspaces": {
+  // Left Arrows (→)
+  "custom/left1": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-bar-fans": {
+  "custom/left2": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-temp-gpu": {
+  "custom/left3": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-memory-cpu": {
+  "custom/left4": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-idle-center": {
+  "custom/left5": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-cava-audio": {
+  "custom/left6": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-audio-backlight": {
+  "custom/left7": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-backlight-battery": {
+  "custom/left8": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-fans-temp": {
+  "custom/left9": {
     "format": "",
     "tooltip": false
   },
-  "custom/left-gpu-memory": {
+  "custom/left10": {
     "format": "",
     "tooltip": false
   },
-  // Right Separators — fg color fills left side of glyph
-  "custom/right-workspaces-window": {
+  // Right Arrows
+  "custom/right1": {
     "format": "",
     "tooltip": false
   },
-  "custom/right-center-clock": {
+  "custom/right2": {
     "format": "",
     "tooltip": false
   },
-  "custom/right-time-date": {
+  "custom/right3": {
     "format": "",
     "tooltip": false
   },
-  "custom/right-date-pomodoro": {
+  "custom/right4": {
     "format": "",
     "tooltip": false
   },
-  "custom/right-wifi-end": {
+  "custom/right5": {
     "format": "",
     "tooltip": false
   },
-  "custom/right-pomodoro-bluetooth": {
+  "custom/right6": {
     "format": "",
     "tooltip": false
   },
-  "custom/right-bluetooth-wifi": {
+  "custom/right7": {
     "format": "",
     "tooltip": false
   },
-  // Left Inverse (same glyph direction as left)
-  "custom/leftin-cpu-idle": {
+  "custom/right8": {
+    "format": "",
+    "tooltip": false
+  },
+  // Left Inverse
+  "custom/leftin1": {
     "format": "",
     "tooltip": false
   },
-  "custom/leftin-battery-power": {
+  "custom/leftin2": {
     "format": "",
     "tooltip": false
   },
-  // Right Inverse (same glyph direction as right)
-  "custom/rightin-clock-time": {
+  "custom/leftin3": {
+    "format": "",
+    "tooltip": false
+  },
+  // Right Inverse
+  "custom/rightin1": {
     "format": "",
     "tooltip": false
   },
+  "custom/rightin2": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/rightin3": {
+    "format": "",
+    "tooltip": false
+  }
 }

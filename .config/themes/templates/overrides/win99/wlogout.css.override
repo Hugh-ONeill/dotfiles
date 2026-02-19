@@ -22,7 +22,7 @@ button {
     border-radius: 0px;
     text-shadow: none;
     box-shadow: none;
-    margin: 8px;
+    margin: ${margin}px;
 }
 
 button:focus {
