@@ -100,9 +100,11 @@ generate_entries() {
                 desc="${desc/#*snap-half.sh /Snap }"
                 desc="${desc/#*clipse/Clipboard}"
                 desc="${desc/#hyprpicker -a/Color Picker}"
+                desc="${desc/#*music/Music Dashboard}"
                 desc="${desc/#*wpctl set-mute*/Mic Mute}"
                 desc="${desc/#dolphin/File Manager}"
                 desc="${desc/#hyprlock/Lock Screen}"
+                desc="${desc/#pkill -x wlogout || wlogout/Logout Menu}"
                 desc="${desc/\$THEMEPICKER/Theme Picker}"
                 desc="${desc/\$KEYBINDS/Keybinds}"
                 ;;
