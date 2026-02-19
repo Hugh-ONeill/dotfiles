@@ -3,20 +3,20 @@
 add_newline = false
 
 format = """
-[](fg:surface0 bg:base)\
+[\ue0b8](fg:base bg:surface0)\
 [\U000f011b](fg:text bg:surface0)\
-[](fg:surface0 bg:g0)\
+[\ue0be](fg:g0 bg:surface0)\
 ${custom.dir_first}\
-[](fg:g0 bg:g1)\
+[\ue0be](fg:g1 bg:g0)\
 ${custom.dir_second}\
-[](fg:g1 bg:g2)\
+[\ue0be](fg:g2 bg:g1)\
 $jobs\
-[](fg:g2 bg:g3)\
+[\ue0be](fg:g3 bg:g2)\
 $git_branch\
 $git_status\
-[](fg:g3 bg:g4)\
+[\ue0be](fg:g4 bg:g3)\
 $cmd_duration\
-[](fg:g4 bg:g5)\
+[\ue0be](fg:g5 bg:g4)\
 $c\
 $rust\
 $golang\
@@ -26,22 +26,22 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[](fg:g5 bg:g6)\
+[\ue0be](fg:g6 bg:g5)\
 $status\
-[](fg:g6 bg:g7)\
+[\ue0be](fg:g7 bg:g6)\
 $docker_context\
-[](fg:g7 bg:g8)\
+[\ue0be](fg:g8 bg:g7)\
 ${custom.updates}\
-[](fg:g8 bg:g9)\
+[\ue0be](fg:g9 bg:g8)\
 ${custom.uptime}\
-[ ](fg:g9 bg:text)\
-[](fg:text bg:base)\
+[\ue0be](fg:text bg:g9)\
+[ \ue0be](fg:base bg:text)\
 $line_break\
 $character
 
 """
 
-palette = 'catppuccin_mocha'
+palette = 'cassette'
 
 [custom.dir_first]
 command = "~/.local/bin/directory-split first"

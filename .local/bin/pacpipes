@@ -1,18 +1,50 @@
 #!/bin/bash
 # pacpipes - Pac-Man terminal screensaver
 #
-# Fills the screen with dots, then Pac-Man eats through random rows
-# left to right, leaving colored trails. Resets when all rows are eaten.
+# Pac-Man eats pellets through 6-row lanes with a ghost
+# in pursuit, leaving colored trails. Direction alternates
+# per lane. Resets when all lanes are eaten.
 
 set -u
 
-# ── Glyphs ──────────────────────────────────────────────────
-PAC_OPEN=$'\U000F0BAF'   # 󰮯 pac-man facing right
-PAC_CLOSED="●"
-DOT="•"
+# ── Sprites (14 wide, 6 tall) ────────────────────────────
+PAC_OPEN=(
+    "   ▄███████▄  "
+    " ▄█████████▀▀ "
+    " ███████▀     "
+    " ███████▄     "
+    " ▀█████████▄▄ "
+    "   ▀███████▀  "
+)
+PAC_CLOSED=(
+    "  ▄████████▄  "
+    "▄████████████▄"
+    "██████████████"
+    "██████████████"
+    "▀████████████▀"
+    "  ▀████████▀  "
+)
+GHOST_SP=(
+    "  ▄███████▄   "
+    "▄█   ███   █▄ "
+    "██ █████ ████ "
+    "█████████████ "
+    "██▀███▀███▀██ "
+    "▀   ▀   ▀   ▀ "
+)
+SPRITE_W=14
+DOT_SPACING=5
+
+# ── Mirrored sprites for right-to-left ────────────────────
+declare -a PAC_OPEN_R=() PAC_CLOSED_R=() GHOST_SP_R=()
+for _line in "${PAC_OPEN[@]}"; do PAC_OPEN_R+=("$(rev <<< "$_line")"); done
+for _line in "${PAC_CLOSED[@]}"; do PAC_CLOSED_R+=("$(rev <<< "$_line")"); done
+for _line in "${GHOST_SP[@]}"; do GHOST_SP_R+=("$(rev <<< "$_line")"); done
 
 # ── Configuration ───────────────────────────────────────────
-EAT_SPEED=0.015      # seconds between each pac-man step
+EAT_SPEED=0.03
+GHOST_DIST=20
+LANE_H=6
 
 # ── Colors ──────────────────────────────────────────────────
 hex_to_ansi() {
@@ -20,13 +52,18 @@ hex_to_ansi() {
     printf '\033[38;2;%d;%d;%dm' "$((16#${hex:0:2}))" "$((16#${hex:2:2}))" "$((16#${hex:4:2}))"
 }
 
-declare -a TRAIL_COLORS
+declare -a TRAIL_COLORS=() TRAIL_R=() TRAIL_G=() TRAIL_B=()
 CURRENT_THEME=$(cat "$HOME/.config/themes/.current" 2>/dev/null)
 PALETTE="$HOME/.config/themes/palettes/${CURRENT_THEME:-none}.json"
 
 if [[ -f "$PALETTE" ]] && command -v jq &>/dev/null; then
     while IFS= read -r hex; do
-        [[ -n "$hex" ]] && TRAIL_COLORS+=("$(hex_to_ansi "$hex")")
+        [[ -n "$hex" ]] || continue
+        hex="${hex#\#}"
+        TRAIL_R+=("$((16#${hex:0:2}))")
+        TRAIL_G+=("$((16#${hex:2:2}))")
+        TRAIL_B+=("$((16#${hex:4:2}))")
+        TRAIL_COLORS+=("$(hex_to_ansi "#$hex")")
     done < <(jq -r '
         .gradient[] as $name |
         if .colors[$name] then
@@ -36,58 +73,161 @@ if [[ -f "$PALETTE" ]] && command -v jq &>/dev/null; then
         else $name end
     ' "$PALETTE" 2>/dev/null)
 
-    pac_hex=$(jq -r '.colors.accent // empty' "$PALETTE" 2>/dev/null)
-    if [[ -n "$pac_hex" && "$pac_hex" == \#* ]]; then
-        PAC_COLOR=$(hex_to_ansi "$pac_hex")
-    elif [[ -n "$pac_hex" ]]; then
-        pac_hex=$(jq -r ".colors[\"$pac_hex\"] // empty" "$PALETTE" 2>/dev/null)
-        [[ -n "$pac_hex" ]] && PAC_COLOR=$(hex_to_ansi "$pac_hex")
-    fi
+    resolve_color() {
+        local val
+        val=$(jq -r ".colors.$1 // empty" "$PALETTE" 2>/dev/null)
+        [[ -z "$val" ]] && return 1
+        if [[ "$val" == \#* ]]; then
+            hex_to_ansi "$val"
+        else
+            val=$(jq -r ".colors[\"$val\"] // empty" "$PALETTE" 2>/dev/null)
+            [[ -n "$val" ]] && hex_to_ansi "$val" || return 1
+        fi
+    }
+
+    PAC_COLOR=$(resolve_color ansi_yellow) || true
+    DOT_COLOR=$(resolve_color accent) || true
+    EYE_WHITE=$(resolve_color text) || true
+    PUPIL_COLOR=$(resolve_color ansi_blue) || true
 fi
 
 if [[ ${#TRAIL_COLORS[@]} -eq 0 ]]; then
-    TRAIL_COLORS=(
-        "\033[38;5;196m" "\033[38;5;208m" "\033[38;5;220m"
-        "\033[38;5;82m"  "\033[38;5;39m"  "\033[38;5;63m"
-        "\033[38;5;129m" "\033[38;5;213m" "\033[38;5;203m"
-        "\033[38;5;117m"
-    )
+    TRAIL_R=(255 255 255 95  0   95  175 255 255 135)
+    TRAIL_G=(0   135 215 255 175 95  0   135 95  215)
+    TRAIL_B=(0   0   0   0   255 255 255 255 95  255)
+    for (( _i=0; _i<${#TRAIL_R[@]}; _i++ )); do
+        TRAIL_COLORS+=($'\033[38;2;'"${TRAIL_R[$_i]};${TRAIL_G[$_i]};${TRAIL_B[$_i]}m")
+    done
 fi
-PAC_COLOR="${PAC_COLOR:-\033[38;5;226m}"
+[[ -n "${PAC_COLOR:-}" ]] || PAC_COLOR=$'\033[38;5;226m'
+[[ -n "${DOT_COLOR:-}" ]] || DOT_COLOR=$'\033[38;5;239m'
+[[ -n "${EYE_WHITE:-}" ]] || EYE_WHITE=$'\033[38;2;255;255;255m'
+[[ -n "${PUPIL_COLOR:-}" ]] || PUPIL_COLOR=$'\033[38;2;33;33;222m'
 
-DOT_COLOR="\033[38;5;239m"
-RST="\033[0m"
+# cylindrical shading: brightness % per row, top/bottom edges use half-blocks
+PIPE_SHADE=(60 80 100 100 80 60)
+PIPE_CHARS=("▄" "█" "█" "█" "█" "▀")
+RST=$'\033[0m'
 
 # ── Terminal setup ──────────────────────────────────────────
+RESIZED=0
+handle_resize() { RESIZED=1; }
+trap handle_resize WINCH
+
 cleanup() {
     tput cnorm 2>/dev/null
-    printf "$RST"
+    printf '%s' "$RST"
     clear
     exit 0
 }
 trap cleanup EXIT INT TERM
 
+# no-fork sleep using read timeout
+if [[ -c /dev/tty ]]; then
+    nsleep() { read -r -s -t "$1" <> /dev/tty 2>/dev/null || true; }
+else
+    nsleep() { sleep "$1"; }
+fi
+
 tput civis
 ROWS=$(tput lines)
 COLS=$(tput cols)
 
-move_to() {
-    printf "\033[%d;%dH" "$1" "$2"
+# ── Drawing helpers ─────────────────────────────────────────
+draw_sprite() {
+    local -n sp=$1
+    local color=$2 top_row=$3 left_col=$4
+    local buf=""
+
+    for (( i=0; i<LANE_H; i++ )); do
+        local r=$(( top_row + i ))
+        (( r < 1 || r > ROWS )) && continue
+        local line="${sp[$i]}"
+        local len=${#line}
+        local start=0 end=$len
+        (( left_col < 1 )) && start=$(( 1 - left_col ))
+        local right_edge=$(( left_col + len - 1 ))
+        (( right_edge > COLS )) && end=$(( len - (right_edge - COLS) ))
+        (( start >= end )) && continue
+        buf+=$'\033['"${r};$(( left_col + start ))H${color}${line:start:end-start}"
+    done
+    [[ -n "$buf" ]] && printf '%s%s' "$buf" "$RST"
 }
 
-# ── Fill screen with dots ──────────────────────────────────
+clear_col() {
+    local col=$1 top_row=$2
+    (( col < 1 || col > COLS )) && return
+    local buf=""
+    for (( i=0; i<LANE_H; i++ )); do
+        local r=$(( top_row + i ))
+        (( r < 1 || r > ROWS )) && continue
+        buf+=$'\033['"${r};${col}H "
+    done
+    [[ -n "$buf" ]] && printf '%s' "$buf"
+}
+
+draw_trail_col() {
+    local col=$1 top_row=$2 cidx=$3
+    (( col < 1 || col > COLS )) && return
+    local buf="" tr=${TRAIL_R[$cidx]} tg=${TRAIL_G[$cidx]} tb=${TRAIL_B[$cidx]}
+    for (( i=0; i<LANE_H; i++ )); do
+        local r=$(( top_row + i ))
+        (( r < 1 || r > ROWS )) && continue
+        local s=${PIPE_SHADE[$i]}
+        buf+=$'\033['"${r};${col}H"$'\033[38;2;'"$(( tr*s/100 ));$(( tg*s/100 ));$(( tb*s/100 ))m${PIPE_CHARS[$i]}"
+    done
+    [[ -n "$buf" ]] && printf '%s%s' "$buf" "$RST"
+}
+
+draw_ghost_eyes() {
+    local top_row=$1 left_col=$2 dir=${3:-0}
+    local buf="" r c
+    if (( dir == 0 )); then
+        local sclera="1:2 1:3 1:4 1:8 1:9 1:10 2:2 2:8"
+        local pupils="2:3 2:4 2:9 2:10"
+    else
+        local sclera="1:3 1:4 1:5 1:9 1:10 1:11 2:5 2:11"
+        local pupils="2:3 2:4 2:9 2:10"
+    fi
+    for pos in $sclera; do
+        r=$(( top_row + ${pos%%:*} ))
+        c=$(( left_col + ${pos##*:} ))
+        (( r < 1 || r > ROWS || c < 1 || c > COLS )) && continue
+        buf+=$'\033['"${r};${c}H${EYE_WHITE}█"
+    done
+    for pos in $pupils; do
+        r=$(( top_row + ${pos%%:*} ))
+        c=$(( left_col + ${pos##*:} ))
+        (( r < 1 || r > ROWS || c < 1 || c > COLS )) && continue
+        buf+=$'\033['"${r};${c}H${PUPIL_COLOR}█"
+    done
+    [[ -n "$buf" ]] && printf '%s%s' "$buf" "$RST"
+}
+
+# ── Draw pellets on lane center rows ─────────────────────
 fill_dots() {
     clear
-    local dot_line=""
+    local num_lanes=$(( ROWS / LANE_H ))
+    local top_line="" bot_line=""
     for (( c=1; c<=COLS; c++ )); do
-        dot_line+="$DOT"
+        if (( c % DOT_SPACING == 0 || (c > 1 && (c-1) % DOT_SPACING == 0) )); then
+            top_line+="▄"
+            bot_line+="▀"
+        else
+            top_line+=" "
+            bot_line+=" "
+        fi
     done
-    printf "${DOT_COLOR}"
-    for (( r=1; r<=ROWS; r++ )); do
-        move_to "$r" 1
-        printf '%s' "$dot_line"
+    printf '%s' "$DOT_COLOR"
+    for (( l=0; l<num_lanes; l++ )); do
+        local r1=$(( l * LANE_H + LANE_H / 2 ))
+        local r2=$(( r1 + 1 ))
+        (( r1 < 1 )) && r1=1
+        (( r2 > ROWS )) && continue
+        printf '\033[%d;1H%s' "$r1" "$top_line"
+        printf '\033[%d;1H%s' "$r2" "$bot_line"
     done
-    printf "${RST}"
+    printf '%s' "$RST"
 }
 
 # ── Shuffle array (Fisher-Yates) ──────────────────────────
@@ -104,46 +244,69 @@ shuffle() {
 
 # ── Main loop ───────────────────────────────────────────────
 while true; do
+    ROWS=$(tput lines)
+    COLS=$(tput cols)
+    RESIZED=0
     fill_dots
 
-    # Build shuffled list of rows
-    declare -a rows=()
-    for (( r=1; r<=ROWS; r++ )); do
-        rows+=("$r")
+    num_lanes=$(( ROWS / LANE_H ))
+    lanes=()
+    for (( l=0; l<num_lanes; l++ )); do
+        lanes+=("$l")
     done
-    shuffle rows
+    shuffle lanes
 
     color_idx=0
-    trail_color="${TRAIL_COLORS[$color_idx]}"
+    dir=$(( RANDOM % 2 ))
 
-    for row in "${rows[@]}"; do
-        # Eat this row left to right
-        for (( c=1; c<=COLS; c++ )); do
-            # Trail behind pac-man
-            if (( c > 1 )); then
-                move_to "$row" "$((c-1))"
-                printf "${trail_color}─${RST}"
-            fi
+    for lane in "${lanes[@]}"; do
+        trail_color="${TRAIL_COLORS[$color_idx]}"
+        top_row=$(( lane * LANE_H + 1 ))
+        total_steps=$(( COLS + GHOST_DIST + SPRITE_W ))
 
-            # Pac-man with mouth animation
-            move_to "$row" "$c"
-            if (( c % 4 < 2 )); then
-                printf "${PAC_COLOR}${PAC_OPEN}${RST}"
+        if (( dir == 0 )); then
+            sp_open=PAC_OPEN sp_closed=PAC_CLOSED sp_ghost=GHOST_SP
+        else
+            sp_open=PAC_OPEN_R sp_closed=PAC_CLOSED_R sp_ghost=GHOST_SP_R
+        fi
+
+        for (( c=1; c<=total_steps; c++ )); do
+            (( RESIZED )) && break 2
+
+            if (( dir == 0 )); then
+                pac_col=$c
+                ghost_col=$(( c - GHOST_DIST ))
+                clear_col $(( pac_col - 1 )) "$top_row"
+                draw_trail_col $(( ghost_col - 1 )) "$top_row" "$color_idx"
             else
-                printf "${PAC_COLOR}${PAC_CLOSED}${RST}"
+                pac_col=$(( COLS - c + 1 ))
+                ghost_col=$(( pac_col + GHOST_DIST ))
+                clear_col $(( pac_col + SPRITE_W )) "$top_row"
+                draw_trail_col $(( ghost_col + SPRITE_W )) "$top_row" "$color_idx"
             fi
 
-            sleep "$EAT_SPEED"
+            # pac-man with mouth animation
+            if (( pac_col + SPRITE_W > 0 && pac_col <= COLS )); then
+                if (( c % 8 < 4 )); then
+                    draw_sprite $sp_open "$PAC_COLOR" "$top_row" "$pac_col"
+                else
+                    draw_sprite $sp_closed "$PAC_COLOR" "$top_row" "$pac_col"
+                fi
+            fi
+
+            # ghost (same color as the trail)
+            if (( ghost_col + SPRITE_W > 0 && ghost_col <= COLS )); then
+                draw_sprite $sp_ghost "$trail_color" "$top_row" "$ghost_col"
+                draw_ghost_eyes "$top_row" "$ghost_col" "$dir"
+            fi
+
+            nsleep "$EAT_SPEED"
         done
 
-        # Replace final pac-man position with trail
-        move_to "$row" "$COLS"
-        printf "${trail_color}─${RST}"
-
-        # Cycle to next gradient color for next row
         color_idx=$(( (color_idx + 1) % ${#TRAIL_COLORS[@]} ))
-        trail_color="${TRAIL_COLORS[$color_idx]}"
+        dir=$(( 1 - dir ))
     done
 
-    sleep 1
+    (( RESIZED )) && continue
+    nsleep 1
 done

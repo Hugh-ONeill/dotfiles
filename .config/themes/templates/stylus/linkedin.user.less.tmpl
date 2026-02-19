@@ -449,10 +449,69 @@
     --system-orange-60-a30: fade(@peach, 30%);
     --system-orange-60-a35: fade(@peach, 35%);
 
-    // quality of life
-    --color-border-low-emphasis: @surface0;
-    --color-element: @crust;
+    // ============================================================
+    // SEMANTIC DESIGN TOKENS (newer Mercado design system)
+    // ============================================================
+
+    color-scheme: dark;
+
+    // backgrounds
+    --color-background-canvas: @crust;
+    --color-background-container: @base;
+    --color-background-container-tint: @mantle;
+    --color-background-container-raised: @surface0;
+    --color-background-container-dark-tint: @crust;
+    --color-background-scrim: fade(@crust, 70%);
+    --color-background-inverse: @text;
+    --color-background-brand: @accent;
+    --color-background-info: fade(@blue, 15%);
+    --color-background-warning: fade(@yellow, 15%);
+    --color-background-danger: fade(@red, 15%);
+    --color-background-success: fade(@green, 15%);
+    --color-background-disabled: @surface0;
+
+    // text
+    --color-text: @text;
+    --color-text-primary: @text;
+    --color-text-secondary: @subtext0;
+    --color-text-low-emphasis: @subtext1;
+    --color-text-disabled: @overlay1;
     --color-text-on-dark: @text;
+    --color-text-on-brand: @crust;
+    --color-text-brand: @accent;
+    --color-text-link: @blue;
+    --color-text-link-visited: @lavender;
+    --color-text-info: @blue;
+    --color-text-success: @green;
+    --color-text-warning: @yellow;
+    --color-text-danger: @red;
+    --color-text-inverse: @crust;
+
+    // borders
+    --color-border: @surface1;
+    --color-border-low-emphasis: @surface0;
+    --color-border-medium-emphasis: @surface1;
+    --color-border-high-emphasis: @surface2;
+    --color-border-focus: @accent;
+    --color-border-brand: @accent;
+    --color-border-inverse: @text;
+
+    // actions & interactive
+    --color-action: @accent;
+    --color-action-hover: darken(@accent, 5%);
+    --color-action-pressed: darken(@accent, 10%);
+    --color-action-disabled: @overlay0;
+    --color-element: @crust;
+    --color-icon-on-dark: @text;
+    --color-scrim: fade(@crust, 40%);
+    --color-signal-positive: @accent;
+    --color-checked: @accent;
+    --color-checked-hover: @accent;
+    --color-checked-active: @accent;
+
+    // component-level tokens
+    --voyager-color-background-badge-notification: @accent;
+    --artdeco-button-secondary-default-hover-background-color: fade(@blue, 20%);
 
     // codeblock fixes
     pre {
@@ -460,21 +519,157 @@
       --color-background-container-dark-tint: @crust;
     }
 
-    // more accent
-    --voyager-color-background-badge-notification: @accent;
-    --color-signal-positive: @accent;
-    --color-checked: @accent;
-    --color-checked-hover: @accent;
-    --color-checked-active: @accent;
-
-    // hover button fix
-    --artdeco-button-secondary-default-hover-background-color: fade(
-      @blue,
-      20%
-    );
-
-    .share-promoted-detour-button-legacy {
-      background-color: @accent !important;
-    }
   }
+
+  // ============================================================
+  // HASHED TOKEN OVERRIDES (applied to every element)
+  // ============================================================
+  // LinkedIn's modern pages use CSS-in-JS with hashed variable
+  // names set on individual elements. We must override on * with
+  // !important to beat element-level declarations.
+
+  * {
+    // ---- white backgrounds → @base ----
+    --_2aeee3b5: @base !important;
+    --_199135c1: @base !important;
+    --_7f083c62: @base !important;
+    --_53be5ad8: @base !important;
+    --_4b66e5f2: @base !important;
+    --_0dec222d: @base !important;
+    --_6104d96b: @base !important;
+    --_63b1ab1c: @base !important;
+    --_681234fd: @base !important;
+    --_7dbb8a63: @base !important;
+    --_2da0e158: @base !important;
+    --_222af257: @base !important;
+    --_802f18c6: @base !important;
+    --_5357e672: @base !important;
+    --_4513febc: @base !important;
+    --_2c53f83d: @base !important;
+    --_986e9783: @base !important;
+    --_1c89700c: @base !important;
+
+    // ---- near-white (#FAFAFA) → @mantle ----
+    --_47009445: @mantle !important;
+    --_412c3194: @mantle !important;
+    --_307508ed: @mantle !important;
+
+    // ---- off-white with subtle hue → @surface0 ----
+    --_58b95ec5: @surface0 !important;
+    --_4f60dc78: @surface0 !important;
+    --_0808484e: @surface0 !important;
+    --_949a8f5c: @surface0 !important;
+    --_4b4156ff: @surface0 !important;
+    --_32bef6ee: @surface0 !important;
+    --_09ca17ee: @surface0 !important;
+    --_33321c04: @surface0 !important;
+
+    // ---- white with alpha → translucent surface ----
+    --_0b0eff18: fade(@surface0, 60%) !important;
+    --_17028228: fade(@surface0, 60%) !important;
+    --_2be4aacf: fade(@surface0, 60%) !important;
+    --_7a3100de: fade(@surface0, 30%) !important;
+    --_7962ea4f: fade(@surface0, 30%) !important;
+    --_4e7ccd90: fade(@surface0, 30%) !important;
+
+    // ---- light gray / border → @surface1 ----
+    --_4ac5b0fd: @surface1 !important;
+
+    // ---- amber/gold accent pastels ----
+    --_1afaa740: @yellow !important;
+    --_95b15735: @yellow !important;
+    --_2d3be4e5: @yellow !important;
+    --_45a377b5: @yellow !important;
+    --_15cefae8: fade(@yellow, 30%) !important;
+    --_903930c5: fade(@yellow, 30%) !important;
+    --_7c499b65: fade(@yellow, 30%) !important;
+    --_6c08dc2f: fade(@yellow, 20%) !important;
+    --_3a43fda6: fade(@yellow, 20%) !important;
+    --_3543a603: fade(@yellow, 20%) !important;
+    --_24373fd8: fade(@yellow, 20%) !important;
+    --_72ccfa0c: fade(@yellow, 15%) !important;
+
+    // ---- red/pink pastels ----
+    --_191a81bf: @red !important;
+    --_28136d92: @red !important;
+    --_945e496f: @red !important;
+    --_96c30ff4: fade(@red, 40%) !important;
+    --_8cc5775d: fade(@red, 20%) !important;
+    --_73da04fe: fade(@red, 15%) !important;
+    --_0a7630af: fade(@red, 10%) !important;
+    --_5ee59ac5: fade(@red, 20%) !important;
+    --_2c91b3e0: fade(@red, 10%) !important;
+    --_6fae1540: fade(@red, 10%) !important;
+    --_0fdf451f: fade(@red, 15%) !important;
+
+    // ---- pink/magenta pastels ----
+    --_5f451758: @pink !important;
+    --_70adc0c6: @pink !important;
+    --_63bf778a: fade(@pink, 15%) !important;
+    --_720ccad6: fade(@pink, 10%) !important;
+
+    // ---- green pastels ----
+    --_48fd9be7: @green !important;
+    --_6ce3d1d8: fade(@green, 25%) !important;
+    --_2a8dc605: fade(@green, 20%) !important;
+    --_6135ecdf: fade(@green, 20%) !important;
+    --_6fe98e9e: fade(@green, 15%) !important;
+
+    // ---- teal/blue pastels ----
+    --_44801e6e: fade(@teal, 20%) !important;
+    --_3f45cfeb: fade(@teal, 15%) !important;
+    --_01b81b3f: fade(@teal, 20%) !important;
+    --_7c7b6e4d: fade(@blue, 20%) !important;
+
+    // ---- overlay tints (rgba) ----
+    --_7d40e72a: fade(@red, 10%) !important;
+    --_9ec31759: fade(@red, 20%) !important;
+    --_76837b1f: fade(@pink, 10%) !important;
+    --_05dbcf27: fade(@pink, 20%) !important;
+    --_0aca785c: fade(@peach, 20%) !important;
+    --_121f3f40: fade(@peach, 10%) !important;
+    --_67c2479a: fade(@yellow, 10%) !important;
+    --_77dfaafb: fade(@yellow, 20%) !important;
+
+    // scrollbar
+    scrollbar-color: @surface1 @crust;
+    scrollbar-width: thin;
+  }
+
+  // ============================================================
+  // STRUCTURAL OVERRIDES
+  // ============================================================
+
+  // page-level backgrounds
+  body,
+  html {
+    background-color: @crust !important;
+    color: @text !important;
+  }
+
+  // artdeco components (older design system, still used in some pages)
+  [class*="artdeco-card"] {
+    background-color: @base !important;
+    border-color: @surface0 !important;
+  }
+
+  [class*="artdeco-modal"],
+  [class*="artdeco-dropdown__content"] {
+    background-color: @base !important;
+  }
+
+  // inputs & search
+  input,
+  textarea,
+  select {
+    background-color: @surface0 !important;
+    color: @text !important;
+    border-color: @surface1 !important;
+  }
+
+  // scrollbar
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: @crust; }
+  ::-webkit-scrollbar-thumb { background: @surface1; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: @surface2; }
 }

@@ -13,6 +13,8 @@ import urllib.parse
 import urllib.request
 
 GENIUS_TOKEN_FILE = os.path.expanduser("~/.config/lyrics/genius_token")
+# lookahead offset in seconds to compensate for polling + subprocess latency
+LYRICS_OFFSET = 0.6
 
 # annotation modes
 ANN_OFF = 0
@@ -260,13 +262,13 @@ def hex_to_curses(hex_color):
 
 
 def load_theme_colors():
-    """Read accent, subtext, surface, mantle, and gradient colors from current theme palette"""
+    """Read accent, subtext, surface, overlay, mantle, and gradient colors from current theme palette"""
     theme_file = os.path.expanduser("~/.config/themes/.current")
     try:
         with open(theme_file) as f:
             theme = f.read().strip()
     except FileNotFoundError:
-        return None, None, None, None, []
+        return None, None, None, None, None, []
 
     for path in [
         os.path.expanduser(f"~/.config/themes/generated/{theme}/palette.json"),
@@ -292,10 +294,10 @@ def load_theme_colors():
                         gradient.append(resolved)
 
             return (resolve("accent"), resolve("subtext0"), resolve("surface0"),
-                    resolve("mantle"), gradient)
+                    resolve("overlay0"), resolve("mantle"), gradient)
         except (FileNotFoundError, json.JSONDecodeError):
             continue
-    return None, None, None, None, []
+    return None, None, None, None, None, []
 
 
 # ============================================================
@@ -344,7 +346,7 @@ def fill_outer_bg(stdscr, term_h, term_w):
 
 def draw_header_footer(stdscr, meta, term_h, term_w, mode_label, hint):
     """Draw outer border with track info and hints"""
-    draw_box(stdscr, 0, 0, term_h, term_w, "double", curses.color_pair(5))
+    draw_box(stdscr, 0, 0, term_h, term_w, "double", curses.color_pair(8))
 
     info = f" \u266b {meta['artist']} \u2014 {meta['title']} \u266b "
     if mode_label:
@@ -429,7 +431,7 @@ def draw_progress_bar(stdscr, y, x, w, position, duration, n_gradients):
             attr = curses.color_pair(40 + gi) if n_gradients > 0 else curses.color_pair(6)
         else:
             char = "\U0001FB8C"  # left half medium shade (legacy computing)
-            attr = curses.color_pair(5)
+            attr = curses.color_pair(8)
         try:
             stdscr.addstr(y, cx, char, attr)
         except curses.error:
@@ -478,6 +480,7 @@ def draw_lyrics_panel(stdscr, lyrics, idx, message, box_y, box_x, box_h, box_w):
             continue
 
         if offset == 0:
+            text = f" \u2767 {text} \u2619 "
             attr = curses.A_BOLD | curses.color_pair(4)
         elif offset < 0:
             attr = curses.A_DIM | curses.color_pair(2)
@@ -504,6 +507,9 @@ def draw_ann_panel(stdscr, ann_display_lines, box_y, box_x, box_h, box_w, scroll
     total = len(ann_display_lines)
     max_scroll = max(0, total - ch)
 
+    # center vertically when content fits in panel
+    v_offset = (ch - total) // 2 if total < ch else 0
+
     # scrollbar for total mode
     if max_scroll > 0:
         bar_h = max(1, ch * ch // total)
@@ -519,7 +525,7 @@ def draw_ann_panel(stdscr, ann_display_lines, box_y, box_x, box_h, box_w, scroll
         li = scroll + row_i
         if li >= total:
             break
-        y = cy + row_i
+        y = cy + v_offset + row_i
         kind, text = ann_display_lines[li]
 
         if kind == "sep":
@@ -540,22 +546,24 @@ def setup_colors():
     curses.start_color()
     curses.use_default_colors()
 
-    accent, subtext, surface, mantle, gradient = load_theme_colors()
+    accent, subtext, surface, overlay, mantle, gradient = load_theme_colors()
 
     if curses.can_change_color() and accent and subtext and surface and mantle:
         curses.init_color(20, *hex_to_curses(accent))
         curses.init_color(21, *hex_to_curses(subtext))
         curses.init_color(22, *hex_to_curses(surface))
         curses.init_color(23, *hex_to_curses(mantle))
+        curses.init_color(24, *hex_to_curses(overlay or surface))
         # inner panel pairs (default/base bg)
         curses.init_pair(1, 20, -1)   # accent
         curses.init_pair(2, 21, -1)   # subtext
-        curses.init_pair(3, 21, -1)   # inner borders
+        curses.init_pair(3, 24, -1)   # inner borders (overlay0)
         curses.init_pair(4, 20, 22)   # accent on surface (current line)
         # outer area pairs (mantle bg)
-        curses.init_pair(5, 21, 23)   # subtext on mantle (outer borders/text)
+        curses.init_pair(5, 21, 23)   # subtext on mantle (hint text)
         curses.init_pair(6, 20, 23)   # accent on mantle (outer header)
         curses.init_pair(7, 23, 23)   # mantle on mantle (background fill)
+        curses.init_pair(8, 24, 23)   # overlay0 on mantle (outer borders)
         # gradient colors for progress bar (pairs 10-19, default bg)
         for i, hex_color in enumerate(gradient[:10]):
             curses.init_color(30 + i, *hex_to_curses(hex_color))
@@ -569,11 +577,12 @@ def setup_colors():
     else:
         curses.init_pair(1, 5, -1)
         curses.init_pair(2, 8, -1)
-        curses.init_pair(3, 8, -1)
+        curses.init_pair(3, 240, -1)
         curses.init_pair(4, 5, 8)
         curses.init_pair(5, 8, -1)
         curses.init_pair(6, 5, -1)
         curses.init_pair(7, -1, -1)
+        curses.init_pair(8, 240, -1)
 
     return len(gradient)
 
@@ -603,7 +612,7 @@ def ensure_annotations(state, meta, term_w, genius_token):
 
 def run(stdscr):
     curses.curs_set(0)
-    stdscr.timeout(200)
+    stdscr.timeout(100)
     n_gradients = setup_colors()
 
     genius_token = load_genius_token()
@@ -627,7 +636,7 @@ def run(stdscr):
             stdscr.erase()
             h, w = stdscr.getmaxyx()
             fill_outer_bg(stdscr, h, w)
-            draw_box(stdscr, 0, 0, h, w, "double", curses.color_pair(5))
+            draw_box(stdscr, 0, 0, h, w, "double", curses.color_pair(8))
             centered_in(stdscr, h // 2, 0, w, "Waiting for player...", curses.color_pair(5))
             stdscr.refresh()
             if stdscr.getch() == ord("q"):
@@ -671,7 +680,7 @@ def run(stdscr):
         fill_outer_bg(stdscr, term_h, term_w)
 
         pos = get_position()
-        idx = find_current(lyrics, pos) if lyrics else 0
+        idx = find_current(lyrics, pos + LYRICS_OFFSET) if lyrics else 0
 
         bar_y = 1
         inner_y = 3
