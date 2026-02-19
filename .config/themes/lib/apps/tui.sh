@@ -27,9 +27,23 @@ apply_sptlrx() {
 }
 apply_fastfetch()   { apply_simple "$1" "fastfetch.jsonc"  "fastfetch"; }
 
+apply_spotify_player() {
+    local theme="$1"
+    local src="$GENERATED_DIR/$theme/spotify-player.toml"
+    local app_conf="$HOME/.config/spotify-player/app.toml"
+    [[ ! -f "$src" ]] && { report_skip "spotify-player (no theme file)"; return; }
+    copy_to_current "$theme" "spotify-player.toml"
+    cp "$src" "$HOME/.config/spotify-player/theme.toml"
+    # point app.toml at the current theme name
+    if [[ -f "$app_conf" ]]; then
+        sed -i "s|^theme = .*|theme = \"$theme\"|" "$app_conf"
+    fi
+    report_ok "spotify-player"
+}
+
 apply_cava() {
     local theme="$1"
-    local colors_file="$THEMES_DIR/$theme/cava-colors.conf"
+    local colors_file="$GENERATED_DIR/$theme/cava-colors.conf"
     if [[ ! -f "$colors_file" ]]; then
         report_skip "cava (no theme file)"
         return

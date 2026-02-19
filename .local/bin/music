@@ -1,0 +1,5 @@
+#!/bin/bash
+# Spotify music dashboard in kitty splits
+# Usage: music
+
+kitty --session "$HOME/.config/kitty/sessions/music.conf" --title music

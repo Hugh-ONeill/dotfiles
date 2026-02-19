@@ -1,0 +1,37 @@
+[[themes]]
+name = "${THEME_NAME}"
+[themes.palette]
+background = "${BASE}"
+foreground = "${TEXT}"
+black = "${SURFACE0}"
+red = "${ANSI_RED}"
+green = "${ANSI_GREEN}"
+yellow = "${ANSI_YELLOW}"
+blue = "${ANSI_BLUE}"
+magenta = "${ANSI_MAGENTA}"
+cyan = "${ANSI_CYAN}"
+white = "${SUBTEXT1}"
+bright_black = "${SURFACE2}"
+bright_red = "${ANSI_RED_BRIGHT}"
+bright_green = "${ANSI_GREEN_BRIGHT}"
+bright_yellow = "${ANSI_YELLOW_BRIGHT}"
+bright_blue = "${ANSI_BLUE_BRIGHT}"
+bright_magenta = "${ANSI_MAGENTA_BRIGHT}"
+bright_cyan = "${ANSI_CYAN_BRIGHT}"
+bright_white = "${TEXT}"
+[themes.component_style]
+block_title = { fg = "${ACCENT}", modifiers = ["Bold"] }
+border = { fg = "${OVERLAY0}" }
+playback_track = { fg = "${TEXT}", modifiers = ["Bold"] }
+playback_artists = { fg = "${ACCENT_SECONDARY}" }
+playback_album = { fg = "${SUBTEXT0}" }
+playback_metadata = { fg = "${OVERLAY1}" }
+playback_progress_bar = { fg = "${ACCENT}" }
+playback_progress_bar_unfilled = { fg = "${SURFACE1}" }
+current_playing = { fg = "${ACCENT}", modifiers = ["Bold"] }
+selection = { fg = "${TEXT}", bg = "${SURFACE1}", modifiers = ["Bold"] }
+secondary_row = { fg = "${SUBTEXT0}" }
+like = { fg = "${SEM_ERR}", modifiers = ["Bold"] }
+table_header = { fg = "${ACCENT_TERTIARY}", modifiers = ["Bold"] }
+page_desc = { fg = "${ACCENT}", modifiers = ["Bold"] }
+playlist_desc = { fg = "${SUBTEXT0}" }
