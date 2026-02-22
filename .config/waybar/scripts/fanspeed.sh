@@ -1,9 +1,18 @@
 #!/bin/bash
 
-# Check if nbfc is available
+# source theme colors (fallback to defaults)
+source "$HOME/.config/themes/current/waybar-script-colors.sh" 2>/dev/null
+COLOR_ERR="${COLOR_ERR:-${COLOR_ERR}}"
+COLOR_WARN="${COLOR_WARN:-${COLOR_WARN}}"
+
+# Check dependencies
 if ! command -v nbfc &>/dev/null; then
-	echo "{\"text\": \" N/A\", \"tooltip\": \"nbfc utility is missing\"}"
-	exit 1
+	echo '{"text": "<span color='"'"'${COLOR_ERR}'"'"'> N/A</span>", "tooltip": "nbfc not found"}'
+	exit 0
+fi
+if ! command -v bc &>/dev/null; then
+	echo '{"text": "<span color='"'"'${COLOR_ERR}'"'"'> N/A</span>", "tooltip": "bc not found"}'
+	exit 0
 fi
 
 # Get nbfc status
@@ -11,8 +20,8 @@ nbfc_output=$(nbfc status 2>&1)
 
 # Check if nbfc command succeeded
 if [ $? -ne 0 ]; then
-	echo "{\"text\": \" ERR\", \"tooltip\": \"Failed to query fan status\"}"
-	exit 1
+	echo "{\"text\": \"<span color='${COLOR_ERR}'> ERR</span>\", \"tooltip\": \"Failed to query fan status\"}"
+	exit 0
 fi
 
 # Parse fan information
@@ -73,10 +82,13 @@ fi
 display_speed=$(printf "%.0f" "$display_speed" 2>/dev/null || echo "0")
 
 # Determine color based on speed
-if [ "$display_speed" -ge 80 ]; then
-	text_output="<span color='#f38ba8'>${display_speed}%</span>"
-elif [ "$display_speed" -ge 60 ]; then
-	text_output="<span color='#f9e2af'>${display_speed}%</span>"
+if [[ ! "$display_speed" =~ ^[0-9]+$ ]]; then
+	display_speed=0
+fi
+if (( display_speed >= 80 )); then
+	text_output="<span color='${COLOR_ERR}'>${display_speed}%</span>"
+elif (( display_speed >= 60 )); then
+	text_output="<span color='${COLOR_WARN}'>${display_speed}%</span>"
 else
 	text_output="${display_speed}%"
 fi

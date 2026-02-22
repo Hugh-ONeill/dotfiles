@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# source theme colors (fallback to defaults)
+source "$HOME/.config/themes/current/waybar-script-colors.sh" 2>/dev/null
+COLOR_ERR="${COLOR_ERR:-${COLOR_ERR}}"
+COLOR_WARN="${COLOR_WARN:-${COLOR_WARN}}"
+COLOR_OK="${COLOR_OK:-${COLOR_OK}}"
+COLOR_INFO="${COLOR_INFO:-${COLOR_INFO}}"
+
 # Battery information script with detailed tooltip
 
 BATTERY_PATH="/sys/class/power_supply/BAT0"
@@ -129,16 +136,16 @@ icon=$(determine_icon "$capacity" "$status")
 # Determine text color based on status
 if [ "$capacity" -le 15 ]; then
 	# Critical - red
-	text_output="<span color='#f38ba8'>${icon} ${capacity}%</span>"
+	text_output="<span color='${COLOR_ERR}'>${icon} ${capacity}%</span>"
 elif [ "$capacity" -le 30 ]; then
 	# Warning - yellow
-	text_output="<span color='#f9e2af'>${icon} ${capacity}%</span>"
+	text_output="<span color='${COLOR_WARN}'>${icon} ${capacity}%</span>"
 elif [ "$status" = "Charging" ]; then
 	# Charging - blue
-	text_output="<span color='#89b4fa'>${icon} ${capacity}%</span>"
+	text_output="<span color='${COLOR_INFO}'>${icon} ${capacity}%</span>"
 elif [ "$status" = "Discharging" ] && [ "$capacity" -gt 50 ]; then
 	# Good battery level while unplugged - green
-	text_output="<span color='#a6e3a1'>${icon} ${capacity}%</span>"
+	text_output="<span color='${COLOR_OK}'>${icon} ${capacity}%</span>"
 else
 	# Normal (includes Full, and discharging 31-50%)
 	text_output="${icon} ${capacity}%"

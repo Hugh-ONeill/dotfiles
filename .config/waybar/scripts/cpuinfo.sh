@@ -1,25 +1,41 @@
 #!/bin/bash
 
+# source theme colors (fallback to defaults)
+source "$HOME/.config/themes/current/waybar-script-colors.sh" 2>/dev/null
+COLOR_ERR="${COLOR_ERR:-${COLOR_ERR}}"
+
 # Get CPU clock speeds
 get_cpu_frequency() {
-	freqlist=$(awk '/cpu MHz/ {print $4}' /proc/cpuinfo)
-	maxfreq=$(sed 's/...$//' /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq)
+	freqlist=$(awk '/cpu MHz/ {print $4}' /proc/cpuinfo 2>/dev/null)
+	maxfreq=$(sed 's/...$//' /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq 2>/dev/null)
+	if [[ -z "$freqlist" || -z "$maxfreq" ]]; then
+		echo "N/A"
+		return
+	fi
 	average_freq=$(echo "$freqlist" | tr ' ' '\n' | awk "{sum+=\$1} END {printf \"%.0f/%s MHz\", sum/NR, $maxfreq}")
 	echo "$average_freq"
 }
 
 # Get CPU temperature
 get_cpu_temperature() {
-	temp=$(sensors | awk '/Package id 0/ {print $4}' | awk -F '[+.]' '{print $2}')
-	if [[ -z "$temp" ]]; then
-		temp=$(sensors | awk '/Tctl/ {print $2}' | tr -d '+°C')
+	if ! command -v sensors &>/dev/null; then
+		echo "N/A N/A"
+		return
 	fi
+
+	local sensors_out
+	sensors_out=$(sensors 2>/dev/null) || { echo "N/A N/A"; return; }
+
+	temp=$(echo "$sensors_out" | awk '/Package id 0/ {print $4}' | awk -F '[+.]' '{print $2}')
 	if [[ -z "$temp" ]]; then
-		temp="N/A"
+		temp=$(echo "$sensors_out" | awk '/Tctl/ {print $2}' | tr -d '+°C')
+	fi
+	if [[ -z "$temp" || ! "$temp" =~ ^[0-9]+$ ]]; then
+		echo "N/A N/A"
 	else
 		temp_f=$(awk "BEGIN {printf \"%.1f\", ($temp * 9 / 5) + 32}")
+		echo "$temp $temp_f"
 	fi
-	echo "${temp:-N/A} ${temp_f:-N/A}"
 }
 
 # Get the corresponding icon based on temperature
@@ -46,19 +62,19 @@ read -r temp_info < <(get_cpu_temperature)
 temp=$(echo "$temp_info" | awk '{print $1}')   # Celsius
 temp_f=$(echo "$temp_info" | awk '{print $2}') # Fahrenheit
 
-# Determine the temperature icon
-thermo_icon=$(get_temperature_icon "$temp")
-
-# Set color based on temperature
-if [ "$temp" -ge 80 ]; then
-	# If temperature is >= 80%, set color to #f38ba8
-	text_output="<span color='#f38ba8'>${thermo_icon} ${temp}°C</span>"
+# Determine the temperature icon — guard non-numeric values
+if [[ "$temp" =~ ^[0-9]+$ ]]; then
+	thermo_icon=$(get_temperature_icon "$temp")
+	if (( temp >= 80 )); then
+		text_output="<span color='${COLOR_ERR}'>${thermo_icon} ${temp}°C</span>"
+	else
+		text_output="${thermo_icon} ${temp}°C"
+	fi
+	tooltip="Temperature: ${temp_f}°F\nClock Speed: ${cpu_frequency}"
 else
-	# Default color
-	text_output="${thermo_icon} ${temp}°C"
+	text_output="<span color='${COLOR_ERR}'>󰔏 N/A</span>"
+	tooltip="Temperature: unavailable\nClock Speed: ${cpu_frequency}"
 fi
-
-tooltip="Temperature: ${temp_f}°F\nClock Speed: ${cpu_frequency}"
 
 # Module and tooltip
 echo "{\"text\": \"$text_output\", \"tooltip\": \"$tooltip\"}"

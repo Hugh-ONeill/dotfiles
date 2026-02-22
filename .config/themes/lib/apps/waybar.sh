@@ -10,6 +10,8 @@ apply_waybar() {
         applied=true
     fi
 
+    copy_to_current "$theme" "waybar-script-colors.sh" 2>/dev/null
+
     # Copy themed waybar config if it exists
     local theme_config="$GENERATED_DIR/$theme/waybar-config.jsonc"
     if [[ -f "$theme_config" ]]; then

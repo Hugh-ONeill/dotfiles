@@ -1,28 +1,38 @@
 #!/bin/bash
 
+# source theme colors (fallback to defaults)
+source "$HOME/.config/themes/current/waybar-script-colors.sh" 2>/dev/null
+COLOR_ERR="${COLOR_ERR:-${COLOR_ERR}}"
+
 # Get CPU model (removed "(R)", "(TM)", and clock speed)
-model=$(awk -F ': ' '/model name/{print $2}' /proc/cpuinfo | head -n 1 | sed 's/@.*//; s/ *\((R)\|(TM)\)//g; s/^[ \t]*//; s/[ \t]*$//')
+model=$(awk -F ': ' '/model name/{print $2}' /proc/cpuinfo 2>/dev/null | head -n 1 | sed 's/@.*//; s/ *\((R)\|(TM)\)//g; s/^[ \t]*//; s/[ \t]*$//')
+model="${model:-Unknown CPU}"
 
 # Get CPU usage percentage
-load=$(vmstat 1 2 | tail -1 | awk '{print 100 - $15}')
+if command -v vmstat &>/dev/null; then
+  load=$(vmstat 1 2 2>/dev/null | tail -1 | awk '{print 100 - $15}')
+fi
+
+if [[ ! "${load:-}" =~ ^[0-9]+$ ]]; then
+  echo "{\"text\": \"<span color='${COLOR_ERR}'>󰻠 N/A</span>\", \"tooltip\": \"${model}\nCPU Usage: unavailable\"}"
+  exit 0
+fi
 
 # Determine CPU state based on usage
-if [ "$load" -ge 80 ]; then
+if (( load >= 80 )); then
   state="Critical"
-elif [ "$load" -ge 60 ]; then
+elif (( load >= 60 )); then
   state="High"
-elif [ "$load" -ge 25 ]; then
+elif (( load >= 25 )); then
   state="Moderate"
 else
   state="Low"
 fi
 
 # Set color based on CPU load
-if [ "$load" -ge 80 ]; then
-  # If CPU usage is >= 80%, set color to #f38ba8
-  text_output="<span color='#f38ba8'>󰀩 ${load}%</span>"
+if (( load >= 80 )); then
+  text_output="<span color='${COLOR_ERR}'>󰀩 ${load}%</span>"
 else
-  # Default color
   text_output="󰻠 ${load}%"
 fi
 
