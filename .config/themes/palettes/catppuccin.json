@@ -89,5 +89,8 @@
     "lavender",
     "mauve",
     "pink"
-  ]
+  ],
+  "style": {
+    "border": "gradient"
+  }
 }

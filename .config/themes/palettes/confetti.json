@@ -81,5 +81,8 @@
     "indigo",
     "violet",
     "magenta"
-  ]
+  ],
+  "style": {
+    "border": "gradient"
+  }
 }

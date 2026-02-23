@@ -179,6 +179,19 @@ for i in "${!GRADIENT[@]}"; do
     export "GRADIENT_FG_${i}_RGB=$(hex_to_rgb "$fg_color")"
 done
 
+# Build hyprland active border value from style.border flag
+STYLE_BORDER=$(jq -r '.style.border // "solid"' "$PALETTE_FILE")
+if [[ "$STYLE_BORDER" == "gradient" ]]; then
+    border_parts=()
+    for i in $(seq 0 9); do
+        nohash_var="GRADIENT_${i}_NOHASH"
+        border_parts+=("rgb(${!nohash_var})")
+    done
+    export HYPR_ACTIVE_BORDER="${border_parts[*]} 45deg"
+else
+    export HYPR_ACTIVE_BORDER="rgba(${ACCENT_NOHASH}FF)"
+fi
+
 # Build list of variables to substitute
 VARS='$THEME_NAME $THEME_DESCRIPTION'
 
@@ -196,7 +209,7 @@ for i in $(seq 0 9); do
 done
 
 # Add style variables
-VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_GAPS_OUT \$STYLE_DECORATION \$STYLE_BAR \$STYLE_WAYBAR \$WAYBAR_SEP_LEFT \$WAYBAR_SEP_RIGHT \$WAYBAR_SEPARATOR_CSS"
+VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_GAPS_OUT \$STYLE_DECORATION \$STYLE_BAR \$STYLE_WAYBAR \$WAYBAR_SEP_LEFT \$WAYBAR_SEP_RIGHT \$WAYBAR_SEPARATOR_CSS \$HYPR_ACTIVE_BORDER"
 
 # Add font variables
 VARS="$VARS \$FONT_FAMILY \$FONT_SIZE"

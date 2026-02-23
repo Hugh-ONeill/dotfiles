@@ -81,5 +81,8 @@
     "lavender",
     "mauve",
     "rose"
-  ]
+  ],
+  "style": {
+    "border": "gradient"
+  }
 }
