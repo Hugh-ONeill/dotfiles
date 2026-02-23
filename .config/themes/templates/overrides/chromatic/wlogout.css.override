@@ -1,0 +1,105 @@
+/* ${THEME_NAME} wlogout theme — Chromatic Aberration */
+
+* {
+    font-family: "${FONT_FAMILY}";
+    font-size: 1em;
+    transition-property: background-color, background-size;
+    transition-duration: 0.3s;
+    background-image: none;
+}
+
+window {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+button {
+    color: ${TEXT};
+    background-color: ${BASE};
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 40%;
+    border-radius: ${STYLE_CORNER_RADIUS}px;
+    text-shadow: -1px 0 ${ACCENT_SECONDARY}, 1px 0 ${ACCENT_TERTIARY};
+    /* Chromatic split borders: red left/bottom, cyan right/top */
+    border: none;
+    box-shadow:
+        inset  2px  0 0 ${ACCENT_TERTIARY},
+        inset  0  2px 0 ${ACCENT_TERTIARY},
+        inset -2px  0 0 ${ACCENT_SECONDARY},
+        inset  0 -2px 0 ${ACCENT_SECONDARY};
+}
+
+button:focus {
+    color: ${SURFACE1};
+    background-color: ${ACCENT};
+    background-size: 50%;
+    text-shadow: -2px 0 ${ACCENT_SECONDARY}, 2px 0 ${ACCENT_TERTIARY};
+    box-shadow:
+        inset  2px  0 0 ${ACCENT_TERTIARY},
+        inset  0  2px 0 ${ACCENT_TERTIARY},
+        inset -2px  0 0 ${ACCENT_SECONDARY},
+        inset  0 -2px 0 ${ACCENT_SECONDARY},
+        0 0 12px 2px ${ACCENT_TERTIARY},
+        0 0 12px 2px ${ACCENT_SECONDARY};
+}
+
+button:hover {
+    background-color: ${SURFACE0};
+    background-size: 50%;
+    text-shadow: -3px 0 1px ${ACCENT_SECONDARY}, 3px 0 1px ${ACCENT_TERTIARY};
+    box-shadow:
+        inset  2px  0 0 ${ACCENT_TERTIARY_BRIGHT},
+        inset  0  2px 0 ${ACCENT_TERTIARY_BRIGHT},
+        inset -2px  0 0 ${ACCENT_SECONDARY_BRIGHT},
+        inset  0 -2px 0 ${ACCENT_SECONDARY_BRIGHT};
+}
+
+/* Default icons */
+#lock {
+    background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
+}
+
+#logout {
+    background-image: url("${HOME}/.config/wlogout/icons/logout-white.png");
+}
+
+#suspend {
+    background-image: url("${HOME}/.config/wlogout/icons/suspend-white.png");
+}
+
+#hibernate {
+    background-image: url("${HOME}/.config/wlogout/icons/hibernate-white.png");
+}
+
+#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
+}
+
+#reboot {
+    background-image: url("${HOME}/.config/wlogout/icons/reboot-white.png");
+}
+
+/* Focused state icons */
+button:focus#lock {
+    background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
+}
+
+button:focus#logout {
+    background-image: url("${HOME}/.config/wlogout/icons/logout-white.png");
+}
+
+button:focus#suspend {
+    background-image: url("${HOME}/.config/wlogout/icons/suspend-white.png");
+}
+
+button:focus#hibernate {
+    background-image: url("${HOME}/.config/wlogout/icons/hibernate-white.png");
+}
+
+button:focus#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
+}
+
+button:focus#reboot {
+    background-image: url("${HOME}/.config/wlogout/icons/reboot-white.png");
+}

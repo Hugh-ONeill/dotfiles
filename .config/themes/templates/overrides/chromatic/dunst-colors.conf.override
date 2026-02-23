@@ -1,0 +1,20 @@
+# ${THEME_NAME} Dunst Colors — Chromatic Aberration
+
+[global]
+frame_color = "${ACCENT}"
+background = "${BASE}"
+foreground = "${TEXT}"
+highlight = "${ACCENT},${SEM_OK}"
+corner_radius = ${STYLE_CORNER_RADIUS}
+
+[urgency_low]
+foreground = "${ACCENT_TERTIARY}"
+frame_color = "${ACCENT_TERTIARY}"
+
+[urgency_normal]
+foreground = "${TEXT}"
+frame_color = "${ACCENT}"
+
+[urgency_critical]
+foreground = "${ACCENT_SECONDARY}"
+frame_color = "${ACCENT_SECONDARY}"

@@ -1,0 +1,79 @@
+# ${THEME_NAME} Palette for Hyprland
+
+# Semantic colors (primary palette)
+$sem_ok = rgb(${SEM_OK_NOHASH})
+$sem_warn = rgb(${SEM_WARN_NOHASH})
+$sem_err = rgb(${SEM_ERR_NOHASH})
+$sem_info = rgb(${SEM_INFO_NOHASH})
+$sem_border = rgb(${SEM_BORDER_NOHASH})
+$sem_selection = rgb(${SEM_SELECTION_NOHASH})
+
+# Accent colors
+$accent = rgb(${ACCENT_NOHASH})
+$accentAlpha = ${ACCENT_NOHASH}
+$accent_secondary = rgb(${ACCENT_SECONDARY_NOHASH})
+$accent_tertiary = rgb(${ACCENT_TERTIARY_NOHASH})
+$accent_bright = rgb(${ACCENT_BRIGHT_NOHASH})
+$accent_secondary_bright = rgb(${ACCENT_SECONDARY_BRIGHT_NOHASH})
+$accent_tertiary_bright = rgb(${ACCENT_TERTIARY_BRIGHT_NOHASH})
+
+# Text colors
+$text = rgb(${TEXT_NOHASH})
+$textAlpha = ${TEXT_NOHASH}
+$subtext1 = rgb(${SUBTEXT1_NOHASH})
+$subtext1Alpha = ${SUBTEXT1_NOHASH}
+$subtext0 = rgb(${SUBTEXT0_NOHASH})
+$subtext0Alpha = ${SUBTEXT0_NOHASH}
+
+# Surface colors
+$overlay2 = rgb(${OVERLAY2_NOHASH})
+$overlay2Alpha = ${OVERLAY2_NOHASH}
+$overlay1 = rgb(${OVERLAY1_NOHASH})
+$overlay1Alpha = ${OVERLAY1_NOHASH}
+$overlay0 = rgb(${OVERLAY0_NOHASH})
+$overlay0Alpha = ${OVERLAY0_NOHASH}
+$surface2 = rgb(${SURFACE2_NOHASH})
+$surface2Alpha = ${SURFACE2_NOHASH}
+$surface1 = rgb(${SURFACE1_NOHASH})
+$surface1Alpha = ${SURFACE1_NOHASH}
+$surface0 = rgb(${SURFACE0_NOHASH})
+$surface0Alpha = ${SURFACE0_NOHASH}
+$base = rgb(${BASE_NOHASH})
+$baseAlpha = ${BASE_NOHASH}
+$mantle = rgb(${MANTLE_NOHASH})
+$mantleAlpha = ${MANTLE_NOHASH}
+$crust = rgb(${CRUST_NOHASH})
+$crustAlpha = ${CRUST_NOHASH}
+$bpp1 = rgb(${BASE_NOHASH})
+$bpp1Alpha = ${BASE_NOHASH}
+
+# Gradient colors (for varied UI elements)
+$g0 = rgb(${GRADIENT_0_NOHASH})
+$g1 = rgb(${GRADIENT_1_NOHASH})
+$g2 = rgb(${GRADIENT_2_NOHASH})
+$g3 = rgb(${GRADIENT_3_NOHASH})
+$g4 = rgb(${GRADIENT_4_NOHASH})
+$g5 = rgb(${GRADIENT_5_NOHASH})
+$g6 = rgb(${GRADIENT_6_NOHASH})
+$g7 = rgb(${GRADIENT_7_NOHASH})
+$g8 = rgb(${GRADIENT_8_NOHASH})
+$g9 = rgb(${GRADIENT_9_NOHASH})
+
+# Cursor theme
+$cursor_theme = ${THEME_NAME}-cursors
+$cursor_size = 24
+
+# Style settings
+decoration {
+    rounding = ${STYLE_CORNER_RADIUS}
+    screen_shader = ~/.config/hypr/shaders/chromatic.frag
+}
+
+general {
+    border_size = 2
+    gaps_in = ${STYLE_GAPS_IN}
+    gaps_out = ${STYLE_GAPS_OUT}
+    # Chromatic split — red left, cyan right
+    col.active_border = rgb(${ACCENT_TERTIARY_NOHASH}) rgb(${ACCENT_TERTIARY_NOHASH}) rgb(${ACCENT_SECONDARY_NOHASH}) rgb(${ACCENT_SECONDARY_NOHASH}) 135deg
+    col.inactive_border = rgb(${SURFACE2_NOHASH}) rgb(${SURFACE2_NOHASH}) rgb(${OVERLAY0_NOHASH}) rgb(${OVERLAY0_NOHASH}) 135deg
+}
