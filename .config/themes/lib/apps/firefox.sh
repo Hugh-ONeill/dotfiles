@@ -29,7 +29,7 @@ apply_firefox() {
             fi
         fi
 
-        ((applied++))
+        ((++applied))
     done
 
     if [[ $applied -gt 0 ]]; then
