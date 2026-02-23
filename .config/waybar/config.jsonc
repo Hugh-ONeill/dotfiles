@@ -119,12 +119,12 @@
     "separate-outputs": true,
     "rewrite": {
       // desktop
-      "": "<span foreground='#5c4874'> </span> Hyprland",
+      "": "<span foreground='#7f849c'> </span> Hyprland",
       // terminals
-      "(.*)kitty": "<span foreground='#5c4874'> </span> kitty",
+      "(.*)kitty": "<span foreground='#7f849c'> </span> kitty",
       // editors
-      "(.*) - Visual Studio Code": "<span foreground='#5c4874'> </span> $1",
-      "(.*)Visual Studio Code": "<span foreground='#5c4874'> </span> Visual Studio Code",
+      "(.*) - Visual Studio Code": "<span foreground='#7f849c'> </span> $1",
+      "(.*)Visual Studio Code": "<span foreground='#7f849c'> </span> Visual Studio Code",
       "(.*) - N?VIM": "<span foreground='#57a143'> </span> $1",
       "(.*)N?VIM": "<span foreground='#57a143'> </span> Neovim",
       // browsers
@@ -132,38 +132,38 @@
       "(.*)Mozilla Firefox": "<span foreground='#e45b30'> </span> Firefox",
       // media
       "(.*)Spotify(.*)": "<span foreground='#1db954'> </span> Spotify",
-      "(.*)mpv": "<span foreground='#5c4874'> </span> mpv",
+      "(.*)mpv": "<span foreground='#7f849c'> </span> mpv",
       // communication
       "vesktop": "<span foreground='#5865f2'> </span> Discord",
       "• Discord(.*)": "Discord$1",
       "(.*)Discord(.*)": "<span foreground='#5865f2'> </span> $1Discord$2",
       // creative
-      "OBS(.*)": "<span foreground='#f8f0e8'> </span> OBS Studio",
+      "OBS(.*)": "<span foreground='#cdd6f4'> </span> OBS Studio",
       "VLC media player": "<span foreground='#e09070'> </span> VLC Media Player",
       "(.*) - VLC media player": "<span foreground='#e09070'> </span> $1",
-      "GNU Image Manipulation Program": "<span foreground='#f8f0e8'> </span> GIMP",
+      "GNU Image Manipulation Program": "<span foreground='#cdd6f4'> </span> GIMP",
       "Godot": "<span foreground='#478cbf'> </span> Godot Engine",
       "Godot Engine - (.*)": "<span foreground='#478cbf'> </span> $1",
       "(.*) - Godot Engine": "<span foreground='#478cbf'> </span> $1",
       // office
-      "Office": "<span foreground='${RED}'> </span> Desktop Editor",
+      "Office": "<span foreground='#f38ba8'> </span> Desktop Editor",
       "(.*).docx": "<span foreground='#2b579a'> </span> $1.docx",
       "(.*).xlsx": "<span foreground='#217346'> </span> $1.xlsx",
       "(.*).pptx": "<span foreground='#d24726'> </span> $1.pptx",
-      "(.*).pdf": "<span foreground='${RED}'> </span> $1.pdf",
+      "(.*).pdf": "<span foreground='#f38ba8'> </span> $1.pdf",
       // file manager
-      "/": "<span foreground='${YELLOW}'> </span> File Manager",
+      "/": "<span foreground='#f9e2af'> </span> File Manager",
       // images
-      "(.*).jpg": "<span foreground='#f03888'>󰈟 </span> $1.jpg",
-      "(.*).png": "<span foreground='#f03888'>󰈟 </span> $1.png",
-      "(.*).svg": "<span foreground='#f03888'>󰈟 </span> $1.svg",
-      "(.*).webp": "<span foreground='#f03888'>󰈟 </span> $1.webp",
-      "(.*).gif": "<span foreground='#f03888'>󰈟 </span> $1.gif",
+      "(.*).jpg": "<span foreground='#f2cdcd'>󰈟 </span> $1.jpg",
+      "(.*).png": "<span foreground='#f2cdcd'>󰈟 </span> $1.png",
+      "(.*).svg": "<span foreground='#f2cdcd'>󰈟 </span> $1.svg",
+      "(.*).webp": "<span foreground='#f2cdcd'>󰈟 </span> $1.webp",
+      "(.*).gif": "<span foreground='#f2cdcd'>󰈟 </span> $1.gif",
       // archives
-      "(.*).zip": "<span foreground='#8050c0'> </span> $1.zip",
-      "(.*).tar(.*)": "<span foreground='#8050c0'> </span> $1.tar$2",
-      "(.*).7z": "<span foreground='#8050c0'> </span> $1.7z",
-      "(.*).rar": "<span foreground='#8050c0'> </span> $1.rar",
+      "(.*).zip": "<span foreground='#74c7ec'> </span> $1.zip",
+      "(.*).tar(.*)": "<span foreground='#74c7ec'> </span> $1.tar$2",
+      "(.*).7z": "<span foreground='#74c7ec'> </span> $1.7z",
+      "(.*).rar": "<span foreground='#74c7ec'> </span> $1.rar",
       // code - brand colors
       "(.*).py": "<span foreground='#3776ab'> </span> $1.py",
       "(.*).js": "<span foreground='#f7df1e'> </span> $1.js",
@@ -175,11 +175,11 @@
       "(.*).lua": "<span foreground='#000080'> </span> $1.lua",
       "(.*).sh": "<span foreground='#4eaa25'> </span> $1.sh",
       // text
-      "(.*).txt": "<span foreground='#5c4874'> </span> $1.txt",
-      "(.*).md": "<span foreground='#5c4874'> </span> $1.md",
-      "(.*).json": "<span foreground='#6058c0'> </span> $1.json",
-      "(.*).yaml": "<span foreground='#6058c0'> </span> $1.yaml",
-      "(.*).toml": "<span foreground='#6058c0'> </span> $1.toml"
+      "(.*).txt": "<span foreground='#7f849c'> </span> $1.txt",
+      "(.*).md": "<span foreground='#7f849c'> </span> $1.md",
+      "(.*).json": "<span foreground='#f9e2af'> </span> $1.json",
+      "(.*).yaml": "<span foreground='#f9e2af'> </span> $1.yaml",
+      "(.*).toml": "<span foreground='#f9e2af'> </span> $1.toml"
     },
     "min-length": 5,
     "max-length": 45
@@ -290,7 +290,7 @@
       "mode-mon-col": 6,
       "on-click-right": "mode",
       "format": {
-        "today": "<span color='#2e203e'><b>{}</b></span>"
+        "today": "<span color='#45475a'><b>{}</b></span>"
       }
     },
     "actions": {
@@ -418,7 +418,8 @@
   "custom/power": {
     "format": "󰐥",
     "tooltip": false,
-    "on-click": "~/.local/bin/logoutlaunch.sh",
+    "on-click": "~/.local/bin/logoutlaunch.sh 2",
+    "on-click-right": "~/.local/bin/logoutlaunch.sh 1",
     "interval": 86400
   },
 
