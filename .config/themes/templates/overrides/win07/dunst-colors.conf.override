@@ -1,0 +1,22 @@
+# ${THEME_NAME} Dunst Colors — Aero Glass Notification
+
+[global]
+frame_color = "${OVERLAY0}"
+background = "${BASE}"
+foreground = "${TEXT}"
+highlight = "${ACCENT},${SEM_OK}"
+corner_radius = 10
+frame_width = 1
+separator_color = "${SURFACE1}"
+
+[urgency_low]
+foreground = "${SUBTEXT1}"
+frame_color = "${SURFACE2}"
+
+[urgency_normal]
+foreground = "${TEXT}"
+frame_color = "${OVERLAY0}"
+
+[urgency_critical]
+foreground = "${SEM_ERR}"
+frame_color = "${SEM_ERR}"

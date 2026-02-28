@@ -1,0 +1,123 @@
+/* vim:ft=css */
+/* Aero Glass — soft rounded edges, translucent panels, subtle glow borders */
+
+/* ---- Window: frosted glass frame ---- */
+
+window {
+    border-radius:    10px;
+    border:           1px;
+    border-color:     @glass-border;
+}
+
+/* ---- Mainbox ---- */
+
+mainbox {
+    border-radius:    10px;
+}
+
+/* ---- Prompt: accent pill ---- */
+
+prompt {
+    background-color: @selected;
+    text-color:       @crust;
+    border:           0;
+    border-radius:    8px;
+    padding:          4px 12px;
+}
+
+/* ---- Entry: subtle inset ---- */
+
+entry {
+    background-color: @mantle;
+    border:           1px;
+    border-radius:    8px;
+    border-color:     @surface1;
+    padding:          4px 10px;
+}
+
+/* ---- List View ---- */
+
+listview {
+    background-color: transparent;
+    border:           0;
+    padding:          4px 0;
+}
+
+/* ---- Elements ---- */
+
+element {
+    border-radius: 8px;
+    border:        0;
+    padding:       6px 10px;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+    text-color:       @text;
+}
+
+element selected.normal {
+    background-color: @selected;
+    text-color:       @crust;
+}
+
+element selected.urgent {
+    background-color: @urgent;
+    text-color:       @crust;
+}
+
+element selected.active {
+    background-color: @selected;
+    text-color:       @crust;
+}
+
+element-text selected {
+    text-color: @crust;
+}
+
+element-icon selected {
+    text-color: @crust;
+}
+
+/* ---- Scrollbar ---- */
+
+scrollbar {
+    width:            6px;
+    handle-width:     6px;
+    handle-color:     @overlay0;
+    background-color: @surface0;
+    border-radius:    3px;
+    border:           0;
+}
+
+/* ---- Buttons ---- */
+
+button {
+    background-color: @surface0;
+    text-color:       @text;
+    border:           0;
+    border-radius:    8px;
+    padding:          4px 12px;
+}
+
+button selected {
+    background-color: @selected;
+    text-color:       @crust;
+}
+
+/* ---- Message / Textbox ---- */
+
+textbox {
+    background-color: @mantle;
+    border:           1px;
+    border-radius:    8px;
+    border-color:     @surface1;
+    padding:          6px 10px;
+}
+
+error-message {
+    border:           1px;
+    border-radius:    8px;
+    border-color:     @urgent;
+}

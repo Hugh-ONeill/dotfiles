@@ -1,0 +1,89 @@
+/* ${THEME_NAME} wlogout theme — Aero Glass */
+
+* {
+    font-family: "Ubuntu Nerd Font", "Noto Sans", sans-serif;
+    font-size: 1em;
+    transition-property: background-color, background-size;
+    transition-duration: 0.3s;
+    background-image: none;
+}
+
+window {
+    background-color: rgba(12, 20, 32, 0.65);
+}
+
+button {
+    color: ${TEXT};
+    background-color: alpha(${BASE}, 0.75);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 40%;
+    border: 1px solid ${SURFACE2};
+    border-radius: 14px;
+    text-shadow: none;
+    box-shadow: none;
+    margin: ${margin}px;
+}
+
+button:focus {
+    color: ${CRUST};
+    background-color: alpha(${ACCENT}, 0.80);
+    background-size: 50%;
+    border-color: ${ACCENT};
+}
+
+button:hover {
+    background-color: alpha(${SURFACE0}, 0.75);
+    background-size: 50%;
+    border-color: ${ACCENT};
+}
+
+/* Default icons */
+#lock {
+    background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
+}
+
+#logout {
+    background-image: url("${HOME}/.config/wlogout/icons/logout-white.png");
+}
+
+#suspend {
+    background-image: url("${HOME}/.config/wlogout/icons/suspend-white.png");
+}
+
+#hibernate {
+    background-image: url("${HOME}/.config/wlogout/icons/hibernate-white.png");
+}
+
+#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
+}
+
+#reboot {
+    background-image: url("${HOME}/.config/wlogout/icons/reboot-white.png");
+}
+
+/* Focused state icons */
+button:focus#lock {
+    background-image: url("${HOME}/.config/wlogout/icons/lock-white.png");
+}
+
+button:focus#logout {
+    background-image: url("${HOME}/.config/wlogout/icons/logout-white.png");
+}
+
+button:focus#suspend {
+    background-image: url("${HOME}/.config/wlogout/icons/suspend-white.png");
+}
+
+button:focus#hibernate {
+    background-image: url("${HOME}/.config/wlogout/icons/hibernate-white.png");
+}
+
+button:focus#shutdown {
+    background-image: url("${HOME}/.config/wlogout/icons/shutdown-white.png");
+}
+
+button:focus#reboot {
+    background-image: url("${HOME}/.config/wlogout/icons/reboot-white.png");
+}

@@ -57,33 +57,25 @@ $g7 = rgb(${GRADIENT_7_NOHASH})
 $g8 = rgb(${GRADIENT_8_NOHASH})
 $g9 = rgb(${GRADIENT_9_NOHASH})
 
-# Style settings
-decoration {
-    rounding = ${STYLE_CORNER_RADIUS}
-    screen_shader = ~/.config/hypr/shaders/crt.frag
-
-    # Win98: no transparency effects
-    active_opacity = 1.0
-    inactive_opacity = 1.0
-
-    dim_inactive = false
-
-    blur {
-        enabled = false
-    }
-
-    shadow {
-        enabled = false
-    }
-}
-
-general {
-    border_size = 4
-    gaps_in = ${STYLE_GAPS_IN}
-    gaps_out = ${STYLE_GAPS_OUT}
-    col.active_border = rgb(${SURFACE1_NOHASH}) rgb(${SURFACE1_NOHASH}) rgb(${OVERLAY2_NOHASH}) rgb(${OVERLAY2_NOHASH}) 25deg
-    col.inactive_border = rgb(${MANTLE_NOHASH}) rgb(${MANTLE_NOHASH}) rgb(${OVERLAY0_NOHASH}) rgb(${OVERLAY0_NOHASH}) 25deg
-}
+# Style variables — Win99
+$theme_rounding = ${STYLE_CORNER_RADIUS}
+$theme_border_size = 4
+$theme_gaps_in = ${STYLE_GAPS_IN}
+$theme_gaps_out = ${STYLE_GAPS_OUT}
+$theme_active_border = rgb(${SURFACE1_NOHASH}) rgb(${SURFACE1_NOHASH}) rgb(${OVERLAY2_NOHASH}) rgb(${OVERLAY2_NOHASH}) 25deg
+$theme_inactive_border = rgb(${MANTLE_NOHASH}) rgb(${MANTLE_NOHASH}) rgb(${OVERLAY0_NOHASH}) rgb(${OVERLAY0_NOHASH}) 25deg
+$theme_active_opacity = 1.0
+$theme_inactive_opacity = 1.0
+$theme_dim_inactive = false
+$theme_dim_strength = 0.0
+$theme_blur_enabled = false
+$theme_blur_size = 1
+$theme_blur_passes = 1
+$theme_shadow_enabled = false
+$theme_screen_shader = ~/.config/hypr/shaders/crt.frag
+$theme_add_borders = 1
+$theme_bpp_border_size_1 = 5
+$theme_bpp_border_size_2 = 5
 
 # Win98: float all windows by default, half-screen size
 windowrule = match:class .*, float on

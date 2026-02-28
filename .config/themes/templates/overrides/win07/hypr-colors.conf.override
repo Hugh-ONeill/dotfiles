@@ -1,4 +1,4 @@
-# ${THEME_NAME} Palette for Hyprland
+# ${THEME_NAME} Palette for Hyprland — Aero Glass
 
 # Semantic colors (primary palette)
 $sem_ok = rgb(${SEM_OK_NOHASH})
@@ -63,11 +63,22 @@ $g9 = rgb(${GRADIENT_9_NOHASH})
 $cursor_theme = ${THEME_NAME}-cursors
 $cursor_size = 24
 
-# Style variables — Chromatic
+# Style variables — Aero Glass
 $theme_rounding = ${STYLE_CORNER_RADIUS}
-$theme_border_size = 2
+$theme_border_size = ${STYLE_BORDER_WIDTH}
 $theme_gaps_in = ${STYLE_GAPS_IN}
 $theme_gaps_out = ${STYLE_GAPS_OUT}
-$theme_active_border = rgb(${ACCENT_TERTIARY_NOHASH}) rgb(${ACCENT_TERTIARY_NOHASH}) rgb(${ACCENT_SECONDARY_NOHASH}) rgb(${ACCENT_SECONDARY_NOHASH}) 135deg
-$theme_inactive_border = rgb(${SURFACE2_NOHASH}) rgb(${SURFACE2_NOHASH}) rgb(${OVERLAY0_NOHASH}) rgb(${OVERLAY0_NOHASH}) 135deg
-$theme_screen_shader = ~/.config/hypr/shaders/chromatic.frag
+$theme_active_border = ${HYPR_ACTIVE_BORDER}
+$theme_inactive_border = rgba(${OVERLAY0_NOHASH}80)
+$theme_active_opacity = 0.85
+$theme_inactive_opacity = 0.70
+$theme_dim_inactive = true
+$theme_dim_strength = 0.05
+$theme_blur_enabled = true
+$theme_blur_size = 10
+$theme_blur_passes = 4
+$theme_shadow_enabled = true
+$theme_screen_shader =
+$theme_add_borders = 0
+$theme_bpp_border_size_1 = 0
+$theme_bpp_border_size_2 = 0

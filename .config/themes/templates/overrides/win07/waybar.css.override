@@ -1,0 +1,320 @@
+/* ${THEME_NAME} Theme — Aero Glass Taskbar */
+
+/* Main Colors — solid azure base, gradient on box child */
+@define-color main-bg               #3080c8;
+@define-color main-fg               #f0f8ff;
+@define-color main-br               #f0f8ff;
+
+@define-color active-bg             ${ACCENT};
+@define-color active-fg             #0c1420;
+
+@define-color hover-bg              ${SURFACE1};
+@define-color hover-fg              ${TEXT};
+
+/* Glass tint colors */
+@define-color glass-border          ${OVERLAY0};
+@define-color glass-highlight       ${OVERLAY2};
+
+/* Aero bar colors */
+@define-color bar-top               #78b8f0;
+@define-color bar-mid               #3c88d8;
+@define-color bar-bottom            #2060b0;
+@define-color start-green           #48a848;
+
+/* Module Colors */
+@define-color module-fg             ${TEXT};
+
+@define-color workspaces            ${SURFACE0};
+
+@define-color idle-fg               ${CRUST};
+@define-color idle-bg               ${TEXT};
+
+@define-color module1-bg            ${MANTLE};
+@define-color module2-bg            ${BASE};
+@define-color module3-bg            ${SURFACE0};
+@define-color module4-bg            ${SURFACE1};
+@define-color module5-bg            ${SURFACE2};
+
+@define-color pulseaudio            ${MANTLE};
+@define-color backlight             ${SURFACE0};
+@define-color battery               ${SURFACE2};
+@define-color power                 ${SUBTEXT0};
+
+/* State Colors */
+@define-color good                  ${SEM_OK};
+@define-color warning               ${SEM_WARN};
+@define-color critical              ${SEM_ERR};
+@define-color full                  ${SEM_OK};
+@define-color charging              ${SEM_INFO};
+
+/* Gradient Colors */
+@define-color g0                    ${GRADIENT_0};
+@define-color g1                    ${GRADIENT_1};
+@define-color g2                    ${GRADIENT_2};
+@define-color g3                    ${GRADIENT_3};
+@define-color g4                    ${GRADIENT_4};
+@define-color g5                    ${GRADIENT_5};
+@define-color g6                    ${GRADIENT_6};
+@define-color g7                    ${GRADIENT_7};
+@define-color g8                    ${GRADIENT_8};
+@define-color g9                    ${GRADIENT_9};
+
+/* Accent Colors */
+@define-color accent                ${ACCENT};
+@define-color accent-secondary      ${ACCENT_SECONDARY};
+@define-color accent-tertiary       ${ACCENT_TERTIARY};
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * AERO GLASS TASKBAR
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+* {
+    font-weight: 500;
+    min-height: 0px;
+}
+
+/* ---- Main Bar — bright azure glass with vertical gradient ---- */
+
+window#waybar > box {
+    background-image: linear-gradient(to bottom, alpha(@bar-top, 0.85), alpha(@bar-mid, 0.80), alpha(@bar-bottom, 0.75));
+    border-top: 1px solid alpha(@bar-top, 0.9);
+    border-bottom: 1px solid alpha(@bar-bottom, 0.9);
+    margin: 0px;
+    padding: 1px 2px;
+}
+
+/* ---- Tooltip ---- */
+
+tooltip {
+    color: @main-fg;
+    background: alpha(@bar-mid, 0.90);
+    border: 1px solid @glass-border;
+    border-radius: 6px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * HIDE POWERLINE SEPARATORS — Aero uses spacing, not arrows
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+window#waybar #custom-left1,
+window#waybar #custom-left2,
+window#waybar #custom-left3,
+window#waybar #custom-left4,
+window#waybar #custom-left5,
+window#waybar #custom-left6,
+window#waybar #custom-left7,
+window#waybar #custom-left8,
+window#waybar #custom-left9,
+window#waybar #custom-left10,
+window#waybar #custom-right1,
+window#waybar #custom-right2,
+window#waybar #custom-right3,
+window#waybar #custom-right4,
+window#waybar #custom-right5,
+window#waybar #custom-right6,
+window#waybar #custom-right7,
+window#waybar #custom-right8,
+window#waybar #custom-leftin1,
+window#waybar #custom-leftin2,
+window#waybar #custom-leftin3,
+window#waybar #custom-rightin1,
+window#waybar #custom-rightin2,
+window#waybar #custom-rightin3,
+window#waybar #custom-left-ws-workspaces,
+window#waybar #custom-left-bar-fans,
+window#waybar #custom-left-fans-temp,
+window#waybar #custom-left-temp-gpu,
+window#waybar #custom-left-gpu-memory,
+window#waybar #custom-left-memory-cpu,
+window#waybar #custom-leftin-cpu-idle,
+window#waybar #custom-left-idle-center,
+window#waybar #custom-left-cava-audio,
+window#waybar #custom-left-audio-backlight,
+window#waybar #custom-left-backlight-battery,
+window#waybar #custom-leftin-battery-power,
+window#waybar #custom-right-workspaces-window,
+window#waybar #custom-right-center-clock,
+window#waybar #custom-rightin-clock-time,
+window#waybar #custom-right-time-date,
+window#waybar #custom-right-date-pomodoro,
+window#waybar #custom-right-pomodoro-bluetooth,
+window#waybar #custom-right-bluetooth-wifi,
+window#waybar #custom-right-wifi-end,
+window#waybar #custom-left-ws-workspaces0 {
+    font-size: 0px;
+    min-width: 0px;
+    padding: 0px;
+    margin: 0px;
+    background: transparent;
+    border: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * MODULES — frosted glass pill shapes
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+window#waybar #custom-ws,
+window#waybar #workspaces,
+window#waybar #window,
+window#waybar #custom-fans,
+window#waybar #custom-gpu,
+window#waybar #custom-temp,
+window#waybar #memory,
+window#waybar #cpu,
+window#waybar #clock,
+window#waybar #custom-pomodoro,
+window#waybar #bluetooth,
+window#waybar #custom-wifi,
+window#waybar #custom-media,
+window#waybar #pulseaudio,
+window#waybar #backlight,
+window#waybar #custom-battery,
+window#waybar #custom-power,
+window#waybar #idle_inhibitor,
+window#waybar #custom-cava {
+    color: @module-fg;
+    background: alpha(white, 0.10);
+    border: 1px solid alpha(white, 0.15);
+    border-radius: 6px;
+    margin: 3px 2px;
+    padding: 0px 8px;
+}
+
+/* ---- Start button — Vista green orb ---- */
+
+window#waybar #custom-ws {
+    background: alpha(@start-green, 0.75);
+    color: @main-fg;
+    border: 1px solid alpha(@start-green, 0.9);
+    border-radius: 6px;
+    padding: 0px 10px;
+    margin: 3px 4px 3px 2px;
+}
+
+window#waybar #custom-ws:hover {
+    background: alpha(@start-green, 0.75);
+}
+
+/* ---- Workspaces — glass buttons ---- */
+
+window#waybar #workspaces {
+    background: alpha(white, 0.08);
+    border: 1px solid alpha(white, 0.12);
+    padding: 0px 2px;
+}
+
+window#waybar #workspaces button {
+    color: @module-fg;
+    background: alpha(white, 0.12);
+    border: 1px solid alpha(white, 0.18);
+    border-radius: 5px;
+    margin: 3px 1px;
+    padding: 0px 8px;
+    min-width: 20px;
+}
+
+window#waybar #workspaces button:hover {
+    background: alpha(white, 0.25);
+}
+
+window#waybar #workspaces button.active {
+    color: @main-fg;
+    background: alpha(white, 0.30);
+    border: 1px solid alpha(white, 0.40);
+    box-shadow: 0px 0px 3px 1px alpha(white, 0.35);
+    text-shadow: none;
+}
+
+window#waybar #workspaces button.visible:not(.active) {
+    background: alpha(white, 0.15);
+}
+
+window#waybar #workspaces button.occupied:not(.active) {
+    color: @module-fg;
+}
+
+/* ---- Window title ---- */
+
+window#waybar #window {
+    background: alpha(white, 0.08);
+    padding: 0px 12px;
+    border: 1px solid alpha(white, 0.10);
+}
+
+/* ---- Idle inhibitor ---- */
+
+window#waybar #idle_inhibitor {
+    background: alpha(white, 0.10);
+    color: @main-fg;
+    border-radius: 6px;
+}
+
+window#waybar #idle_inhibitor.activated {
+    background: alpha(white, 0.30);
+    border: 1px solid alpha(white, 0.40);
+}
+
+/* ---- Power button — accent glow ---- */
+
+window#waybar #custom-power {
+    background: alpha(white, 0.15);
+    color: @main-fg;
+    border: 1px solid alpha(white, 0.25);
+    border-radius: 14px;
+    margin: 3px 4px;
+    padding: 0px 8px;
+}
+
+window#waybar #custom-power:hover {
+    background: alpha(white, 0.30);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * STATE COLORS
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+window#waybar #memory.warning,
+window#waybar #custom-battery.warning {
+    color: @warning;
+}
+
+window#waybar #memory.critical,
+window#waybar #custom-battery.critical {
+    color: @critical;
+}
+
+window#waybar #custom-battery.good {
+    color: @good;
+}
+
+window#waybar #custom-battery.charging {
+    color: @charging;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * HOVER — gradient glow
+ * ══════════════════════════════════════════════════════════════════════════════ */
+
+window#waybar #custom-fans:hover,
+window#waybar #custom-temp:hover,
+window#waybar #custom-gpu:hover,
+window#waybar #memory:hover,
+window#waybar #cpu:hover,
+window#waybar #clock.time:hover,
+window#waybar #clock.date:hover,
+window#waybar #custom-pomodoro:hover,
+window#waybar #bluetooth:hover,
+window#waybar #custom-wifi:hover,
+window#waybar #pulseaudio:hover,
+window#waybar #backlight:hover,
+window#waybar #custom-battery:hover   { color: white; background: alpha(white, 0.20); }
+
+/* ---- Hide cava ---- */
+
+window#waybar #custom-cava {
+    font-size: 0px;
+    min-width: 0px;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+}
