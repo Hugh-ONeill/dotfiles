@@ -114,6 +114,9 @@ export STARSHIP_CACHE="$XDG_CACHE_HOME/starship"
 # Wget
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 
+# Android SDK
+export ANDROID_HOME="$XDG_DATA_HOME/android-sdk"
+
 # Zoxide
 export _ZO_DATA_DIR="$XDG_DATA_HOME/zoxide"
 export _ZO_FZF_OPTS="+m"
@@ -151,6 +154,8 @@ path=(
   "$XDG_SCRIPT_HOME"
   "$BUN_INSTALL/bin"
   "$GEM_HOME/bin"
+  "$ANDROID_HOME/platform-tools"
+  "$ANDROID_HOME/emulator"
   $path
 )
 export PATH

@@ -30,6 +30,9 @@ eval "$(echo "$input" | jq -r '
   @sh "duration_ms=\(.cost.total_duration_ms // 0)"
 ')"
 
+# Trim model name to just the family (e.g. "Opus 4.6 (1M context)" -> "Opus")
+model_name="${model_name%% [0-9]*}"
+
 # Get split directory parts
 dir_first=$(~/.local/bin/directory-split first "$dir")
 dir_second=$(~/.local/bin/directory-split second "$dir")

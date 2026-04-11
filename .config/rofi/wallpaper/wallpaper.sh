@@ -3,7 +3,7 @@
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Rofi Wallpaper Picker
-# Requires: swww, hyprpaper, or swaybg
+# Requires: awww, hyprpaper, or swaybg
 # ══════════════════════════════════════════════════════════════════════════════
 
 theme="$HOME/.config/rofi/wallpaper/style.rasi"
@@ -68,23 +68,23 @@ set_wallpaper() {
     local wallpaper="$1"
     local full_path="$wallpaper_dir/$wallpaper"
 
-    # Use swww for GIFs (animated support), otherwise try hyprpaper first
+    # Use awww for GIFs (animated support), otherwise try hyprpaper first
     if [[ "$wallpaper" == *.gif ]]; then
-        # GIFs require swww for animation
-        if ! pgrep -x swww-daemon &>/dev/null; then
+        # GIFs require awww for animation
+        if ! pgrep -x awww-daemon &>/dev/null; then
             pkill hyprpaper 2>/dev/null
-            swww-daemon &
+            awww-daemon &
             sleep 0.5
         fi
-        swww img "$full_path" \
+        awww img "$full_path" \
             --transition-type grow \
             --transition-pos center \
             --transition-duration 1 \
             --transition-fps 60
     elif pgrep -x hyprpaper &>/dev/null; then
         hyprctl hyprpaper wallpaper ",$full_path"
-    elif pgrep -x swww-daemon &>/dev/null; then
-        swww img "$full_path" \
+    elif pgrep -x awww-daemon &>/dev/null; then
+        awww img "$full_path" \
             --transition-type grow \
             --transition-pos center \
             --transition-duration 1 \

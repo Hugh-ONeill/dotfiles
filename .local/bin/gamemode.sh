@@ -32,7 +32,7 @@ else
         keyword render:direct_scanout 1;\
         keyword layerrule noanim,waybar;\
         keyword layerrule noanim,swaync-notification-window;\
-        keyword layerrule noanim,swww-daemon;\
+        keyword layerrule noanim,awww-daemon;\
         keyword layerrule noanim,rofi
         "
   hyprctl 'keyword windowrulev2 opaque,class:(.*)'

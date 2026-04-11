@@ -1075,6 +1075,8 @@ def generate_theme_palette(palette: dict, output_path: str) -> None:
             "accent_secondary": colors["color5"],
             "accent_tertiary": colors["color6"],
             "accent_bright": colors["color12"],
+            "accent_secondary_bright": colors["color13"],
+            "accent_tertiary_bright": colors["color14"],
             # Semantic colors (hue-based mapping)
             "sem_ok": colors["color2"],      # green hue
             "sem_warn": colors["color3"],    # yellow hue

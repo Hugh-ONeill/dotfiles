@@ -65,7 +65,7 @@ local function apply_theme(opts)
     vim.o.background = is_light(base) and "light" or "dark"
   end
   require("catppuccin").setup(opts)
-  vim.cmd.colorscheme("catppuccin")
+  vim.cmd.colorscheme("catppuccin-nvim")
   refresh_lualine()
 end
 
@@ -103,7 +103,7 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "catppuccin",
+      colorscheme = "catppuccin-nvim",
     },
   },
   {

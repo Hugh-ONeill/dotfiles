@@ -77,7 +77,7 @@ cmd_set() {
 
     # Special handling for chameleon - extract colors from current wallpaper
     if [[ "$theme" == "chameleon" ]]; then
-        local wallpaper=$(swww query 2>/dev/null | grep -oP 'image: \K[^\s]+' | head -1)
+        local wallpaper=$(awww query 2>/dev/null | grep -oP 'image: \K[^\s]+' | head -1)
         if [[ -n "$wallpaper" && -f "$wallpaper" ]]; then
             echo -e "  ${CYAN}Extracting colors from wallpaper...${NC}"
             "$SCRIPTS_DIR/palette-extract" "$wallpaper" --generate-theme 2>/dev/null && \

@@ -78,29 +78,29 @@ set_wallpaper() {
     echo "Setting wallpaper: $image"
 
     # Determine which backend to use
-    # If swww-daemon is running, use swww (it handles both static and animated)
-    # Otherwise use hyprpaper for static images, swww for GIFs
-    local use_swww=false
+    # If awww-daemon is running, use awww (it handles both static and animated)
+    # Otherwise use hyprpaper for static images, awww for GIFs
+    local use_awww=false
 
-    if pgrep -x swww-daemon >/dev/null; then
-        use_swww=true
+    if pgrep -x awww-daemon >/dev/null; then
+        use_awww=true
     elif [[ "$image" == *.gif ]]; then
-        use_swww=true
+        use_awww=true
     fi
 
-    if [[ "$use_swww" == "true" ]]; then
-        # Ensure swww daemon is running
-        if ! pgrep -x swww-daemon >/dev/null; then
-            swww-daemon &
+    if [[ "$use_awww" == "true" ]]; then
+        # Ensure awww daemon is running
+        if ! pgrep -x awww-daemon >/dev/null; then
+            awww-daemon &
             sleep 0.5
         fi
         # Kill hyprpaper if running to avoid conflicts
         pkill -x hyprpaper 2>/dev/null || true
 
-        swww img "$image" --transition-type grow --transition-pos center
+        awww img "$image" --transition-type grow --transition-pos center
     else
-        # Kill swww if running to avoid conflicts
-        pkill -x swww-daemon 2>/dev/null || true
+        # Kill awww if running to avoid conflicts
+        pkill -x awww-daemon 2>/dev/null || true
 
         # Set via hyprpaper
         if ! hyprctl hyprpaper wallpaper ",$image"; then
@@ -112,7 +112,11 @@ set_wallpaper() {
 splash = false
 ipc = on
 
-wallpaper = ,$image
+wallpaper {
+    monitor =
+    path = $image
+    fit_mode = fill
+}
 EOF
     fi
 
