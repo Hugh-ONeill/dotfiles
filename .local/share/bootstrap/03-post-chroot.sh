@@ -63,13 +63,20 @@ sed -i "s|^HOOKS=.*|HOOKS=($MKINITCPIO_HOOKS)|" /mnt/etc/mkinitcpio.conf
 
 mkdir -p /mnt/etc/kernel
 
+# CPU-vendor-specific IOMMU param (same hardware as live ISO)
+if grep -q AuthenticAMD /proc/cpuinfo; then
+    IOMMU="amd_iommu=on"
+else
+    IOMMU="intel_iommu=on"
+fi
+
 # Build cmdline as one space-separated line (UKIs accept newlines too, but
 # heredoc continuations don't auto-join — flat string avoids surprises).
-echo "root=UUID=$ROOT_UUID rw rootfstype=btrfs rootflags=subvol=/@ zswap.enabled=0 amd_iommu=on iommu=pt nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1 quiet loglevel=3 systemd.show_status=auto vt.global_cursor_default=0 fbcon=nodefer" \
+echo "root=UUID=$ROOT_UUID rw rootfstype=btrfs rootflags=subvol=/@ zswap.enabled=0 $IOMMU iommu=pt nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1 quiet loglevel=3 systemd.show_status=auto vt.global_cursor_default=0 fbcon=nodefer" \
     > /mnt/etc/kernel/cmdline
 
 # Fallback cmdline: drop GPU params + silent-boot, keep root + iommu
-echo "root=UUID=$ROOT_UUID rw rootfstype=btrfs rootflags=subvol=/@ zswap.enabled=0 amd_iommu=on iommu=pt" \
+echo "root=UUID=$ROOT_UUID rw rootfstype=btrfs rootflags=subvol=/@ zswap.enabled=0 $IOMMU iommu=pt" \
     > /mnt/etc/kernel/cmdline_fallback
 
 # ============================================================

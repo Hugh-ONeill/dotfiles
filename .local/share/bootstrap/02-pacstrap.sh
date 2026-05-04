@@ -15,7 +15,12 @@ LANG_VAL="${LANG_VAL:-en_US.UTF-8}"
 KEYMAP="${KEYMAP:-us}"
 
 KERNEL_PKGS="linux linux-headers"
-UCODE_PKG="amd-ucode"
+# Detect CPU vendor at runtime — same hardware as live ISO
+if grep -q AuthenticAMD /proc/cpuinfo; then
+    UCODE_PKG="amd-ucode"
+else
+    UCODE_PKG="intel-ucode"
+fi
 BASE_PKGS="base base-devel linux-firmware sudo iptables-nft efibootmgr"
 FS_PKGS="dosfstools e2fsprogs btrfs-progs"
 NET_PKGS="networkmanager wpa_supplicant"

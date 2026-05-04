@@ -59,7 +59,7 @@ Tested: syntax-clean. Needs VM run-through.
 
 ## Open decisions
 
-- ~~Target machine arch:~~ DECIDED — AMD CPU + `nvidia-open-dkms`; reflected throughout 02/03 + clean pkglists.
+- ~~Target machine arch:~~ DECIDED — runtime-detected via `/proc/cpuinfo` in 02 (`UCODE_PKG`) and 03 (`IOMMU`). Either Intel or AMD just works.
 - ~~Encrypted swap:~~ DECIDED — dropped, zram only.
 - ~~Encryption layer:~~ DECIDED — no LUKS at all, no per-partition encryption.
 - **`BUILDDIR=/tmp/makepkg`:** keep for AUR build speed, or drop to avoid OOM on chromium/llvm/rust builds (tmpfs is RAM-backed; need to know new machine's RAM size + tmpfs size before deciding).
