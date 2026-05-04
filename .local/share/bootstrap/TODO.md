@@ -3,56 +3,69 @@
 ## Done
 
 - `00-pacman.sh` — pacman.conf, makepkg.conf, checkupdates hook
+- `01-disks.sh` — partition + format + mount (EFI + root with ~18 btrfs subvols + home, no encryption, no swap partition)
+- `02-pacstrap.sh` — pacstrap base, fstab, locale/timezone/hostname, network services, user creation
+- `03-post-chroot.sh` — mkinitcpio HOOKS w/ microcode, kernel cmdline, zram, UKI presets, sbctl, direct UEFI entries, btrfs-balance, snapper configs, service enablement
 - `04-first-login.sh` — repo pkgs, paru, AUR pkgs, user timers
 - `etc/pacman.conf`, `etc/makepkg.conf`, `etc/pacman.d/hooks/`
 - `etc/systemd/system/btrfs-balance.{service,timer}` — captured outside `/etc/`
+- `etc/snapper/configs/{root,home}` — tuned snapper configs
 - `pkglist-{official,aur}{,-clean}.txt` — moved in from `$HOME`
 
 ## Pending scripts
 
-### `01-disks.sh`
+### `01-disks.sh` — DONE (v1)
 
-Port disk prep from `~/Documents/Backup/data/wiz/arch_install.sh` lines 79–222. The valuable parts:
+Pure-custom disk prep, ~184 lines. Stops at `/mnt` fully mounted; 02 picks up from there.
 
-- EFI boot entry cleanup pass (`efibootmgr --delete-bootnum`)
-- Granular btrfs subvolume layout (`@`, `@data`, `@home`, `@root`, `@snapshots`, `@srv`, `@swap`, `@usr_local`, `@var_*` × 12)
-- Hardened per-subvol mount opts (`nodev,nosuid,noexec` on `/var/*`, `/srv`, `/swap`, `/data`)
-- LUKS2 root with sector-size=4096
-- Encrypted swap with random `/dev/urandom` key + 1MiB ext2 label trick
+Departures from old script:
+- No LUKS root (user opted out — desktop, no strict security need)
+- No encrypted swap, no swap partition (zram only, configured in `03`)
+- Dropped `@swap` subvol (no swapfile)
+- Kept granular btrfs layout (~18 root subvols + `@home`) and hardened mount opts on `/var/*`, `/srv`, `/data`, `/root`, `/usr/local`
+- `space_cache=v2` dropped from mount opts (default since kernel 5.15)
 
-**Open:** pure-custom (do all disks myself) vs archinstall pre-mount mode (mount everything in `01`, let archinstall just pacstrap + configure). Pure-custom is more code to maintain but archinstall-independent.
+Tested: syntax-clean. Needs VM run-through before trusting.
 
-### `02-archinstall.sh` *or* `02-pacstrap.sh`
+**Future iterations:** add HyDe-style menu front-end (whiptail or bash select) for hostname/user/disk-layout choices.
 
-Depends on `01` decision:
+### `02-pacstrap.sh` — DONE (v1)
 
-- If pre-mount mode: `02-archinstall.sh` runs `archinstall --config archinstall-config.json --silent` against the already-mounted `/mnt`. Need to author `archinstall-config.json` (locale, timezone, mirrors, hostname, user, base pkg set).
-- If pure-custom: `02-pacstrap.sh` runs `pacstrap -K /mnt $BASE_PKGS $KERNEL_PKGS $FS_PKGS $UCODE_PKG $OTHER_PKGS` and `genfstab -U /mnt >> /mnt/etc/fstab`.
+Pure-custom (no archinstall). ~122 lines. Pacstrap, fstab, time/locale/hostname, network services, user.
 
-### `03-post-chroot.sh`
+Defaults:
+- `KERNEL_PKGS="linux linux-headers"`, `UCODE_PKG="amd-ucode"` (target machine)
+- Network: `networkmanager + wpa_supplicant`, no `iwd` (desktop, ethernet primary)
+- Locale: `en_US.UTF-8` always enabled (some software hardcodes), plus `$LANG_VAL` if different
+- User: in `wheel` group, sudoers uncommented for `%wheel ALL=(ALL:ALL) ALL`
+- Root: locked by default; prompt offers to set password
 
-Runs inside `arch-chroot /mnt`. Port from old script lines ~244–476:
+Tested: syntax-clean. Needs VM run-through.
 
-- Locale / timezone / hostname / vconsole
-- `crypttab.initramfs` for root, `crypttab` for random-key swap
-- mkinitcpio: systemd hooks including the `microcode` hook (mkinitcpio v39+, replaces manual ucode-in-cmdline) — example HOOKS: `base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck`
-- mkinitcpio MODULES: GPU + VFIO (`vfio_pci vfio vfio_iommu_type1`, plus `nvidia*` for new machine)
-- Kernel cmdline: root, btrfs subvol, `zswap.enabled=0`, `intel_iommu=on iommu=pt` (or `amd_iommu=on` on new machine), `nvidia_drm.modeset=1 …`, `quiet loglevel=3 …`
-- ZRAM: install `zram-generator`, write `/etc/systemd/zram-generator.conf`
-- UKI presets: rewrite `/etc/mkinitcpio.d/$KERNEL.preset` to emit `/efi/EFI/Linux/ArchLinux-*.efi`
-- Secure Boot: `sbctl create-keys && enroll-keys --microsoft && sign --save` each UKI
-- `efibootmgr --create` direct UEFI boot entries for each UKI
-- firewalld: default-zone=drop, ICMP echo blocked
-- Snapper: `snapper -c root create-config /` and `snapper -c home create-config /home` (creates the subvol-aware skeletons and `.snapshots/`), then drop in the tracked `etc/snapper/configs/{root,home}` over the auto-generated ones, then enable `snapper-timeline.timer` / `snapper-cleanup.timer`. Configs already tuned: `ALLOW_USERS=wiz`, `SYNC_ACL=yes`, root `TIMELINE_CREATE=no` (snap-pac handles it), `NUMBER_LIMIT_IMPORTANT=15` on root, `TIMELINE_LIMIT_WEEKLY=4` on home.
-- `systemctl enable` btrfs-balance.timer, sshd, NetworkManager, systemd-resolved, firewalld
+### `03-post-chroot.sh` — DONE (v1)
+
+~179 lines. Departures from old script:
+
+- **No firewalld** (deferred — desktop on home network, no strict security need; user can install later)
+- **No `sd-encrypt` hook, no crypttab** (no LUKS)
+- **No nvidia in `MODULES=()`** — defer to 04 where `nvidia-open-dkms` is in pkglist; pacman hook rebuilds UKIs after install. First boot is tty-only on framebuffer.
+- **`microcode` hook** added to HOOKS line (v39+; replaces legacy ucode-in-cmdline)
+- **`amd_iommu=on iommu=pt`** in cmdline (instead of `intel_iommu=on`)
+- Snapper: skip `create-config` since `/.snapshots` is already a subvol from 01; just drop in tuned configs + register via `/etc/conf.d/snapper`
+- Auto-detects `ROOT_UUID`, `EFI_DEV`, `EFI_PART_NUM` from current `/mnt` mounts — no env-var or arg required
+- sbctl gracefully skips if firmware not in Setup Mode (warns + tells user to enroll later)
+
+Tested: syntax-clean. Needs VM run-through.
 
 ## Open decisions
 
-- **Target machine arch:** AMD CPU + `nvidia-open-dkms` (already reflected in `pkglist-*-clean.txt`). Old script hardcoded `intel-ucode` + intel/nvidia GPU paths — `03` needs `amd-ucode` + AMD IOMMU + nvidia-open module names.
-- **Encrypted swap:** keep (random-key, no hibernate) or drop in favor of zram-only.
+- ~~Target machine arch:~~ DECIDED — AMD CPU + `nvidia-open-dkms`; reflected throughout 02/03 + clean pkglists.
+- ~~Encrypted swap:~~ DECIDED — dropped, zram only.
+- ~~Encryption layer:~~ DECIDED — no LUKS at all, no per-partition encryption.
 - **`BUILDDIR=/tmp/makepkg`:** keep for AUR build speed, or drop to avoid OOM on chromium/llvm/rust builds (tmpfs is RAM-backed; need to know new machine's RAM size + tmpfs size before deciding).
-- **archinstall vs pure-custom:** see `01` above.
+- ~~archinstall vs pure-custom:~~ DECIDED — pure-custom, all four scripts.
 - **Mirrorlist:** the in-repo `mirrorlist.pacnew` from April never got merged. Decide whether to ship a static mirrorlist in `etc/`, run `reflector` fresh on the live ISO, or replicate archinstall's approach (fetch `archlinux.org/mirrors/status/json/` + sort by region/score/speed in ~50 lines of `curl | jq`).
+- **Firewalld:** dropped from 03 default; revisit if you want it on the new machine. Add 5 lines in 03 if so (install + enable + accept SSH).
 
 ## Other gaps
 
