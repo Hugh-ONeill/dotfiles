@@ -1,0 +1,10 @@
+com.github.tchx84.Flatseal
+com.usebottles.bottles
+com.valvesoftware.Steam
+dev.vencord.Vesktop
+io.github.tsmetana.mpk3-settings
+org.blender.Blender
+org.godotengine.Godot
+org.libretro.RetroArch
+org.musicbrainz.Picard
+org.winehq.Wine

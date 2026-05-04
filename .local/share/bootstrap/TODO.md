@@ -69,7 +69,7 @@ Tested: syntax-clean. Needs VM run-through.
 
 ## Other gaps
 
-- **`flatpaks.txt`:** missing — regenerate with `flatpak list --app --columns=application > flatpaks.txt` and add a flatpak install step to `04`.
+- ~~`flatpaks.txt`:~~ DONE — moved in from `$HOME`, wired into `04` (adds flathub remote if missing, then `xargs flatpak install`).
 - **dotbare clone in bootstrap flow:** the user runs `git clone --bare git@github.com:GrumpyRumpus/dotfiles.git ~/.dotfiles && dotbare checkout` *before* `04` runs (since the scripts live inside dotbare). Document this prerequisite somewhere — possibly a thin `bootstrap.sh` at the root that handles dotbare clone, then dispatches to the numbered scripts.
 - **Machine-specific overrides:** old script handled this via env-var blocks at the top. Consider an `env/` dir with `desktop.env`, `laptop.env`, `vm.env` files that get sourced.
 - **Drift between `etc/*` and live `/etc/*`:** copying snapshots into the bootstrap repo means they can fall out of sync. Consider a `sync-etc.sh` helper or a pacman hook that warns when `/etc/pacman.conf` changes vs the tracked copy.

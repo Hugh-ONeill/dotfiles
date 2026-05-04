@@ -31,6 +31,15 @@ fi
 paru -S --needed --noconfirm - < "$here/pkglist-aur-clean.txt"
 
 # ============================================================
+# FLATPAKS
+# ============================================================
+
+if command -v flatpak &>/dev/null && [[ -s "$here/flatpaks.txt" ]]; then
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    xargs -a "$here/flatpaks.txt" flatpak install --noninteractive flathub
+fi
+
+# ============================================================
 # USER SYSTEMD SERVICES
 # ============================================================
 
