@@ -89,27 +89,44 @@ load_palette_colors() {
         _colors_ref["$key"]="$value"
     done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#")) | "\(.key)=\(.value)"' "$palette_file")
 
-    # second pass: resolve references
+    # Iterate reference resolution until convergence — supports multi-level chains
+    # like sem_info -> ansi_cyan -> seafoam -> #acd8c4. Cap at 10 to prevent cycles.
+    local i changed
+    for i in {1..10}; do
+        changed=0
+        while IFS='=' read -r key ref; do
+            [[ "${_colors_ref[$key]:-}" == \#* ]] && continue
+            local resolved="${_colors_ref[$ref]:-}"
+            if [[ "$resolved" == \#* ]]; then
+                _colors_ref["$key"]="$resolved"
+                changed=1
+            fi
+        done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#") | not) | "\(.key)=\(.value)"' "$palette_file")
+        [[ $changed -eq 0 ]] && break
+    done
+
+    # Warn about anything still unresolved after convergence
     while IFS='=' read -r key ref; do
-        local resolved="${_colors_ref[$ref]}"
-        if [[ -n "$resolved" ]]; then
-            _colors_ref["$key"]="$resolved"
-        else
-            echo "Warning: unresolved reference '$ref' for '$key'" >&2
-        fi
+        [[ "${_colors_ref[$key]:-}" == \#* ]] || echo "Warning: unresolved reference '$ref' for '$key'" >&2
     done < <(jq -r '.colors | to_entries[] | select(.value | startswith("#") | not) | "\(.key)=\(.value)"' "$palette_file")
 }
 
-# Resolve a single color key from a palette JSON, following one level of reference.
+# Resolve a single color key from a palette JSON, following references through hex.
 # Usage: resolve_color "accent" /path/to/palette.json
 resolve_color() {
     local key="$1" palette_file="$2"
     local value
     value=$(jq -r ".colors[\"$key\"] // empty" "$palette_file")
     [[ -z "$value" ]] && return
-    if [[ "$value" == \#* ]]; then
-        echo "$value"
-    else
-        jq -r ".colors[\"$value\"] // \"$value\"" "$palette_file"
-    fi
+
+    # Follow chain through references until we hit a hex (cap at 10 hops)
+    local hops=0
+    while [[ "$value" != \#* && $hops -lt 10 ]]; do
+        local next
+        next=$(jq -r ".colors[\"$value\"] // empty" "$palette_file")
+        [[ -z "$next" || "$next" == "$value" ]] && break
+        value="$next"
+        ((hops++))
+    done
+    echo "$value"
 }
