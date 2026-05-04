@@ -24,9 +24,11 @@ case "$phase" in
     live)
         [[ "$EUID" -eq 0 ]] || { echo "live phase needs root."; exit 1; }
         bash "$here/00-pacman.sh"
+        bash "$here/00b-mirrorlist.sh"
         bash "$here/01-disks.sh"
         bash "$here/02-pacstrap.sh"
         bash "$here/00-pacman.sh" /mnt
+        bash "$here/00b-mirrorlist.sh" /mnt
         bash "$here/03-post-chroot.sh"
         echo
         echo "Live phase complete. Reboot, log in as your user, then run:"

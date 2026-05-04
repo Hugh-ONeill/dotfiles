@@ -62,9 +62,9 @@ Tested: syntax-clean. Needs VM run-through.
 - ~~Target machine arch:~~ DECIDED — runtime-detected via `/proc/cpuinfo` in 02 (`UCODE_PKG`) and 03 (`IOMMU`). Either Intel or AMD just works.
 - ~~Encrypted swap:~~ DECIDED — dropped, zram only.
 - ~~Encryption layer:~~ DECIDED — no LUKS at all, no per-partition encryption.
-- **`BUILDDIR=/tmp/makepkg`:** keep for AUR build speed, or drop to avoid OOM on chromium/llvm/rust builds (tmpfs is RAM-backed; need to know new machine's RAM size + tmpfs size before deciding).
+- ~~**`BUILDDIR=/tmp/makepkg`:**~~ DECIDED — commented out in `etc/makepkg.conf` (default in-place build, disk-backed). 32 GB RAM on desktop can't safely tmpfs chromium/llvm/rust.
 - ~~archinstall vs pure-custom:~~ DECIDED — pure-custom, all four scripts.
-- **Mirrorlist:** the in-repo `mirrorlist.pacnew` from April never got merged. Decide whether to ship a static mirrorlist in `etc/`, run `reflector` fresh on the live ISO, or replicate archinstall's approach (fetch `archlinux.org/mirrors/status/json/` + sort by region/score/speed in ~50 lines of `curl | jq`).
+- ~~**Mirrorlist:**~~ DECIDED — `00b-mirrorlist.sh` mirrors archinstall's approach: fetch `archlinux.org/mirrors/status/json/`, filter (active + last_sync + score<100 + http(s) + country code), sort by score, take top N. `bootstrap.sh live` runs it twice (once on live ISO, once on `/mnt` post-pacstrap, since pacstrap doesn't copy the live mirrorlist). `COUNTRIES=US,CA TOP_N=30 ...` to override.
 - **Firewalld:** dropped from 03 default; revisit if you want it on the new machine. Add 5 lines in 03 if so (install + enable + accept SSH).
 
 ## Other gaps
