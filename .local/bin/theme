@@ -124,10 +124,8 @@ cmd_set() {
     apply_fsh "$theme"
     apply_starship "$theme" "$palette_path"
     apply_dunst "$theme"
-    if [[ -x "$SCRIPTS_DIR/build-gtk-theme.sh" ]]; then
-        "$SCRIPTS_DIR/build-gtk-theme.sh" "$theme" 2>/dev/null && report_ok "gtk3 theme" || report_skip "gtk3 theme (no base installed)"
-    fi
     apply_gtk_qt "$theme"
+    apply_qt "$theme"
     apply_pywal "$theme"
     apply_stylus "$theme"
     apply_firefox "$theme"

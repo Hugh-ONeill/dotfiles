@@ -51,25 +51,33 @@ apply_gtk_qt() {
         report_ok "cursor theme ($gtk_cursor_theme)"
     fi
 
-    # QT theme
-    local qt_color_scheme=$(get_conf qt_color_scheme)
-    if [[ -n "$qt_color_scheme" ]]; then
-        local qt_applied=false
-        for qtconf in "$HOME/.config/qt5ct/qt5ct.conf" "$HOME/.config/qt6ct/qt6ct.conf"; do
-            if [[ -f "$qtconf" ]]; then
-                sed -i "s|^color_scheme_path=.*|color_scheme_path=${qtconf%/*}/colors/$qt_color_scheme|" "$qtconf" 2>/dev/null || true
-                qt_applied=true
-            fi
-        done
-        $qt_applied && report_ok "qt color scheme ($qt_color_scheme)"
-    fi
-
     # Kvantum
     local kvantum_theme=$(get_conf kvantum_theme)
     if [[ -n "$kvantum_theme" ]] && command -v kvantummanager &>/dev/null; then
         kvantummanager --set "$kvantum_theme" 2>/dev/null || true
         report_ok "kvantum ($kvantum_theme)"
     fi
+}
+
+apply_qt() {
+    local theme="$1"
+    local src="$GENERATED_DIR/$theme/qt-colorscheme.conf"
+
+    [[ ! -f "$src" ]] && { report_skip "qt (no qt-colorscheme.conf)"; return; }
+
+    copy_to_current "$theme" "qt-colorscheme.conf" >/dev/null
+
+    local applied=false
+    for qtdir in "$HOME/.config/qt5ct" "$HOME/.config/qt6ct"; do
+        [[ -d "$qtdir" ]] || continue
+        mkdir -p "$qtdir/colors"
+        cp "$CURRENT_DIR/qt-colorscheme.conf" "$qtdir/colors/current.conf"
+        local qtconf="$qtdir/$(basename "$qtdir").conf"
+        [[ -f "$qtconf" ]] && sed -i "s|^color_scheme_path=.*|color_scheme_path=$qtdir/colors/current.conf|" "$qtconf" 2>/dev/null
+        applied=true
+    done
+
+    $applied && report_ok "qt color scheme" || report_skip "qt (no qt5ct/qt6ct config dir)"
 }
 
 apply_pywal() {
