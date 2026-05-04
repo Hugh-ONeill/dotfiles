@@ -33,20 +33,38 @@ apply_gtk_qt() {
     local gtk_cursor_theme=$(get_conf gtk_cursor_theme)
     local gtk_cursor_size=$(get_conf gtk_cursor_size)
 
+    # gtk-3.0/settings.ini wins over gsettings outside GNOME (no portal mapping
+    # under Hyprland), so any GTK3 app that doesn't speak gsettings — pinentry-gtk,
+    # for one — reads the .ini directly. Keep both surfaces in sync.
+    local gtk3_ini="$HOME/.config/gtk-3.0/settings.ini"
+    update_gtk3_ini() {
+        local key="$1" val="$2"
+        [[ -f "$gtk3_ini" && -n "$val" ]] || return
+        if grep -q "^$key=" "$gtk3_ini"; then
+            sed -i "s|^$key=.*|$key=$val|" "$gtk3_ini"
+        else
+            echo "$key=$val" >> "$gtk3_ini"
+        fi
+    }
+
     if [[ -n "$gtk_theme" ]] && command -v gsettings &>/dev/null; then
         gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
         gsettings set org.gnome.desktop.interface color-scheme "prefer-dark" 2>/dev/null || true
+        update_gtk3_ini gtk-theme-name "$gtk_theme"
         report_ok "gtk theme ($gtk_theme)"
     fi
 
     if [[ -n "$gtk_icon_theme" ]] && command -v gsettings &>/dev/null; then
         gsettings set org.gnome.desktop.interface icon-theme "$gtk_icon_theme" 2>/dev/null || true
+        update_gtk3_ini gtk-icon-theme-name "$gtk_icon_theme"
         report_ok "icon theme ($gtk_icon_theme)"
     fi
 
     if [[ -n "$gtk_cursor_theme" ]] && command -v gsettings &>/dev/null; then
         gsettings set org.gnome.desktop.interface cursor-theme "$gtk_cursor_theme" 2>/dev/null || true
         [[ -n "$gtk_cursor_size" ]] && gsettings set org.gnome.desktop.interface cursor-size "$gtk_cursor_size" 2>/dev/null || true
+        update_gtk3_ini gtk-cursor-theme-name "$gtk_cursor_theme"
+        [[ -n "$gtk_cursor_size" ]] && update_gtk3_ini gtk-cursor-theme-size "$gtk_cursor_size"
         hyprctl setcursor "$gtk_cursor_theme" "${gtk_cursor_size:-24}" &>/dev/null || true
         report_ok "cursor theme ($gtk_cursor_theme)"
     fi
