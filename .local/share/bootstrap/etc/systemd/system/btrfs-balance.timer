@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly btrfs balance on root filesystem
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+RandomizedDelaySec=3600
+
+[Install]
+WantedBy=timers.target

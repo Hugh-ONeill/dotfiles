@@ -1,0 +1,9 @@
+[Unit]
+Description=Btrfs balance on root filesystem
+ConditionPathIsMountPoint=/
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/btrfs balance start -dusage=50 -musage=50 /
+Nice=19
+IOSchedulingClass=idle

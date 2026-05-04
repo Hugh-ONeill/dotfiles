@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = Updating cached package count ...
+When = PostTransaction
+Exec = /home/wiz/.local/bin/checkupdates-refresh
