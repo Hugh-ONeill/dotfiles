@@ -14,9 +14,13 @@
 
 ## Pending scripts
 
-### `01-disks.sh` — DONE (v1)
+### `01-disks.sh` — DONE (v2)
 
-Pure-custom disk prep, ~184 lines. Stops at `/mnt` fully mounted; 02 picks up from there.
+Pure-custom disk prep. Stops at `/mnt` fully mounted; 02 picks up from there.
+
+**Two modes:**
+- Interactive (default): pick disk → drop into gdisk → pick partition numbers → type DESTROY. Same flow as before. Three partitions, possibly across different disks (EFI / ROOT / HOME).
+- `AUTO_DISK=/dev/vda` (env var): wipes the named disk, creates 2 partitions (1G EFI + rest btrfs), and folds `@home` in as a subvol of the root FS. Single-disk, no prompts, no DESTROY confirmation. Designed for VM testing and unattended one-disk installs.
 
 Departures from old script:
 - No LUKS root (user opted out — desktop, no strict security need)
