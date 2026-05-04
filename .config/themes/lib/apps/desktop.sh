@@ -77,6 +77,12 @@ apply_qt() {
         applied=true
     done
 
+    # Restart long-running Qt daemons so they pick up the new color scheme.
+    # Most Qt apps cache palette at startup; hyprpolkitagent is the user-facing
+    # one (sudo/auth dialogs).
+    systemctl --user is-active --quiet hyprpolkitagent 2>/dev/null \
+        && systemctl --user restart hyprpolkitagent 2>/dev/null
+
     $applied && report_ok "qt color scheme" || report_skip "qt (no qt5ct/qt6ct config dir)"
 }
 
