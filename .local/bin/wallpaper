@@ -35,15 +35,12 @@ undo_colors() {
     if [[ -f "$HOME/.cache/wal/colors.json.bak" ]]; then
         cp "$HOME/.cache/wal/colors.json.bak" "$HOME/.cache/wal/colors.json"
         echo "Restoring previous colors..."
-        # Re-generate theme from restored colors.json (skip extraction)
+        # Re-generate theme from restored colors.json (skip extraction).
+        # generate-theme.sh (invoked by palette-extract) builds GTK+Kvantum itself.
         if ! "$HOME/.config/themes/scripts/palette-extract" --from-cache --generate-theme; then
             echo "Error: Failed to generate theme"
             exit 1
         fi
-        # Build GTK and Kvantum themes
-        local themes_dir="$HOME/.config/themes"
-        [[ -x "$themes_dir/scripts/build-gtk-theme.sh" ]] && "$themes_dir/scripts/build-gtk-theme.sh" chameleon 2>/dev/null || true
-        [[ -x "$themes_dir/scripts/build-kvantum-theme.sh" ]] && "$themes_dir/scripts/build-kvantum-theme.sh" chameleon 2>/dev/null || true
         if theme set chameleon; then
             echo "Restored previous colors"
         else
@@ -70,7 +67,7 @@ set_wallpaper() {
     fi
 
     # Validate that it's actually an image file
-    if ! file "$image" | grep -qiE 'image|bitmap|png|jpeg|gif|webp'; then
+    if ! file -L "$image" | grep -qiE 'image|bitmap|png|jpeg|gif|webp'; then
         echo "Error: Not a valid image file: $image"
         exit 1
     fi
@@ -136,16 +133,8 @@ EOF
             exit 1
         fi
 
-        # Build GTK and Kvantum themes for chameleon palette
-        local themes_dir="$HOME/.config/themes"
-        if [[ -x "$themes_dir/scripts/build-gtk-theme.sh" ]]; then
-            "$themes_dir/scripts/build-gtk-theme.sh" chameleon 2>/dev/null || true
-        fi
-        if [[ -x "$themes_dir/scripts/build-kvantum-theme.sh" ]]; then
-            "$themes_dir/scripts/build-kvantum-theme.sh" chameleon 2>/dev/null || true
-        fi
-
         # Apply the chameleon theme
+        # (generate-theme.sh, called by palette-extract, builds GTK+Kvantum itself)
         if [[ "$APPLY_THEME" == "true" ]]; then
             if ! theme set chameleon; then
                 echo "Error: Failed to apply theme"
@@ -158,7 +147,7 @@ EOF
 }
 
 find_images() {
-    find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" -o -iname "*.gif" \) 2>/dev/null
+    find -L "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" -o -iname "*.gif" \) 2>/dev/null
 }
 
 pick_wallpaper() {
