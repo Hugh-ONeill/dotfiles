@@ -34,7 +34,22 @@ fi
 # AUR PACKAGES
 # ============================================================
 
-paru -S --needed --noconfirm - < "$here/pkglist-aur-clean.txt"
+# Install one at a time: provider-resolution prompts and individual build
+# failures don't take down the whole list. --skipreview avoids PKGBUILD
+# review prompts. Failures are collected and reported at the end so you
+# can re-attempt them manually.
+aur_failed=()
+while IFS= read -r pkg; do
+    [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+    paru -S --needed --noconfirm --skipreview "$pkg" || aur_failed+=("$pkg")
+done < "$here/pkglist-aur-clean.txt"
+
+if (( ${#aur_failed[@]} > 0 )); then
+    echo
+    echo "WARN: ${#aur_failed[@]} AUR package(s) failed:"
+    printf '  - %s\n' "${aur_failed[@]}"
+    echo "Re-run manually to resolve, then re-run this script (it's idempotent)."
+fi
 
 # ============================================================
 # FLATPAKS
