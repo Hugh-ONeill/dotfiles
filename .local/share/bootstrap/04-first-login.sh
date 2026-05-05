@@ -7,6 +7,36 @@ set -euo pipefail
 here="$(dirname "$(readlink -f "$0")")"
 
 # ============================================================
+# SUPPRESS SNAP-PAC DURING BULK INSTALL
+# ============================================================
+
+# 03 enabled snapper + snap-pac, which creates pre+post root snapshots on
+# every pacman/paru transaction. During this script that's ~200+ snapshots
+# pinning every intermediate FS state — easy way to fill a small VM disk.
+# Symlinking the hook files to /dev/null is the canonical "disable" pattern;
+# an EXIT trap restores them no matter how the script ends.
+SNAPPAC_HOOKS=(05-snap-pac-pre.hook 10-snap-pac-removal.hook zz-snap-pac-post.hook)
+SNAPPAC_DISABLED=0
+
+restore_snappac() {
+    [[ "$SNAPPAC_DISABLED" -eq 1 ]] || return 0
+    for h in "${SNAPPAC_HOOKS[@]}"; do
+        sudo rm -f "/etc/pacman.d/hooks/$h"
+    done
+    echo "snap-pac hooks restored"
+}
+trap restore_snappac EXIT
+
+if pacman -Q snap-pac &>/dev/null; then
+    echo "Suppressing snap-pac for bulk install..."
+    sudo install -d /etc/pacman.d/hooks
+    for h in "${SNAPPAC_HOOKS[@]}"; do
+        sudo ln -sf /dev/null "/etc/pacman.d/hooks/$h"
+    done
+    SNAPPAC_DISABLED=1
+fi
+
+# ============================================================
 # REPO PACKAGES
 # ============================================================
 
