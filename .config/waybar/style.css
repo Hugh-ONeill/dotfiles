@@ -92,8 +92,8 @@ tooltip {
 #custom-wifi,
 #custom-media,
 #pulseaudio,
-#backlight,
-#custom-battery,
+#custom-brightness,
+#custom-powerdraw,
 #custom-power {
   opacity: 1;
   color: @module-fg;
@@ -315,7 +315,7 @@ tooltip {
   background: @pulseaudio;
 }
 
-#backlight {
+#custom-brightness {
   background: @backlight;
 }
 
@@ -325,24 +325,8 @@ tooltip {
   background: @backlight;
 }
 
-#custom-battery {
+#custom-powerdraw {
   background: @battery;
-}
-
-#custom-battery.good {
-  color: @good;
-}
-
-#custom-battery.warning {
-  color: @warning;
-}
-
-#custom-battery.critical {
-  color: @critical;
-}
-
-#custom-battery.charging {
-  color: @charging;
 }
 
 /* Power Button */
@@ -439,12 +423,12 @@ tooltip {
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
-#backlight:hover {
+#custom-brightness:hover {
   color: @accent-tertiary;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
-#custom-battery:hover {
+#custom-powerdraw:hover {
   color: @g7;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }

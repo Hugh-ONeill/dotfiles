@@ -15,7 +15,8 @@
   "reload_style_on_change": true,
   "output": [
     "eDP-1",
-    "HDMI-A-1"
+    "HDMI-A-1",
+    "DP-4"
   ],
 
   // ============================================================
@@ -63,9 +64,9 @@
     "custom/left6",
     "pulseaudio",
     "custom/left7",
-    "backlight",
+    "custom/brightness",
     "custom/left8",
-    "custom/battery",
+    "custom/powerdraw",
     "custom/leftin2",
     "custom/power"
   ],
@@ -93,7 +94,7 @@
     "on-scroll-up": "~/.config/waybar/scripts/workspace-scroll.sh up",
     "on-scroll-down": "~/.config/waybar/scripts/workspace-scroll.sh down",
     "persistent-workspaces": {
-      "eDP-1": [1, 2, 3, 4, 5]
+      "DP-4": [1, 2, 3, 4, 5]
     },
     "sort-by-number": true,
     "tooltip": false
@@ -162,9 +163,7 @@
     "return-type": "json",
     "format": " {}",
     "tooltip": true,
-    "on-scroll-up": "~/.config/waybar/scripts/fancontrol.sh up",
-    "on-scroll-down": "~/.config/waybar/scripts/fancontrol.sh down",
-    "on-click": "~/.config/waybar/scripts/fancontrol.sh auto",
+    "on-click": "coolercontrol",
     "interval": 5,
     "min-length": 8,
     "max-length": 8
@@ -343,35 +342,28 @@
     "max-length": 6
   },
 
-  // Screen Brightness
-  "backlight": {
-    "device": "intel_backlight",
-    "format": "{icon} {percent}%",
-    "format-icons": [
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      ""
-    ],
-    "on-scroll-up": "brightnessctl set 1%+",
-    "on-scroll-down": "brightnessctl set 1%-",
-    "min-length": 6
-  },
-
-  // Battery Status
-  "custom/battery": {
-    "exec": "~/.config/waybar/scripts/batteryinfo.sh",
+  // Screen Brightness (DDC/CI via ddcutil)
+  "custom/brightness": {
+    "exec": "~/.config/waybar/scripts/brightness.sh",
     "return-type": "json",
     "format": "{}",
     "tooltip": true,
     "interval": 30,
+    "signal": 5,
+    "on-scroll-up": "~/.local/bin/brightnesscontrol i",
+    "on-scroll-down": "~/.local/bin/brightnesscontrol d",
+    "min-length": 6
+  },
+
+  // GPU Power Draw (replaces laptop battery on this desktop)
+  "custom/powerdraw": {
+    "exec": "~/.config/waybar/scripts/powerinfo.sh",
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true,
+    "interval": 2,
     "min-length": 6,
-    "max-length": 6
+    "max-length": 7
   },
 
   // Power Menu
