@@ -28,7 +28,7 @@ get_cpu_temperature() {
 
 	temp=$(echo "$sensors_out" | awk '/Package id 0/ {print $4}' | awk -F '[+.]' '{print $2}')
 	if [[ -z "$temp" ]]; then
-		temp=$(echo "$sensors_out" | awk '/Tctl/ {print $2}' | tr -d '+°C')
+		temp=$(echo "$sensors_out" | awk '/Tctl/ {print $2}' | awk -F '[+.]' '{print $2}')
 	fi
 	if [[ -z "$temp" || ! "$temp" =~ ^[0-9]+$ ]]; then
 		echo "N/A N/A"

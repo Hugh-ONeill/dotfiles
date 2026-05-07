@@ -1,116 +1,54 @@
 #!/bin/bash
 
-# source theme colors (fallback to defaults)
 source "$HOME/.config/themes/current/waybar-script-colors.sh" 2>/dev/null
-COLOR_ERR="${COLOR_ERR:-${COLOR_ERR}}"
-COLOR_WARN="${COLOR_WARN:-${COLOR_WARN}}"
+: "${COLOR_ERR:=#f38ba8}"
+: "${COLOR_WARN:=#f9e2af}"
 
-# Check dependencies
-if ! command -v nbfc &>/dev/null; then
-	echo '{"text": "<span color='"'"'${COLOR_ERR}'"'"'> N/A</span>", "tooltip": "nbfc not found"}'
-	exit 0
-fi
-if ! command -v bc &>/dev/null; then
-	echo '{"text": "<span color='"'"'${COLOR_ERR}'"'"'> N/A</span>", "tooltip": "bc not found"}'
-	exit 0
-fi
+HWMON=""
+for d in /sys/class/hwmon/hwmon*; do
+	[[ -f "$d/name" && "$(cat "$d/name")" == "nct6687" ]] && { HWMON=$d; break; }
+done
 
-# Get nbfc status
-nbfc_output=$(nbfc status 2>&1)
-
-# Check if nbfc command succeeded
-if [ $? -ne 0 ]; then
-	echo "{\"text\": \"<span color='${COLOR_ERR}'> ERR</span>\", \"tooltip\": \"Failed to query fan status\"}"
+if [[ -z "$HWMON" ]]; then
+	printf '{"text": "<span color=\\"%s\\">N/A</span>", "tooltip": "nct6687 hwmon not found — is the module loaded?"}\n' "$COLOR_ERR"
 	exit 0
 fi
 
-# Parse fan information
-config_name=$(echo "$nbfc_output" | awk -F': ' '/Selected Config Name/ {print $2}' | xargs)
-
-# Function to get fan info by index
-get_fan_info() {
-	local fan_index=$1
-	local fan_info=$(echo "$nbfc_output" | awk -v RS="" -v fan="$fan_index" '
-		/Fan Display Name/ {
-			if (++count == fan+1) {
-				print
-			}
-		}
-	')
-
-	if [ -z "$fan_info" ]; then
-		echo ""
-		return 1
-	fi
-
-	local display_name=$(echo "$fan_info" | awk -F': ' '/Fan Display Name/ {print $2}' | xargs)
-	local temperature=$(echo "$fan_info" | awk -F': ' '/^Temperature/ {print $2}' | xargs)
-	local current_speed=$(echo "$fan_info" | awk -F': ' '/Current Fan Speed/ {print $2}' | xargs)
-	local target_speed=$(echo "$fan_info" | awk -F': ' '/Target Fan Speed/ {print $2}' | xargs)
-	local auto_control=$(echo "$fan_info" | awk -F': ' '/Auto Control Enabled/ {print $2}' | xargs)
-
-	echo "${display_name}|${temperature}|${current_speed}|${target_speed}|${auto_control}"
-}
-
-# Get info for both fans
-fan0_info=$(get_fan_info 0)
-fan1_info=$(get_fan_info 1)
-
-# Parse fan 0
-if [ -n "$fan0_info" ]; then
-	IFS='|' read -r fan0_name fan0_temp fan0_current fan0_target fan0_auto <<< "$fan0_info"
+# Primary display: CPU Fan PWM%
+cpu_pwm_raw=$(cat "$HWMON/pwm1" 2>/dev/null)
+if [[ -z "$cpu_pwm_raw" ]]; then
+	printf '{"text": "<span color=\\"%s\\">N/A</span>", "tooltip": "pwm1 unreadable"}\n' "$COLOR_ERR"
+	exit 0
 fi
+cpu_pct=$(( cpu_pwm_raw * 100 / 255 ))
 
-# Parse fan 1
-if [ -n "$fan1_info" ]; then
-	IFS='|' read -r fan1_name fan1_temp fan1_current fan1_target fan1_auto <<< "$fan1_info"
-fi
-
-# Calculate average or max fan speed for display
-if [ -n "$fan0_current" ] && [ -n "$fan1_current" ]; then
-	# Use the higher of the two fan speeds
-	if (( $(echo "$fan0_current > $fan1_current" | bc -l) )); then
-		display_speed=$fan0_current
-	else
-		display_speed=$fan1_current
-	fi
+if (( cpu_pct >= 80 )); then
+	color="$COLOR_ERR"
+elif (( cpu_pct >= 60 )); then
+	color="$COLOR_WARN"
 else
-	display_speed=${fan0_current:-${fan1_current:-0}}
+	color=""
 fi
 
-# Round to integer
-display_speed=$(printf "%.0f" "$display_speed" 2>/dev/null || echo "0")
-
-# Determine color based on speed
-if [[ ! "$display_speed" =~ ^[0-9]+$ ]]; then
-	display_speed=0
-fi
-if (( display_speed >= 80 )); then
-	text_output="<span color='${COLOR_ERR}'>${display_speed}%</span>"
-elif (( display_speed >= 60 )); then
-	text_output="<span color='${COLOR_WARN}'>${display_speed}%</span>"
+if [[ -n "$color" ]]; then
+	text=$(printf "<span color='%s'>%3d%%</span>" "$color" "$cpu_pct")
 else
-	text_output="${display_speed}%"
+	text=$(printf "%3d%%" "$cpu_pct")
 fi
 
-# Build tooltip
-tooltip="${config_name}\n"
+# Tooltip: every labeled fan, PWM% + RPM
+tooltip="Fans (PWM% / RPM)"
+for i in 1 2 3 4 5 6 7 8; do
+	label=$(cat "$HWMON/fan${i}_label" 2>/dev/null) || continue
+	rpm=$(cat "$HWMON/fan${i}_input" 2>/dev/null)
+	pwm=$(cat "$HWMON/pwm${i}" 2>/dev/null)
+	[[ -z "$rpm" || -z "$pwm" ]] && continue
+	# Skip fans that are both idle and driven at 0 — empty headers report pwm=255 at 0 rpm,
+	# so filter on rpm=0 instead.
+	(( rpm == 0 )) && continue
+	pct=$(( pwm * 100 / 255 ))
+	tooltip+=$'\n'"$(printf '  %-14s %3d%%  (%d RPM)' "$label" "$pct" "$rpm")"
+done
 
-if [ -n "$fan0_info" ]; then
-	tooltip+="\n${fan0_name}:"
-	tooltip+="\n  Temperature:  ${fan0_temp}°C"
-	tooltip+="\n  Current:      ${fan0_current}%"
-	tooltip+="\n  Target:       ${fan0_target}%"
-	tooltip+="\n  Auto Control: ${fan0_auto}"
-fi
-
-if [ -n "$fan1_info" ]; then
-	tooltip+="\n\n${fan1_name}:"
-	tooltip+="\n  Temperature:  ${fan1_temp}°C"
-	tooltip+="\n  Current:      ${fan1_current}%"
-	tooltip+="\n  Target:       ${fan1_target}%"
-	tooltip+="\n  Auto Control: ${fan1_auto}"
-fi
-
-# Output JSON for waybar
-echo "{\"text\": \"$text_output\", \"tooltip\": \"$tooltip\"}"
+tooltip_json=${tooltip//$'\n'/\\n}
+printf '{"text": "%s", "tooltip": "%s"}\n' "$text" "$tooltip_json"

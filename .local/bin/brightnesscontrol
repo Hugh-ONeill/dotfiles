@@ -1,80 +1,102 @@
 #!/usr/bin/env bash
 
-# Check for required dependencies
-if ! command -v brightnessctl &>/dev/null; then
-  echo "Error: brightnessctl is not installed" >&2
-  notify-send "Brightness Control" "brightnessctl is not installed" -u critical 2>/dev/null
+if ! command -v ddcutil &>/dev/null; then
+  echo "Error: ddcutil is not installed" >&2
+  notify-send "Brightness Control" "ddcutil is not installed" -u critical 2>/dev/null
   exit 1
 fi
 
+RUN="${XDG_RUNTIME_DIR:-/tmp}"
+CACHE="$RUN/ddc-brightness"
+APPLIED="$CACHE.applied"
+EDIT_LOCK="$CACHE.edit.lock"
+WORKER_LOCK="$CACHE.worker.lock"
+DDC_OPTS=(--sleep-multiplier 0.1 --noverify)
+DEBOUNCE_MS=60
+
 print_usage() {
   cat <<EOF
-Usage: $(basename "${0}") <action> [step] 
+Usage: $(basename "${0}") <action> [step]
 
 Actions:
-    i    <i>ncrease brightness [+5%]
-    d    <d>ecrease brightness [-5%]
-
-Optional:
-    step  brightness change step [default: 5]
-
-
-Examples:
-    $(basename "${0}") i 10    # Increase brightness by 10%
-    $(basename "${0}") d       # Decrease brightness by default step (5%)
+    i    <i>ncrease brightness [default +5%]
+    d    <d>ecrease brightness [default -5%]
 EOF
   exit 1
 }
 
-send_notification() {
-  local delta=$1
-  brightness=$(brightnessctl info | grep -oP "(?<=\()\d+(?=%)")
-  brightness_level=$((brightness / 15 + 1))
-  ico="$HOME/.config/dunst/icons/brightness-${brightness_level:-4}.svg"
-  notify-send -a "brightnesscontrol.sh" -r 1 -t 800 -h int:value:"${brightness}" -i "${ico}" "Brightness" "${brightness} (${delta})"
+ddc_get() {
+  local out
+  out=$(ddcutil "${DDC_OPTS[@]}" getvcp 10 2>/dev/null) || return 1
+  [[ $out =~ current\ value\ =\ +([0-9]+) ]] && echo "${BASH_REMATCH[1]}"
 }
 
-get_brightness() {
-  brightnessctl -m | grep -o '[0-9]\+%' | head -c-2
+send_notification() {
+  local delta=$1 brightness=$2
+  local lvl=$((brightness / 15 + 1))
+  local ico="$HOME/.config/dunst/icons/brightness-${lvl:-4}.svg"
+  notify-send -a "brightnesscontrol" -r 1 -t 800 \
+    -h int:value:"${brightness}" -i "${ico}" "Brightness" "${brightness} (${delta})" &
+}
+
+worker() {
+  exec 200>"$WORKER_LOCK"
+  flock -n 200 || exit 0
+
+  while true; do
+    # Debounce: let bursts of scrolls accumulate into CACHE before we send DDC.
+    sleep "$(awk "BEGIN { print $DEBOUNCE_MS/1000 }")"
+    local target applied
+    target=$(cat "$CACHE" 2>/dev/null) || break
+    applied=$(cat "$APPLIED" 2>/dev/null || echo "")
+    [[ "$target" == "$applied" ]] && break
+    ddcutil "${DDC_OPTS[@]}" setvcp 10 "$target" >/dev/null 2>&1
+    echo "$target" > "$APPLIED"
+  done
 }
 
 step="${2:-5}"
-
 case $1 in
-i | -i)
-  brightness=$(get_brightness)
+  i | -i) op=i ;;
+  d | -d) op=d ;;
+  *)      print_usage ;;
+esac
 
-  if [[ $brightness -ge 100 ]]; then
-    # do nothing
-    delta="..."
+# Atomically bump CACHE (the target). Cheap, sub-ms.
+exec 201>"$EDIT_LOCK"
+flock 201
+
+current=$(cat "$CACHE" 2>/dev/null)
+if [[ -z "$current" ]]; then
+  current=$(ddc_get) || { echo "DDC unavailable" >&2; exit 1; }
+  echo "$current" > "$APPLIED"
+fi
+
+if [[ $op == i ]]; then
+  if (( current >= 100 )); then
+    new=100; delta="..."
   else
-    # increase the backlight by 1% if less than 10%
-    [ "${brightness}" -lt 10 ] && step=1
-
-    brightnessctl set "${step}"%+
+    new=$(( current + step )); (( new > 100 )) && new=100
     delta="+${step}%"
   fi
-
-  send_notification "$delta"
-  ;;
-d | -d)
-  brightness=$(get_brightness)
-
-  if [[ $brightness -le 1 ]]; then
-    # do nothing
-    delta="..."
+else
+  if (( current <= 0 )); then
+    new=0; delta="..."
   else
-    # decrease the backlight by 1% if less than 10%
-    [ "${brightness}" -le 10 ] && step=1
-
-    brightnessctl set "${step}"%-
-    # escape "-"
+    new=$(( current - step )); (( new < 0 )) && new=0
     delta="\-${step}%"
   fi
+fi
 
-  send_notification "$delta"
-  ;;
-*)
-  print_usage
-  ;;
-esac
+echo "$new" > "$CACHE"
+flock -u 201
+
+pkill -RTMIN+5 waybar 2>/dev/null
+send_notification "$delta" "$new"
+
+# Spawn a detached worker. If one is already running, it'll pick up our bump
+# and we exit fast; otherwise we become the worker.
+setsid -f bash -c "$(declare -f worker ddc_get); \
+  DDC_OPTS=(${DDC_OPTS[*]}); CACHE='$CACHE'; APPLIED='$APPLIED'; \
+  WORKER_LOCK='$WORKER_LOCK'; DEBOUNCE_MS=$DEBOUNCE_MS; worker" \
+  </dev/null >/dev/null 2>&1
