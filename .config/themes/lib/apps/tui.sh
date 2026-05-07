@@ -26,6 +26,7 @@ apply_sptlrx() {
     fi
 }
 apply_fastfetch()   { apply_simple "$1" "fastfetch.jsonc"  "fastfetch"; }
+apply_oterm()       { apply_simple "$1" "oterm-theme.json"  "oterm"; }
 
 apply_spotify_player() {
     local theme="$1"

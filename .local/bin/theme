@@ -112,6 +112,7 @@ cmd_set() {
     apply_sptlrx "$theme"
     apply_spotify_player "$theme"
     apply_claude "$theme"
+    apply_oterm "$theme"
     apply_nvim "$theme"
     apply_fastfetch "$theme"
     apply_cava "$theme"
