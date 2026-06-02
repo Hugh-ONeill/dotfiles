@@ -91,6 +91,17 @@ if command -v flatpak &>/dev/null && [[ -s "$here/flatpaks.txt" ]]; then
 fi
 
 # ============================================================
+# UDEV RULES (system)
+# ============================================================
+
+# Phone MTP auto-mount rule. The tracked copy hardcodes user wiz / uid 1000;
+# template it to the current account so a restore works under any username.
+sed -e "s/\bwiz\b/$USER/g" -e "s#/run/user/1000#/run/user/$(id -u)#g" \
+    "$here/etc/udev/rules.d/99-mtp-phone.rules" \
+    | sudo tee /etc/udev/rules.d/99-mtp-phone.rules >/dev/null
+sudo udevadm control --reload-rules
+
+# ============================================================
 # USER SYSTEMD SERVICES
 # ============================================================
 

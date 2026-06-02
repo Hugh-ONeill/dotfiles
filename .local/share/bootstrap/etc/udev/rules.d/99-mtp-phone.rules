@@ -1,0 +1,15 @@
+# Auto-mount/unmount Samsung Galaxy (MTP) for user wiz via jmtpfs systemd user service.
+# The phone only enumerates with this ID *after* it is unlocked and set to
+# "File Transfer" mode on the device, so this rule fires at exactly that moment.
+#
+# NOTE: the user name (wiz) and uid (1000) below are templated at install time by
+# 04-first-login.sh, so this tracked copy is just the canonical reference.
+
+# Plugged in (and in MTP mode) -> start the user mount service
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="04e8", ATTR{idProduct}=="6860", \
+  RUN+="/bin/su wiz -c 'XDG_RUNTIME_DIR=/run/user/1000 /usr/bin/systemctl --user --no-block start phone-mount.service'"
+
+# Unplugged -> stop the service (which unmounts ~/phone). Match on stored ENV since
+# attributes are gone once the device is removed.
+ACTION=="remove", SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="04e8", ENV{ID_MODEL_ID}=="6860", \
+  RUN+="/bin/su wiz -c 'XDG_RUNTIME_DIR=/run/user/1000 /usr/bin/systemctl --user --no-block stop phone-mount.service'"
