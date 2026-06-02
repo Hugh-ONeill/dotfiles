@@ -130,6 +130,12 @@ export THEME_NAME
 THEME_DESCRIPTION=$(jq -r '.description // ""' "$PALETTE_FILE")
 export THEME_DESCRIPTION="${THEME_DESCRIPTION:-$THEME_NAME theme}"
 
+# Cursor theme name from palette, defaulting to the <theme>-cursors convention.
+# Lets a palette point at an externally-installed cursor set whose name doesn't
+# match the theme (e.g. catppuccin -> catppuccin-mocha-dark-cursors).
+CURSOR_THEME=$(jq -r '.cursor // empty' "$PALETTE_FILE")
+export CURSOR_THEME="${CURSOR_THEME:-$THEME_NAME-cursors}"
+
 # Get MODULE_FG values for contrast calculation
 MODULE_FG="${COLORS[module_fg]}"
 MODULE_FG_LIGHT="${COLORS[module_fg_light]}"
@@ -193,7 +199,7 @@ else
 fi
 
 # Build list of variables to substitute
-VARS='$THEME_NAME $THEME_DESCRIPTION'
+VARS='$THEME_NAME $THEME_DESCRIPTION $CURSOR_THEME'
 
 # Add all color variables (uppercase versions)
 for key in "${!COLORS[@]}"; do
@@ -321,6 +327,15 @@ if [[ -x "$SCRIPT_DIR/build-kvantum-theme.sh" ]]; then
     "$SCRIPT_DIR/build-kvantum-theme.sh" "$THEME_NAME" >/dev/null 2>&1 \
         && echo "  -> kvantum theme (~/.config/Kvantum/$THEME_NAME/)" \
         || echo "  -> kvantum theme skipped (no base installed)"
+fi
+# Build the recolored cursor theme (-> ~/.local/share/icons/<theme>-cursors), unless
+# the palette pins an external cursor via .cursor. Only the build-cursors.sh path
+# (and bulk regenerate-all.sh) produced these before, so single-theme generates
+# silently shipped configs referencing a cursor theme that didn't exist.
+if [[ -z "$(jq -r '.cursor // empty' "$PALETTE_FILE")" && -x "$SCRIPT_DIR/build-cursors.sh" ]]; then
+    "$SCRIPT_DIR/build-cursors.sh" "$THEME_NAME" >/dev/null 2>&1 \
+        && echo "  -> cursor theme (~/.local/share/icons/$CURSOR_THEME/)" \
+        || echo "  -> cursor theme skipped (build failed)"
 fi
 
 echo "Done! Generated files in: $OUTPUT_DIR"
