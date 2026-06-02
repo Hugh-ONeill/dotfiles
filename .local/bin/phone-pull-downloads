@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# phone-pull-downloads — copy everything from the phone's Download folder to this machine.
+#
+# Mounts the phone via jmtpfs if needed, verifies the mount is actually live (MTP
+# sessions go stale silently), copies the Download folder's contents, and prints a
+# summary. Safe to re-run: already-copied files are skipped. Use -m to move instead
+# of copy (deletes from the phone only after a size-verified copy).
+#
+# Works on any machine/user — paths derive from $HOME, jmtpfs mounts as the caller.
+set -euo pipefail
+
+# ── config (override via env or flags) ─────────────────────────────────────────
+MOUNT="${PHONE_MOUNT:-$HOME/phone}"
+SRC_SUB="${PHONE_SRC:-Internal storage/Download}"
+DEST="${PHONE_DEST:-$HOME/Downloads/phone}"
+DO_UNMOUNT=0
+DO_MOVE=0
+
+usage() {
+  cat <<EOF
+Usage: ${0##*/} [-d DEST] [-u] [-m]
+  -d DEST   destination directory (default: $DEST)
+  -u        unmount the phone when finished
+  -m        MOVE: delete each file from the phone after its copy is size-verified
+  -h        this help
+Env overrides: PHONE_MOUNT (=$MOUNT), PHONE_SRC (="$SRC_SUB"), PHONE_DEST (=$DEST)
+EOF
+}
+
+while getopts ":d:umh" opt; do
+  case "$opt" in
+    d) DEST="$OPTARG" ;;
+    u) DO_UNMOUNT=1 ;;
+    m) DO_MOVE=1 ;;
+    h) usage; exit 0 ;;
+    *) usage >&2; exit 1 ;;
+  esac
+done
+
+SRC="$MOUNT/$SRC_SUB"
+
+# ── preflight ───────────────────────────────────────────────────────────────────
+command -v jmtpfs >/dev/null 2>&1 || {
+  echo "error: jmtpfs is not installed (e.g. 'paru -S jmtpfs')." >&2; exit 1; }
+
+is_mounted() { mountpoint -q "$MOUNT"; }
+mount_live() { ls "$SRC" >/dev/null 2>&1; }
+
+mkdir -p "$MOUNT"
+
+# Clear a stale mount (mounted but unreadable — phone slept / session died)
+if is_mounted && ! mount_live; then
+  echo "Phone mount is stale; remounting…"
+  fusermount -u "$MOUNT" 2>/dev/null || true
+fi
+
+# Mount if not already (the udev auto-mount service may have done it already)
+if ! is_mounted; then
+  echo "Mounting phone at $MOUNT …"
+  jmtpfs "$MOUNT" || {
+    echo "error: jmtpfs mount failed." >&2
+    echo "  Is the phone plugged in, unlocked, and set to 'File Transfer' mode?" >&2
+    exit 1; }
+fi
+
+# Confirm we can actually read the source folder
+if ! mount_live; then
+  echo "error: cannot read '$SRC'." >&2
+  echo "  - Unlock the phone and tap 'Allow access to phone data', then re-run." >&2
+  echo "  - If your downloads live elsewhere, set PHONE_SRC (current: '$SRC_SUB')." >&2
+  exit 1
+fi
+
+mkdir -p "$DEST"
+
+# ── copy ──────────────────────────────────────────────────────────────────────
+echo "Copying from:  $SRC"
+echo "          to:  $DEST"
+echo
+
+before=$(find "$DEST" -type f 2>/dev/null | wc -l)
+
+# cp is far more reliable than rsync over MTP. -n: never clobber (safe re-runs),
+# -r: recurse, -v: show each item as it lands.
+shopt -s dotglob nullglob
+for item in "$SRC"/*; do
+  name="$(basename "$item")"
+  if cp -rnv "$item" "$DEST/" >/dev/null 2>&1; then
+    echo "  + $name"
+  else
+    echo "  ! failed: $name" >&2
+  fi
+done
+shopt -u dotglob nullglob
+
+after=$(find "$DEST" -type f 2>/dev/null | wc -l)
+echo
+echo "Copied. Files in destination: $before -> $after  (new: $((after - before)))"
+
+# ── optional move: delete from phone only after verifying the copy by size ──────
+if [ "$DO_MOVE" -eq 1 ]; then
+  echo
+  echo "Verifying copies before removing originals from the phone…"
+  removed=0 kept=0
+  while IFS= read -r -d '' f; do
+    rel="${f#"$SRC"/}"
+    dst="$DEST/$rel"
+    if [ -f "$dst" ] && [ "$(stat -c%s "$f")" = "$(stat -c%s "$dst")" ]; then
+      rm -f "$f" && removed=$((removed + 1))
+    else
+      echo "  keep (unverified): $rel" >&2
+      kept=$((kept + 1))
+    fi
+  done < <(find "$SRC" -type f -print0)
+  # prune emptied directories on the phone
+  find "$SRC" -mindepth 1 -type d -empty -delete 2>/dev/null || true
+  echo "Removed $removed verified file(s) from phone; kept $kept unverified."
+fi
+
+# ── optional unmount ────────────────────────────────────────────────────────────
+if [ "$DO_UNMOUNT" -eq 1 ]; then
+  fusermount -u "$MOUNT" 2>/dev/null && echo "Unmounted $MOUNT."
+fi
