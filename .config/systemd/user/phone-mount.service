@@ -1,0 +1,16 @@
+[Unit]
+Description=Mount Android phone via jmtpfs (MTP)
+Documentation=man:jmtpfs(1)
+
+[Service]
+Type=forking
+# Make sure the mountpoint exists and clear any stale mount from a previous abrupt unplug
+ExecStartPre=-/usr/bin/mkdir -p %h/phone
+ExecStartPre=-/usr/bin/fusermount -u %h/phone
+# Give the phone time to show the "Allow access to phone data" grant before
+# jmtpfs claims the USB interface — avoids the udev race that leaves a dead session.
+ExecStartPre=/usr/bin/sleep 5
+ExecStart=/usr/bin/jmtpfs %h/phone
+ExecStop=-/usr/bin/fusermount -u %h/phone
+Restart=no
+TimeoutStartSec=30

@@ -108,3 +108,10 @@ alias colorscripts='find ~/.local/bin/ascii/color-scripts -type f | fzf --previe
   --bind="enter:execute(sh {})+abort"'
 alias rascii='find ~/.local/bin/ascii -maxdepth 1 -type f | shuf -n 1 | sh'
 alias rcolorscripts='find ~/.local/bin/ascii/color-scripts -type f | shuf -n 1 | sh'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Phone (MTP)
+# ══════════════════════════════════════════════════════════════════════════════
+
+alias phone='systemctl --user start phone-mount.service'      # mount   -> ~/phone
+alias phone-off='systemctl --user stop phone-mount.service'   # unmount ~/phone

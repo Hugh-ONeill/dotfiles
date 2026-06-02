@@ -541,3 +541,21 @@ tls() {
     --bind="enter:execute(trash-restore {+})" \
     --bind="ctrl-d:execute(trash-rm {+})+reload(trash-list)"
 }
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Phone (MTP)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Recover a stale/dead jmtpfs MTP session without unplugging: stop -> fresh start -> verify
+phone-remount() {
+  systemctl --user stop phone-mount.service
+  sleep 2
+  systemctl --user start phone-mount.service
+  sleep 6
+  if ls "$HOME/phone/Internal storage/" >/dev/null 2>&1; then
+    echo "~/phone is live."
+  else
+    echo "Still unreadable — unlock the phone + tap 'Allow access to phone data', then rerun." >&2
+    return 1
+  fi
+}
