@@ -3,7 +3,7 @@
 # Wallpaper setter with color extraction
 # Sets wallpaper via hyprpaper and extracts colors with palette-extract
 
-WALLPAPER_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Backgrounds"
+WALLPAPER_DIR="${XDG_PICTURES_DIR:-$HOME/Documents/Pictures}/Backgrounds"
 
 show_help() {
     echo "Usage: $(basename "$0") [options] [image]"
@@ -74,48 +74,25 @@ set_wallpaper() {
 
     echo "Setting wallpaper: $image"
 
-    # Determine which backend to use
-    # If awww-daemon is running, use awww (it handles both static and animated)
-    # Otherwise use hyprpaper for static images, awww for GIFs
-    local use_awww=false
+    # Backend: awww (handles static images and animated GIFs). awww owns the
+    # background layer, so make sure hyprpaper isn't also running.
+    pkill -x hyprpaper 2>/dev/null || true
 
-    if pgrep -x awww-daemon >/dev/null; then
-        use_awww=true
-    elif [[ "$image" == *.gif ]]; then
-        use_awww=true
+    if ! pgrep -x awww-daemon >/dev/null; then
+        awww-daemon >/dev/null 2>&1 &
+        for _ in $(seq 1 50); do
+            awww query >/dev/null 2>&1 && break
+            sleep 0.2
+        done
     fi
 
-    if [[ "$use_awww" == "true" ]]; then
-        # Ensure awww daemon is running
-        if ! pgrep -x awww-daemon >/dev/null; then
-            awww-daemon &
-            sleep 0.5
-        fi
-        # Kill hyprpaper if running to avoid conflicts
-        pkill -x hyprpaper 2>/dev/null || true
-
-        awww img "$image" --transition-type grow --transition-pos center
-    else
-        # Kill awww if running to avoid conflicts
-        pkill -x awww-daemon 2>/dev/null || true
-
-        # Set via hyprpaper
-        if ! hyprctl hyprpaper wallpaper ",$image"; then
-            echo "Warning: hyprctl hyprpaper command failed"
-        fi
-
-        # Update hyprpaper.conf for persistence
-        cat > "$HOME/.config/hypr/hyprpaper.conf" << EOF
-splash = false
-ipc = on
-
-wallpaper {
-    monitor =
-    path = $image
-    fit_mode = fill
-}
-EOF
+    if ! awww img "$image" --transition-type grow --transition-pos center; then
+        echo "Warning: awww img command failed"
     fi
+
+    # awww caches the last image for restore-on-restart; keep our own pointer
+    # too so wallpaper-init and the theme tool agree on the current wallpaper.
+    ln -sf "$image" "$HOME/.cache/current_wallpaper"
 
     # Extract colors and generate theme
     if [[ "$RUN_WAL" == "true" ]]; then

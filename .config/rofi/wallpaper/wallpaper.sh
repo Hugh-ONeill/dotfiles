@@ -3,7 +3,7 @@
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Rofi Wallpaper Picker
-# Requires: awww, hyprpaper, or swaybg
+# Requires: awww (awww-daemon)
 # ══════════════════════════════════════════════════════════════════════════════
 
 theme="$HOME/.config/rofi/wallpaper/style.rasi"
@@ -68,32 +68,24 @@ set_wallpaper() {
     local wallpaper="$1"
     local full_path="$wallpaper_dir/$wallpaper"
 
-    # Use awww for GIFs (animated support), otherwise try hyprpaper first
-    if [[ "$wallpaper" == *.gif ]]; then
-        # GIFs require awww for animation
-        if ! pgrep -x awww-daemon &>/dev/null; then
-            pkill hyprpaper 2>/dev/null
-            awww-daemon &
-            sleep 0.5
-        fi
-        awww img "$full_path" \
-            --transition-type grow \
-            --transition-pos center \
-            --transition-duration 1 \
-            --transition-fps 60
-    elif pgrep -x hyprpaper &>/dev/null; then
-        hyprctl hyprpaper wallpaper ",$full_path"
-    elif pgrep -x awww-daemon &>/dev/null; then
-        awww img "$full_path" \
-            --transition-type grow \
-            --transition-pos center \
-            --transition-duration 1 \
-            --transition-fps 60
-    elif command -v swaybg &>/dev/null; then
-        pkill swaybg
-        swaybg -i "$full_path" -m fill &
-    else
-        notify-send "Wallpaper" "No wallpaper daemon running" -u critical
+    # awww handles both static images and animated GIFs. It owns the background
+    # layer, so make sure hyprpaper isn't also running.
+    pkill -x hyprpaper 2>/dev/null
+
+    if ! pgrep -x awww-daemon &>/dev/null; then
+        awww-daemon &
+        for _ in $(seq 1 50); do
+            awww query &>/dev/null && break
+            sleep 0.2
+        done
+    fi
+
+    if ! awww img "$full_path" \
+        --transition-type grow \
+        --transition-pos center \
+        --transition-duration 1 \
+        --transition-fps 60; then
+        notify-send "Wallpaper" "awww failed to set wallpaper" -u critical 2>/dev/null
         return 1
     fi
 
