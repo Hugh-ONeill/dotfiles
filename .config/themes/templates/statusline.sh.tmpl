@@ -67,12 +67,16 @@ else
   context_percent=0
 fi
 
-# Format duration (convert ms to days/hours/minutes)
+# Format duration (convert ms to months/weeks/days/hours/minutes)
 duration_total_min=$((duration_ms / 60000))
-duration_days=$((duration_total_min / 1440))
+duration_months=$((duration_total_min / 43200))
+duration_weeks=$(( (duration_total_min % 43200) / 10080 ))
+duration_days=$(( (duration_total_min % 10080) / 1440 ))
 duration_hours=$(( (duration_total_min % 1440) / 60 ))
 duration_min=$((duration_total_min % 60))
 duration=""
+[ "$duration_months" -gt 0 ] && duration+="${duration_months}mo"
+[ "$duration_weeks" -gt 0 ] && duration+="${duration_weeks}w"
 [ "$duration_days" -gt 0 ] && duration+="${duration_days}d"
 [ "$duration_hours" -gt 0 ] && duration+="${duration_hours}h"
 duration+="${duration_min}m"

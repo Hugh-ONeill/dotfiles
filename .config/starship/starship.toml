@@ -141,7 +141,7 @@ style = "bg:g8"
 format = '[[ 󰏔 $output ](fg:g8_fg bg:g8)]($style)'
 
 [custom.uptime]
-command = "uptime -p | sed -E 's/^up //; s/ hours?/h/g; s/ minutes?/m/g; s/,//g; s/ //g'"
+command = "uptime -p | sed -E 's/^up //; s/ years?/y/g; s/ months?/mo/g; s/ weeks?/w/g; s/ days?/d/g; s/ hours?/h/g; s/ minutes?/m/g; s/,//g; s/ //g'"
 when = "true"
 symbol = "\uf017"
 style = "bg:g9"
