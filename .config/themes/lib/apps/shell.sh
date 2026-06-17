@@ -44,33 +44,15 @@ apply_bat() {
 
 apply_starship() {
     local theme="$1"
-    local palette_path="$2"
+    local src="$GENERATED_DIR/$theme/starship.toml"
 
-    [[ ! -f "$HOME/.config/starship/starship.toml" ]] && return
+    [[ ! -d "$HOME/.config/starship" ]] && return
 
-    local palette_name="$theme"
-    [[ "$theme" == "catppuccin" ]] && palette_name="catppuccin_mocha"
-
-    if grep -q "palettes.$palette_name" "$HOME/.config/starship/starship.toml"; then
-        sed -i "s|^palette = .*|palette = '$palette_name'|" "$HOME/.config/starship/starship.toml"
-
-        # Swap format based on theme style
-        local style_bar="rounded"
-        if [[ -n "$palette_path" ]]; then
-            style_bar=$(grep -oP '^export STYLE_BAR="\K[^"]+' "$palette_path" 2>/dev/null || echo "rounded")
-        fi
-        local json_palette="$PALETTES_DIR/$theme.json"
-        if [[ "$style_bar" == "rounded" && -f "$json_palette" ]]; then
-            local json_bar=$(jq -r '.style.bar // empty' "$json_palette" 2>/dev/null)
-            [[ -n "$json_bar" ]] && style_bar="$json_bar"
-        fi
-
-        [[ -x "$SCRIPTS_DIR/starship-format-swap" ]] && \
-            "$SCRIPTS_DIR/starship-format-swap" "$style_bar" >/dev/null 2>&1
-
+    if [[ -f "$src" ]]; then
+        cp "$src" "$HOME/.config/starship/starship.toml"
         report_ok "starship"
     else
-        report_skip "starship (palette not found)"
+        report_skip "starship (no generated config — run generate-theme.sh)"
     fi
 }
 

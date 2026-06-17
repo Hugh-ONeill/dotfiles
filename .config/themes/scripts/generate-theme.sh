@@ -338,4 +338,11 @@ if [[ -z "$(jq -r '.cursor // empty' "$PALETTE_FILE")" && -x "$SCRIPT_DIR/build-
         || echo "  -> cursor theme skipped (build failed)"
 fi
 
+# Assemble starship.toml (format block + base modules + all palette blocks)
+if [[ -x "$SCRIPT_DIR/build-starship.sh" ]]; then
+    "$SCRIPT_DIR/build-starship.sh" "$THEME_NAME" >/dev/null 2>&1 \
+        && echo "  -> starship.toml" \
+        || echo "  -> starship.toml skipped (build failed)"
+fi
+
 echo "Done! Generated files in: $OUTPUT_DIR"

@@ -1,0 +1,123 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+
+@@STARSHIP_FORMAT@@
+
+palette = '@@STARSHIP_PALETTE@@'
+
+[custom.dir_first]
+command = "~/.local/bin/directory-split first"
+when = "true"
+shell = ["bash", "--noprofile", "--norc"]
+style = "bg:g0"
+format = "[[$output ](fg:g0_fg bg:g0)]($style)"
+
+[custom.dir_second]
+command = "~/.local/bin/directory-split second"
+when = "true"
+shell = ["bash", "--noprofile", "--norc"]
+style = "bg:g1"
+format = "[[ $output ](fg:g1_fg bg:g1)]($style)"
+
+[jobs]
+symbol = "\uf0ae"
+style = "bg:g2"
+format = '[[ $symbol $number ](fg:g2_fg bg:g2)]($style)'
+
+[git_branch]
+symbol = "\ue0a0 "
+style = "bg:g3"
+format = "[[ $symbol$branch ](fg:g3_fg bg:g3)]($style)"
+
+[git_status]
+style = "bg:g3"
+format = '[[($all_status$ahead_behind )](fg:g3_fg bg:g3)]($style)'
+
+[cmd_duration]
+min_time = 500
+style = "bg:g4"
+format = '[[ 󱎫 $duration ](fg:g4_fg bg:g4)]($style)'
+
+[docker_context]
+symbol = "\uf308"
+style = "bg:g7"
+format = "[[ $symbol( $context) ](fg:g7_fg bg:g7)]($style)"
+
+[status]
+disabled = false
+symbol = "\u2718"
+success_symbol = ""
+style = "bg:g6"
+format = "[[ $symbol $status ](fg:g6_fg bg:g6)]($style)"
+
+[nodejs]
+symbol = "\ue718"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[c]
+symbol = "\ue61e"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[rust]
+symbol = "\ue7a8"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[golang]
+symbol = "\ue627"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[php]
+symbol = "\ue73d"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[java]
+symbol = "\ue738"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[kotlin]
+symbol = "\ue634"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[haskell]
+symbol = "\ue61f"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[python]
+symbol = "\ue73c"
+style = "bg:g5"
+format = "[[ $symbol( $version) ](fg:g5_fg bg:g5)]($style)"
+
+[custom.updates]
+command = "~/.local/bin/checkupdates-cached"
+when = "test -f ~/.cache/checkupdates-count && test $(cat ~/.cache/checkupdates-count) -gt 0"
+shell = ["bash", "--noprofile", "--norc"]
+style = "bg:g8"
+format = '[[ 󰏔 $output ](fg:g8_fg bg:g8)]($style)'
+
+[custom.uptime]
+command = "uptime -p | sed -E 's/^up //; s/ years?/y/g; s/ months?/mo/g; s/ weeks?/w/g; s/ days?/d/g; s/ hours?/h/g; s/ minutes?/m/g; s/,//g; s/ //g'"
+when = "true"
+symbol = "\uf017"
+style = "bg:g9"
+format = "[[ $symbol $output ](fg:g9_fg bg:g9)]($style)"
+
+[line_break]
+disabled = false
+
+[character]
+disabled = false
+success_symbol = '[❯](bold fg:sem_ok)'
+error_symbol = '[❯](bold fg:sem_err)'
+vimcmd_symbol = "[\U0000e62b](bold fg:sem_ok)"
+vimcmd_replace_one_symbol = "[\U0000e62b](bold fg:sem_warn)"
+vimcmd_replace_symbol = "[\U0000e62b](bold fg:sem_warn)"
+vimcmd_visual_symbol = "[\U0000e62b](bold fg:sem_info)"

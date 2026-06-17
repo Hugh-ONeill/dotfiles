@@ -67,8 +67,7 @@ for theme in "${themes[@]}"; do
     fi
 done
 
-# Update starship palettes
-./update-starship-palettes.sh > "$tmpdir/starship.log" 2>&1 && echo "  ✓ starship" || echo "  ✗ starship"
+# starship.toml is assembled per-theme by generate-theme.sh (build-starship.sh)
 
 # Build cursor themes (optional)
 if [[ "$BUILD_CURSORS" == true ]]; then
