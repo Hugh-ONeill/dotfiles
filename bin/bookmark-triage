@@ -1,0 +1,348 @@
+#!/usr/bin/env python3
+# Triage GitHub-repo bookmarks from Firefox: enrich each repo via the GitHub
+# API (through the `gh` CLI) and emit a markdown report flagging dead, archived,
+# and stale repos plus a per-folder ranking.
+# Usage: bookmark-triage [-o OUTPUT.md] [--profile NAME] [--json FILE]
+#                        [--stale-years N] [--quiet]
+
+import argparse
+import configparser
+import json
+import os
+import re
+import shutil
+import sqlite3
+import subprocess
+import sys
+import tempfile
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
+
+# ============================================================
+# CONFIG
+# ============================================================
+
+FIREFOX_DIR = os.path.expanduser("~/.mozilla/firefox")
+DEFAULT_OUTPUT = os.path.expanduser("~/bookmark-triage.md")
+BATCH_SIZE = 80                      # repos per GraphQL request
+NONREPO_OWNERS = {                   # github.com/<this>/... is not a repo
+    "orgs", "settings", "sponsors", "marketplace", "topics", "collections",
+    "features", "about", "pricing", "explore", "notifications", "search",
+    "trending", "apps",
+}
+
+GRAPHQL_FIELDS = """
+  nameWithOwner
+  description
+  stargazerCount
+  forkCount
+  isArchived
+  isFork
+  isDisabled
+  pushedAt
+  primaryLanguage { name }
+  licenseInfo { spdxId }
+"""
+
+
+def log(msg, quiet=False):
+    if not quiet:
+        print(msg, file=sys.stderr)
+
+
+# ============================================================
+# FIREFOX PROFILE
+# ============================================================
+
+def find_profile(name=None):
+    # Locate the places.sqlite for a Firefox profile. With no name, follow the
+    # default install's profile from profiles.ini; fall back to Default=1.
+    if name:
+        path = os.path.join(FIREFOX_DIR, name)
+        if not os.path.isdir(path):
+            sys.exit(f"profile not found: {path}")
+        return os.path.join(path, "places.sqlite")
+
+    ini = os.path.join(FIREFOX_DIR, "profiles.ini")
+    if not os.path.exists(ini):
+        sys.exit(f"no profiles.ini at {ini}")
+    cfg = configparser.ConfigParser()
+    cfg.read(ini)
+
+    rel = None
+    # ---- prefer the [InstallXXXX] default ----
+    for sec in cfg.sections():
+        if sec.startswith("Install") and cfg.has_option(sec, "Default"):
+            rel = cfg.get(sec, "Default")
+            break
+    # ---- else a [ProfileN] flagged Default=1 ----
+    if rel is None:
+        for sec in cfg.sections():
+            if cfg.has_option(sec, "Default") and cfg.get(sec, "Default") == "1":
+                rel = cfg.get(sec, "Path")
+                break
+    if rel is None:
+        sys.exit("could not determine default Firefox profile")
+
+    path = os.path.join(FIREFOX_DIR, rel, "places.sqlite")
+    if not os.path.exists(path):
+        sys.exit(f"places.sqlite not found at {path}")
+    return path
+
+
+# ============================================================
+# EXTRACT
+# ============================================================
+
+def normalize(url):
+    # github.com/<owner>/<repo>... -> "owner/repo", or None if not a repo URL.
+    m = re.match(r"https?://github\.com/([^/]+)/([^/#?]+)", url)
+    if not m:
+        return None
+    owner, name = m.group(1), re.sub(r"\.git$", "", m.group(2))
+    if owner.lower() in NONREPO_OWNERS:
+        return None
+    return f"{owner}/{name}"
+
+
+def extract(places_path, quiet=False):
+    # Copy the (possibly locked) db, then pull every GitHub repo bookmark with
+    # its folder. Returns (repo -> [instances], url -> count).
+    tmp = tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False).name
+    shutil.copy(places_path, tmp)
+    try:
+        con = sqlite3.connect(tmp)
+        rows = con.execute("""
+            SELECT p.url, b.title, par.title, b.dateAdded
+            FROM moz_bookmarks b
+            JOIN moz_places p   ON b.fk = p.id
+            JOIN moz_bookmarks par ON b.parent = par.id
+            WHERE b.type = 1 AND p.url GLOB 'http*://github.com/*/*'
+        """).fetchall()
+        con.close()
+    finally:
+        os.unlink(tmp)
+
+    repo_bm = defaultdict(list)
+    url_count = defaultdict(int)
+    repo_urls = defaultdict(set)
+    for url, title, folder, added in rows:
+        repo = normalize(url)
+        if not repo:
+            continue
+        repo_bm[repo].append({"folder": folder, "title": title, "added": added})
+        url_count[url] += 1
+        repo_urls[repo].add(url)
+    log(f"extracted {len(rows)} bookmarks -> {len(repo_bm)} unique repos", quiet)
+    return repo_bm, url_count, repo_urls
+
+
+# ============================================================
+# ENRICH
+# ============================================================
+
+def chunks(seq, n):
+    for i in range(0, len(seq), n):
+        yield seq[i:i + n]
+
+
+def enrich(repos, quiet=False):
+    # Batch repos through the GitHub GraphQL API via `gh`. Repos that fail to
+    # resolve (deleted/renamed/private) are marked {"status": "dead"}.
+    meta = {}
+    done = 0
+    for batch in chunks(repos, BATCH_SIZE):
+        aliases, parts = {}, []
+        for i, repo in enumerate(batch):
+            owner, name = repo.split("/", 1)
+            a = f"r{i}"
+            aliases[a] = repo
+            owner_e, name_e = owner.replace('"', '\\"'), name.replace('"', '\\"')
+            parts.append(f'{a}: repository(owner: "{owner_e}", name: "{name_e}") '
+                         f'{{{GRAPHQL_FIELDS}}}')
+        query = "query {\n" + "\n".join(parts) + "\n}"
+        res = subprocess.run(["gh", "api", "graphql", "-f", f"query={query}"],
+                             capture_output=True, text=True)
+        # gh exits non-zero if ANY node 404s, but still returns partial `data`.
+        data = {}
+        if res.stdout.strip():
+            try:
+                data = json.loads(res.stdout).get("data", {}) or {}
+            except json.JSONDecodeError:
+                log(f"  unparseable batch: {res.stderr[:160]}", quiet)
+        for a, repo in aliases.items():
+            node = data.get(a)
+            if node is None:
+                meta[repo] = {"status": "dead"}
+            else:
+                meta[repo] = {
+                    "status": "ok",
+                    "stars": node["stargazerCount"],
+                    "forks": node["forkCount"],
+                    "archived": node["isArchived"],
+                    "disabled": node["isDisabled"],
+                    "isFork": node["isFork"],
+                    "pushedAt": node.get("pushedAt"),
+                    "lang": (node.get("primaryLanguage") or {}).get("name"),
+                    "license": (node.get("licenseInfo") or {}).get("spdxId"),
+                    "description": node.get("description"),
+                }
+        done += len(batch)
+        log(f"  enriched {done}/{len(repos)}", quiet)
+    return meta
+
+
+# ============================================================
+# REPORT
+# ============================================================
+
+def render(repo_bm, url_count, repo_urls, meta, stale_years):
+    today = datetime.now(timezone.utc)
+    stale_before = (today - timedelta(days=365 * stale_years)).strftime("%Y-%m-%d")
+    today_s = today.strftime("%Y-%m-%d")
+
+    repos = list(meta)
+    ok = [r for r in repos if meta[r]["status"] == "ok"]
+    dead = [r for r in repos if meta[r]["status"] == "dead"]
+    archived = [r for r in ok if meta[r]["archived"]]
+    stale = [r for r in ok if not meta[r]["archived"]
+             and (meta[r]["pushedAt"] or "")[:10] < stale_before]
+    true_dupes = {u: c for u, c in url_count.items() if c > 1}
+    multipage = {r: us for r, us in repo_urls.items() if len(us) > 1}
+    total_bm = sum(len(v) for v in repo_bm.values())
+
+    def stars(r):
+        return meta[r].get("stars", 0)
+
+    def pushed(r):
+        return (meta[r].get("pushedAt") or "")[:10]
+
+    def line(r, flag=""):
+        m = meta[r]
+        desc = (m.get("description") or "").strip().replace("\n", " ")
+        if len(desc) > 90:
+            desc = desc[:87] + "..."
+        lang = m.get("lang") or "—"
+        tail = f" — {desc}" if desc else ""
+        return (f"- **[{r}](https://github.com/{r})** ★{m['stars']:,} · "
+                f"{lang} · pushed {pushed(r)}{tail}{flag}")
+
+    o = []
+    w = o.append
+    w("# GitHub Bookmark Triage")
+    w("")
+    w(f"_{total_bm} GitHub bookmarks -> {len(repos)} unique repos · generated {today_s}_")
+    w("")
+    w("## Summary")
+    w("")
+    w("| Metric | Count |")
+    w("|---|---|")
+    w(f"| Total GitHub bookmarks | {total_bm} |")
+    w(f"| Unique repos | {len(repos)} |")
+    w(f"| True duplicates (identical URL) | {len(true_dupes)} URLs, "
+      f"{sum(true_dupes.values()) - len(true_dupes)} extra |")
+    w(f"| Repos saved as multiple sub-pages | {len(multipage)} |")
+    w(f"| **Dead / renamed / private** (prune) | **{len(dead)}** |")
+    w(f"| Archived upstream | {len(archived)} |")
+    w(f"| Stale (no push since {stale_before}) | {len(stale)} |")
+    w(f"| Combined stars across collection | {sum(stars(r) for r in ok):,} |")
+    w("")
+
+    w(f"## ⚑ Prune candidates")
+    w("")
+    w(f"### Dead / renamed / deleted ({len(dead)})")
+    w("No longer resolve — deleted, renamed, or made private. Safe to remove.")
+    w("")
+    for r in sorted(dead):
+        folders = ", ".join(sorted({i["folder"] for i in repo_bm[r]}))
+        w(f"- `{r}` — in _{folders}_")
+    w("")
+    w(f"### Archived upstream ({len(archived)})")
+    w("Read-only now; keep for reference but no future updates.")
+    w("")
+    for r in sorted(archived, key=stars, reverse=True):
+        w(line(r))
+    w("")
+
+    w(f"## ⧉ True duplicates ({len(true_dupes)} URLs)")
+    w("Identical URL saved more than once — safe to dedupe.")
+    w("")
+    for u, c in sorted(true_dupes.items(), key=lambda kv: -kv[1]):
+        w(f"- `{u}` ×{c}")
+    w("")
+
+    w(f"## ⌥ Repos saved as many sub-pages ({len(multipage)})")
+    w("Distinct wiki/plugin/dir pages within one repo — consider consolidating.")
+    w("")
+    for r in sorted(multipage, key=lambda r: -len(multipage[r]))[:25]:
+        w(f"- `{r}` — {len(multipage[r])} distinct pages")
+    w("")
+
+    w("## Most-starred in your collection (top 30)")
+    w("")
+    for r in sorted(ok, key=stars, reverse=True)[:30]:
+        w(line(r))
+    w("")
+
+    w("## By folder")
+    w("")
+    folder_repos = defaultdict(set)
+    for r, insts in repo_bm.items():
+        for i in insts:
+            folder_repos[i["folder"]].add(r)
+    for folder in sorted(folder_repos, key=lambda f: -len(folder_repos[f])):
+        rs = [r for r in folder_repos[folder] if meta[r]["status"] == "ok"]
+        if not rs:
+            continue
+        nstale = sum(1 for r in rs if r in stale)
+        w(f"### {folder} ({len(folder_repos[folder])} repos · {nstale} stale)")
+        w("")
+        for r in sorted(rs, key=stars, reverse=True)[:8]:
+            flag = (" `STALE`" if r in stale
+                    else " `ARCHIVED`" if meta[r]["archived"] else "")
+            w(line(r, flag))
+        if len(rs) > 8:
+            w(f"- _...and {len(rs) - 8} more_")
+        w("")
+
+    return "\n".join(o)
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+def main():
+    ap = argparse.ArgumentParser(description="Triage GitHub-repo bookmarks from Firefox.")
+    ap.add_argument("-o", "--output", default=DEFAULT_OUTPUT,
+                    help=f"markdown output path (default: {DEFAULT_OUTPUT})")
+    ap.add_argument("--profile", help="Firefox profile dir name (default: auto-detect)")
+    ap.add_argument("--json", help="also dump enriched data to this JSON file")
+    ap.add_argument("--stale-years", type=int, default=2,
+                    help="flag repos with no push in N years (default: 2)")
+    ap.add_argument("--quiet", action="store_true", help="suppress progress output")
+    args = ap.parse_args()
+
+    if not shutil.which("gh"):
+        sys.exit("`gh` CLI not found - install it and run `gh auth login`")
+
+    places = find_profile(args.profile)
+    repo_bm, url_count, repo_urls = extract(places, args.quiet)
+    if not repo_bm:
+        sys.exit("no GitHub repo bookmarks found")
+    meta = enrich(sorted(repo_bm), args.quiet)
+
+    report = render(repo_bm, url_count, repo_urls, meta, args.stale_years)
+    with open(args.output, "w") as f:
+        f.write(report)
+    log(f"wrote {args.output}", args.quiet)
+
+    if args.json:
+        with open(args.json, "w") as f:
+            json.dump({"meta": meta,
+                       "bookmarks": {r: repo_bm[r] for r in repo_bm}}, f)
+        log(f"wrote {args.json}", args.quiet)
+
+
+if __name__ == "__main__":
+    main()
