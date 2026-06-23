@@ -3,6 +3,7 @@
 bindkey -v
 
 source "$ZDOTDIR/env.zsh"
+[[ -f "$ZDOTDIR/secrets.zsh" ]] && source "$ZDOTDIR/secrets.zsh"
 source "$ZDOTDIR/options.zsh"
 source "$ZDOTDIR/history.zsh"
 source "$ZDOTDIR/theme.zsh"
