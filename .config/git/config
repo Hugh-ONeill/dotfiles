@@ -24,3 +24,12 @@
 # Machine-specific config (user, credentials, etc.)
 [include]
 	path = config.local
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[user]
+	name = Hugh O'Neill
+	email = hugh.j.oneill.4@gmail.com
