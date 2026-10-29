@@ -41,6 +41,16 @@
             "statusMessage": "Checking TODO/DONE split..."
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/wiz/.claude/skills/hallmark/scripts/lint-hook.mjs\"",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },
