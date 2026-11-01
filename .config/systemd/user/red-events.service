@@ -1,0 +1,15 @@
+[Unit]
+Description=red-recomp event feed (journal + chain.log + party -> ~/.local/state/red-recomp/events.jsonl)
+Documentation=file://%h/Developer/red-recomp/tools/events.py
+
+[Service]
+# Read-only toward the run; idle-cheap when no chain is up, and it picks the
+# chain back up by itself after every relaunch (the journal is re-opened when
+# a restart replaces it), so it needs no hook in the chain scripts.
+ExecStart=/usr/bin/python3 -u %h/Developer/red-recomp/tools/events.py --follow
+Restart=on-failure
+RestartSec=5
+Nice=10
+
+[Install]
+WantedBy=default.target
