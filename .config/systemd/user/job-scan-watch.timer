@@ -1,0 +1,13 @@
+[Unit]
+Description=job-scan intraday watch, every two hours through the working day
+
+[Timer]
+# 10:00 .. 20:00. The 07:00 daily run covers the night (3-day LinkedIn and
+# 7-day freehire windows), so a watch missed during suspend is NOT replayed on
+# wake: Persistent=false. On the hour, clear of news-scan's :30 watches.
+OnCalendar=*-*-* 10..20/2:00:00
+Persistent=false
+Unit=job-scan-watch.service
+
+[Install]
+WantedBy=timers.target
