@@ -69,6 +69,6 @@ fi
 # 2. Either the target workspace exists OR the adjacent workspace exists (and has windows if going down)
 if [ "$target_ws" -ge "$min_ws" ] && [ "$target_ws" -le "$max_allowed" ]; then
     if [ -n "$target_exists" ] || [ -n "$adjacent_exists" ]; then
-        hyprctl dispatch workspace "$target_ws"
+        hyprctl dispatch "hl.dsp.focus({ workspace = $target_ws })"
     fi
 fi

@@ -64,7 +64,7 @@ case "$chosen" in
         ans=$(confirm_exit)
         if [[ "$ans" == "Yes" ]]; then
             case "$XDG_CURRENT_DESKTOP" in
-                Hyprland) hyprctl dispatch exit ;;
+                Hyprland) hyprctl dispatch 'hl.dsp.exit()' ;;
                 sway) swaymsg exit ;;
                 i3) i3-msg exit ;;
                 *) loginctl terminate-user "$USER" ;;
