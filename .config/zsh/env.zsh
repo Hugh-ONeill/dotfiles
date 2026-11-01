@@ -155,6 +155,7 @@ path=(
   "$ANDROID_HOME/platform-tools"
   "$ANDROID_HOME/emulator"
   $path
+  /opt/rocm/bin  # rocminfo, rocm-smi; /etc/profile.d/rocm.sh only reaches login shells
 )
 export PATH
 
