@@ -1,0 +1,16 @@
+[Unit]
+Description=news-scan intraday breakout watch
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Developer/news-scan
+# Short (~10 s fetch + a few LLM calls only for NEW breakout candidates), but
+# hold the inhibitor anyway so an idle-suspend can't cut a rundown in half.
+ExecStart=systemd-inhibit --what=sleep --mode=block --why="news-scan watch" %h/Developer/news-scan/.venv/bin/python -m news_scan watch
+Environment=DISPLAY=:0
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+TimeoutStartSec=20min
+StandardOutput=journal
+StandardError=journal

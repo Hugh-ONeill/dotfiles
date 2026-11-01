@@ -1,0 +1,14 @@
+[Unit]
+Description=Run news-scan daily, after job-scan
+
+[Timer]
+# job-scan fires at 07:00 with up to 5 min jitter. Firing at 07:06 means its
+# start job is already queued or running, so After=job-scan.service in the
+# unit (plus the wait loop in run.sh) orders us behind it and we inherit the
+# warm Gemma. Persistent=true catches up after suspend/poweroff.
+OnCalendar=*-*-* 07:06:00
+Persistent=true
+Unit=news-scan.service
+
+[Install]
+WantedBy=timers.target

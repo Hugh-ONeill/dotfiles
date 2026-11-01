@@ -1,0 +1,13 @@
+[Unit]
+Description=news-scan breakout watch, every two hours through the day
+
+[Timer]
+# 09:30 .. 23:30. The 07:06 morning run covers the night (its HN top-24h and
+# rising windows catch what peaked while the box slept), so a watch missed
+# during suspend is NOT replayed on wake: Persistent=false.
+OnCalendar=*-*-* 09..23/2:30:00
+Persistent=false
+Unit=news-scan-watch.service
+
+[Install]
+WantedBy=timers.target

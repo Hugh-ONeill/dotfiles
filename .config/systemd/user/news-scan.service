@@ -1,0 +1,18 @@
+[Unit]
+Description=Daily GitHub trending + HN scan against interests profile
+After=network-online.target job-scan.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Developer/news-scan
+# Hold a sleep inhibitor for the whole run: hypridle suspends after 30 min idle, which
+# would otherwise land mid-run and time out every in-flight request.
+ExecStart=systemd-inhibit --what=sleep --mode=block --why="news-scan daily run" %h/Developer/news-scan/run.sh
+# Make notify-send able to reach the user session
+Environment=DISPLAY=:0
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+# run.sh may wait up to 2 h for job-scan, then the scan itself.
+TimeoutStartSec=3h
+StandardOutput=journal
+StandardError=journal

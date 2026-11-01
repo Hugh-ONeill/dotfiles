@@ -1,0 +1,16 @@
+[Unit]
+Description=news-scan dashboard web server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Developer/news-scan
+ExecStart=%h/Developer/news-scan/serve.sh
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
