@@ -107,7 +107,12 @@ tooltip {
   padding-left: 8px;
 }
 
-/* General Left Arrow Styling */
+/* General Left Arrow Styling.
+   Both the module and its inner label: since waybar 0.15.0 custom modules
+   are a box with the #custom-<name> on the box and the glyph in a child
+   label, and the `*` font-size rule above matches that label directly, which
+   beats inheritance. Without the `label` selectors the endcaps render at
+   12px and no longer meet the module edges. */
 #custom-left-ws-workspaces,
 #custom-left-bar-fans,
 #custom-left-temp-gpu,
@@ -117,18 +122,35 @@ tooltip {
 #custom-left-audio-backlight,
 #custom-left-backlight-battery,
 #custom-left-fans-temp,
-#custom-left-ws-workspaces0 {
+#custom-left-ws-workspaces0,
+#custom-left-ws-workspaces label,
+#custom-left-bar-fans label,
+#custom-left-temp-gpu label,
+#custom-left-memory-cpu label,
+#custom-left-idle-center label,
+#custom-left-cava-audio label,
+#custom-left-audio-backlight label,
+#custom-left-backlight-battery label,
+#custom-left-fans-temp label,
+#custom-left-ws-workspaces0 label {
   font-size: 13pt;
 }
 
-/* General Right Arrow Styling */
+/* General Right Arrow Styling (see the note above) */
 #custom-right-workspaces-window,
 #custom-right-center-clock,
 #custom-right-time-date,
 #custom-right-date-pomodoro,
 #custom-right-wifi-end,
 #custom-right-pomodoro-bluetooth,
-#custom-right-bluetooth-wifi {
+#custom-right-bluetooth-wifi,
+#custom-right-workspaces-window label,
+#custom-right-center-clock label,
+#custom-right-time-date label,
+#custom-right-date-pomodoro label,
+#custom-right-wifi-end label,
+#custom-right-pomodoro-bluetooth label,
+#custom-right-bluetooth-wifi label {
   font-size: 13pt;
 }
 
