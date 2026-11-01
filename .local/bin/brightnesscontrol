@@ -14,6 +14,22 @@ WORKER_LOCK="$CACHE.worker.lock"
 DDC_OPTS=(--sleep-multiplier 0.1 --noverify)
 DEBOUNCE_MS=60
 
+# only talk to the i2c bus behind a connected monitor. probing every bus
+# (the r9700 alone owns seven) wakes the idle card and has been seen to drop
+# it off the pcie link.
+ddc_bus() {
+  local c a
+  for c in /sys/class/drm/card*-*; do
+    [[ -r $c/status && $(<"$c/status") == connected ]] || continue
+    # displayport: ddc/ci rides the aux channel, exposed as an i2c adapter under the connector
+    for a in "$c"/i2c-*; do
+      [[ -d $a ]] && { basename "$a" | sed "s/^i2c-//"; return 0; }
+    done
+    [[ -L $c/ddc ]] && { basename "$(readlink -f "$c/ddc")" | sed "s/^i2c-//"; return 0; }
+  done
+  return 1
+}
+
 print_usage() {
   cat <<EOF
 Usage: $(basename "${0}") <action> [step]
@@ -54,6 +70,9 @@ worker() {
     echo "$target" > "$APPLIED"
   done
 }
+
+bus=$(ddc_bus) || { echo "no connected monitor with a DDC bus" >&2; exit 1; }
+DDC_OPTS+=(--bus "$bus")
 
 step="${2:-5}"
 case $1 in

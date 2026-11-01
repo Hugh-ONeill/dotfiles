@@ -4,9 +4,26 @@ CACHE="${XDG_RUNTIME_DIR:-/tmp}/ddc-brightness"
 ICONS=(󱩎 󱩏 󱩐 󱩑 󱩒 󱩓 󱩔 󱩕 󱩖)
 DDC_OPTS=(--sleep-multiplier 0.1 --noverify)
 
+# only talk to the i2c bus behind a connected monitor. probing every bus
+# (the r9700 alone owns seven) wakes the idle card and has been seen to drop
+# it off the pcie link.
+ddc_bus() {
+  local c a
+  for c in /sys/class/drm/card*-*; do
+    [[ -r $c/status && $(<"$c/status") == connected ]] || continue
+    # displayport: ddc/ci rides the aux channel, exposed as an i2c adapter under the connector
+    for a in "$c"/i2c-*; do
+      [[ -d $a ]] && { basename "$a" | sed "s/^i2c-//"; return 0; }
+    done
+    [[ -L $c/ddc ]] && { basename "$(readlink -f "$c/ddc")" | sed "s/^i2c-//"; return 0; }
+  done
+  return 1
+}
+
 fetch_ddc() {
-  local out
-  out=$(ddcutil "${DDC_OPTS[@]}" getvcp 10 2>/dev/null) || return 1
+  local out bus
+  bus=$(ddc_bus) || return 1
+  out=$(ddcutil "${DDC_OPTS[@]}" --bus "$bus" getvcp 10 2>/dev/null) || return 1
   [[ $out =~ current\ value\ =\ +([0-9]+) ]] && echo "${BASH_REMATCH[1]}"
 }
 
