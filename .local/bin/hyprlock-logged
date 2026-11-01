@@ -13,27 +13,46 @@
 # We cannot fix the race from out here, but we can make it invisible: if
 # hyprlock dies abnormally while the session is still locked, bring it right
 # back. Needs misc:allow_session_lock_restore = true (set in general.conf).
+#
+# 2026-10-03: a hyprlock started 09-15 outlived its lock and spun on
+# "got poll event" TRACE lines for 18 days, filling the disk (20 TB apparent
+# in ~/.local/state/hyprlock.log). So: no --verbose (the assertion above
+# prints without it), output goes to journald (size-capped; read with
+# `journalctl --user -t hyprlock`), and a watchdog kills a hyprlock that is
+# still running after the session has been unlocked.
 
 set -u
-LOG="$HOME/.local/state/hyprlock.log"
 MAX_RESTARTS=10          # give up rather than spin forever
 MIN_HEALTHY_SECS=120     # a run this long counts as healthy; reset the counter
+ORPHAN_CHECK_SECS=30     # watchdog poll; 2 unlocked polls in a row = orphan
 
-log() { echo "===== $(date -Is) $* =====" >> "$LOG"; }
+log() { echo "===== $* =====" | systemd-cat -t hyprlock-logged; }
 
-rotate() {
-    [[ -f "$LOG" ]] || return 0
-    (( $(stat -c %s "$LOG" 2>/dev/null || echo 0) > 1048576 )) && mv -f "$LOG" "$LOG.1"
-    return 0
-}
+is_locked() { hyprctl locked 2>/dev/null | grep -q true; }
 
 attempts=0
 while :; do
-    rotate
     log "hyprlock starting (attempt $((attempts + 1)))"
     start=$SECONDS
 
-    hyprlock --verbose >> "$LOG" 2>&1
+    hyprlock > >(systemd-cat -t hyprlock) 2>&1 &
+    pid=$!
+
+    misses=0
+    while kill -0 "$pid" 2>/dev/null; do
+        sleep "$ORPHAN_CHECK_SECS"
+        if is_locked; then
+            misses=0
+        else
+            misses=$(( misses + 1 ))
+            if (( misses >= 2 )) && kill -0 "$pid" 2>/dev/null; then
+                log "session unlocked but hyprlock still running; killing orphan"
+                kill "$pid"
+                break
+            fi
+        fi
+    done
+    wait "$pid"
     rc=$?
     ran=$(( SECONDS - start ))
 
@@ -43,7 +62,7 @@ while :; do
     (( rc == 0 )) && break
 
     # Session no longer locked (someone unlocked another way). Done.
-    if ! hyprctl locked 2>/dev/null | grep -q true; then
+    if ! is_locked; then
         log "session no longer locked; not restarting"
         break
     fi
