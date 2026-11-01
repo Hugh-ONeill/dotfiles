@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Find pip-installed packages in the system Python (not owned by pacman).
+# These make pacman/paru fail with "exists in filesystem" when a package
+# later wants the same files. `pip-strays --fix` removes them and reinstalls
+# any pacman packages whose files pip overwrote.
+set -euo pipefail
+export LC_ALL=C
+
+site=$(python -c 'import sysconfig; print(sysconfig.get_path("purelib"))')
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+
+pacman -Ql | awk -v s="$site/" 'index($2, s) == 1 {print $2"\t"$1}' | sort > "$tmp/owned"
+
+strays=() clobbered=()
+for d in "$site"/*.dist-info; do
+  grep -q "^$d/"$'\t' "$tmp/owned" && continue
+  name=$(grep -m1 '^Name:' "$d/METADATA" | cut -d' ' -f2)
+  strays+=("$name")
+  [[ -f $d/RECORD ]] || continue
+  while read -r pkg; do clobbered+=("$pkg"); done < <(
+    cut -d, -f1 "$d/RECORD" | grep -v -e '\.dist-info/' -e '^\.\./' | sed "s|^|$site/|" |
+      sort | join -t$'\t' - "$tmp/owned" | cut -f2 | sort -u)
+done
+
+if (( ${#strays[@]} == 0 )); then
+  echo "✓ no pip-installed packages in $site"
+  exit 0
+fi
+
+mapfile -t clobbered < <(printf '%s\n' "${clobbered[@]}" | sort -u | grep .) || true
+echo "pip-installed in $site (${#strays[@]}):"
+printf '  %s\n' "${strays[@]}"
+if (( ${#clobbered[@]} )); then
+  echo "pacman packages with files overwritten by pip (${#clobbered[@]}):"
+  printf '  %s\n' "${clobbered[@]}"
+fi
+
+[[ ${1:-} == --fix ]] || { echo; echo "run 'pip-strays --fix' to remove them"; exit 1; }
+
+sudo PIP_REQUIRE_VIRTUALENV=false pip uninstall --break-system-packages -y "${strays[@]}"
+if (( ${#clobbered[@]} )); then
+  sudo pacman -S --noconfirm "${clobbered[@]}"
+fi
+echo "✓ done; rerun pip-strays to verify"
