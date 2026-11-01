@@ -1,11 +1,17 @@
 # Full replacement for /usr/lib/systemd/user/waybar.service.
-# The packaged unit has Requisite=graphical-session.target, and that target
-# never activates in this uwsm session, so it refuses to start. A drop-in can
-# override Restart= but could not reset the inherited Requisite=, so this
-# shadows the packaged unit entirely.
+# Bound to graphical-session.target: uwsm binds that target to
+# hyprland-session.target and exports WAYLAND_DISPLAY before activating it, so
+# waybar starts with the compositor and stops with it. It must NOT be wanted by
+# default.target: the user manager starts that seconds before Hyprland is up,
+# waybar then dies with "cannot open display" five times in three seconds and
+# trips its start limit, after which even the autostart restart is refused
+# (seen 2026-11-01, first 0.57 login).
 [Unit]
 Description=Waybar (supervised)
 Documentation=https://github.com/Alexays/Waybar/wiki/
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
 
 [Service]
 Type=simple
@@ -17,4 +23,4 @@ Restart=always
 RestartSec=1
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
