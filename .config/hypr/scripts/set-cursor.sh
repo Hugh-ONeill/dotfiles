@@ -1,12 +1,12 @@
 #!/bin/bash
 # Set cursor theme based on current theme
 
-COLORS_CONF="$HOME/.config/hypr/appearance/colors.conf"
+COLORS_LUA="$HOME/.config/hypr/appearance/colors.lua"
 
-if [[ -f "$COLORS_CONF" ]]; then
-    # Extract cursor_theme from colors.conf
-    cursor_theme=$(grep '^\$cursor_theme' "$COLORS_CONF" | sed 's/.*= *//')
-    cursor_size=$(grep '^\$cursor_size' "$COLORS_CONF" | sed 's/.*= *//' || echo "24")
+if [[ -f "$COLORS_LUA" ]]; then
+    # Extract cursor_theme / cursor_size from colors.lua (M.cursor_theme = "x")
+    cursor_theme=$(sed -n 's/^M\.cursor_theme *= *"\([^"]*\)".*/\1/p' "$COLORS_LUA")
+    cursor_size=$(sed -n 's/^M\.cursor_size *= *\([0-9]*\).*/\1/p' "$COLORS_LUA")
 
     if [[ -n "$cursor_theme" ]]; then
         size="${cursor_size:-24}"
@@ -40,8 +40,7 @@ if [[ -f "$COLORS_CONF" ]]; then
             done
         fi
 
-        # XWayland/Qt apps read XCURSOR_* from the env instead. Hyprland 0.56 has
-        # no runtime env setter (`hyprctl setenv` is not a request), so those are
-        # declared in environment/theme.conf where $cursor_theme is in scope.
+        # XWayland/Qt apps read XCURSOR_* from the env instead; those are set
+        # with hl.env() in environment/theme.lua from the same colors.lua.
     fi
 fi
