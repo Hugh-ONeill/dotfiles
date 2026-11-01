@@ -16,6 +16,7 @@
     ]
   },
   "model": "claude-fable-5-1",
+  "cleanupPeriodDays": 3650,
   "hooks": {
     "PreToolUse": [
       {
