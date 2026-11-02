@@ -36,19 +36,20 @@ monitor_asleep() {
 }
 
 read_value() {
-  local now age val
-  now=$(date +%s)
+  local val
+  # The cache is written by brightnesscontrol on every scroll and by the one
+  # DDC read below, so once it exists it is authoritative for this login.
+  # Measured 2026-11-01: the old 60s timed `ddcutil getvcp` poll was in flight
+  # at 3 of 3 DP link drops that day and at >=47 of 151 over the Sep 27-Nov 1
+  # boot (poll duty cycle <2%). Each drop recycles the wl_output global and
+  # kills Firefox, kitty, hyprlock. So: no timed polling. waybar runs this
+  # module with "interval": "once" plus signal 5; DDC is read at most once per
+  # login. Brightness changed on the monitor's own buttons will show stale.
   if [[ -f "$CACHE" ]]; then
-    age=$(( now - $(stat -c %Y "$CACHE") ))
     val=$(cat "$CACHE")
-    if [[ -n "$val" ]] && { (( age < 60 )) || monitor_asleep; }; then
-      echo "$val"
-      return
-    fi
+    [[ -n "$val" ]] && { echo "$val"; return; }
   fi
-  # Never probe a sleeping panel. DDC/CI traffic to a monitor in DPMS standby
-  # can drop the DP link; Hyprland then recycles the wl_output global and every
-  # client bound to it dies (hyprlock, waybar, awww, the portals).
+  # Never probe a sleeping panel either.
   monitor_asleep && return 1
   val=$(fetch_ddc) || return 1
   echo "$val" > "$CACHE"
