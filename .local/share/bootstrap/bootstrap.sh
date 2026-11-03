@@ -7,14 +7,16 @@
 # How to obtain this script on a fresh live ISO (chicken-and-egg, since it lives
 # inside the dotbare repo):
 #   pacman -Sy --noconfirm git
-#   git clone https://github.com/GrumpyRumpus/dotfiles.git /tmp/dots
+#   git clone https://github.com/Hugh-ONeill/dotfiles.git /tmp/dots
 #   /tmp/dots/.local/share/bootstrap/bootstrap.sh live
 
 set -euo pipefail
 here="$(dirname "$(readlink -f "$0")")"
 
-DOTBARE_REMOTE="${DOTBARE_REMOTE:-https://github.com/GrumpyRumpus/dotfiles.git}"
-DOTBARE_DIR="$HOME/.dotfiles"
+DOTBARE_REMOTE="${DOTBARE_REMOTE:-https://github.com/Hugh-ONeill/dotfiles.git}"
+# same location as ~/.config/zsh/.zshenv; reuse a legacy ~/.dotfiles if one exists
+DOTBARE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles"
+[[ ! -d "$DOTBARE_DIR" && -d "$HOME/.dotfiles" ]] && DOTBARE_DIR="$HOME/.dotfiles"
 gbare() { git --git-dir="$DOTBARE_DIR" --work-tree="$HOME" "$@"; }
 
 phase="${1:-}"

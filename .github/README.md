@@ -70,7 +70,7 @@ Managed via Dotbare
 
 ## Overview
 
-This repository uses Git's bare repository pattern to track dotfiles across the entire home directory without symlinks or complex tooling. Configuration files live in their native locations (`~/.config/...`) and are managed by a bare repo at `~/.dotfiles`.
+This repository uses Git's bare repository pattern to track dotfiles across the entire home directory without symlinks or complex tooling. Configuration files live in their native locations (`~/.config/...`) and are managed by a bare repo at `~/.local/share/dotfiles` (`$XDG_DATA_HOME/dotfiles`).
 
 On top of file tracking, a template-driven theme engine generates consistent color schemes, font settings, and UI styles for every configured application from a single palette definition.
 
@@ -109,7 +109,7 @@ On top of file tracking, a template-driven theme engine generates consistent col
 
 Each theme is defined by a single JSON palette. The generator reads it, resolves color references, calculates contrast foregrounds, and runs `envsubst` across 30+ templates to produce config files for every application. Running `theme set <name>` copies those files into place and signals each application to reload.
 
-The bare Git repo (`~/.dotfiles`) tracks all configuration files in-place — no symlink farms, no stow. Just `dotbare add` any file under `$HOME` and it's version controlled.
+The bare Git repo (`~/.local/share/dotfiles`) tracks all configuration files in-place — no symlink farms, no stow. Just `dotbare add` any file under `$HOME` and it's version controlled.
 
 ## Features
 
@@ -163,7 +163,7 @@ The bare Git repo (`~/.dotfiles`) tracks all configuration files in-place — no
 ### Clone the bare repository
 
 ```bash
-git clone --bare git@github.com:GrumpyRumpus/dotfiles.git ~/.dotfiles
+git clone --bare git@github.com:Hugh-ONeill/dotfiles.git ~/.local/share/dotfiles
 ```
 
 ### Set up the dotbare alias
@@ -171,7 +171,7 @@ git clone --bare git@github.com:GrumpyRumpus/dotfiles.git ~/.dotfiles
 Add to your shell config (`.bashrc` or `.zshrc`):
 
 ```bash
-alias dotbare='git --work-tree=$HOME --git-dir=$HOME/.dotfiles'
+alias dotbare='git --work-tree=$HOME --git-dir=$HOME/.local/share/dotfiles'
 ```
 
 ### Checkout tracked files
@@ -1110,7 +1110,7 @@ Plus 70+ additional ASCII art scripts and color palette demos.
 ## Repository Structure
 
 ```
-~/.dotfiles/                              # bare Git repository
+~/.local/share/dotfiles/                  # bare Git repository
 
 ~/.config/themes/                         # theme system
 ├── palettes/                             # 10 palette definitions (JSON)
