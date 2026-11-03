@@ -1,7 +1,10 @@
 # Full replacement for /usr/lib/systemd/user/waybar.service.
-# Bound to graphical-session.target: uwsm binds that target to
-# hyprland-session.target and exports WAYLAND_DISPLAY before activating it, so
-# waybar starts with the compositor and stops with it. It must NOT be wanted by
+# Bound to graphical-session.target, which comes up with the compositor on
+# either launch path: under uwsm, uwsm binds it to hyprland-session.target and
+# exports WAYLAND_DISPLAY first; with plain start-hyprland from a TTY (the
+# laptop's ~/.zprofile), Hyprland activates its own hyprland-session.target,
+# which BindsTo graphical-session.target. Either way waybar starts with the
+# compositor and stops with it. It must NOT be wanted by
 # default.target: the user manager starts that seconds before Hyprland is up,
 # waybar then dies with "cannot open display" five times in three seconds and
 # trips its start limit, after which even the autostart restart is refused

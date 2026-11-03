@@ -5,7 +5,12 @@
 -- reaches everything Hyprland itself spawns. Values are plain strings: no $VAR
 -- expansion, use os.getenv().
 
--- Aquamarine (multi-GPU)
+local host = require("lib.host")
+
+-- Aquamarine (multi-GPU), and the GPU split further down, differ per machine.
+-- The desktop path is the original; the laptop branch is in the else block.
+if host.desktop then
+
 -- Display/compositor runs on the AMD iGPU so the desktop survives discrete-GPU
 -- faults. Addressed by a stable alias because /dev/dri/cardN numbering is
 -- assigned at probe time and is not stable across boots or driver reloads.
@@ -42,6 +47,33 @@ hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 --   NVD_BACKEND                      nvidia-vaapi-driver only
 hl.env("LIBVA_DRIVER_NAME", "radeonsi")
 hl.env("VDPAU_DRIVER", "radeonsi")
+
+else
+
+-- Laptop: Intel UHD 630 (00:02.0) drives eDP-1 and goes first, the Quadro
+-- P2000 (01:00.0) second for the HDMI port. Resolved from by-path each start
+-- because cardN swaps between boots; falls back to the old fixed order.
+local igpu = host.drm_card("0000:00:02.0")
+local dgpu = host.drm_card("0000:01:00.0")
+if igpu and dgpu then
+    hl.env("AQ_DRM_DEVICES", igpu .. ":" .. dgpu)
+elseif igpu then
+    hl.env("AQ_DRM_DEVICES", igpu)
+else
+    hl.env("AQ_DRM_DEVICES", "/dev/dri/card2:/dev/dri/card1")
+end
+
+-- NVIDIA, carried over unchanged from the hyprlang env.conf
+hl.env("GBM_BACKEND", "nvidia-drm")
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+hl.env("__GL_GSYNC_ALLOWED", "1")
+hl.env("__GL_VRR_ALLOWED", "1")
+hl.env("LIBVA_DRIVER_NAME", "vdpau")
+hl.env("LIBVA_DRIVER", "nvidia")
+hl.env("VDPAU_DRIVER", "nvidia")
+hl.env("NVD_BACKEND", "direct")
+
+end
 
 -- Firefox
 hl.env("MOZ_ENABLE_WAYLAND", "1")

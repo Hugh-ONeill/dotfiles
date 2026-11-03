@@ -15,7 +15,7 @@
       "Bash(pacman -Qi *)"
     ]
   },
-  "model": "claude-fable-5-1",
+  "model": "opus",
   "cleanupPeriodDays": 3650,
   "hooks": {
     "PreToolUse": [
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/enforce-longrun-wrap.sh",
+            "command": "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/enforce-longrun-wrap.sh",
             "timeout": 10,
             "statusMessage": "Checking long-run wrap..."
           }
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/enforce-todo-done-split.sh",
+            "command": "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/enforce-todo-done-split.sh",
             "timeout": 10,
             "statusMessage": "Checking TODO/DONE split..."
           }
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/wiz/.claude/skills/hallmark/scripts/lint-hook.mjs\"",
+            "command": "node \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/hallmark/scripts/lint-hook.mjs\"",
             "timeout": 10
           }
         ]
@@ -57,7 +57,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline-current.sh"
+    "command": "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/statusline-current.sh"
   },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true,

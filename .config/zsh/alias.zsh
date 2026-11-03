@@ -12,6 +12,8 @@ alias e=$EDITOR
 # edit root-owned files as yourself; sudoedit writes the result back as root
 # (running nvim under sudo leaves root-owned files in ~/.local/share/nvim)
 alias svim='sudoedit'
+# nvidia-settings hardcodes ~/.nvidia-settings-rc otherwise
+alias nvidia-settings='nvidia-settings --config="$XDG_CONFIG_HOME/nvidia/settings"'
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Listing (eza)

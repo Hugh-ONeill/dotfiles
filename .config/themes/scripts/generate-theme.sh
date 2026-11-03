@@ -362,10 +362,10 @@ if [[ -d "$STYLUS_TMPL" ]]; then
 fi
 
 # Build GTK + Kvantum themes (idempotent; required for apply step to find them
-# at ~/.themes/<theme>/ and ~/.config/Kvantum/<theme>/)
+# at $XDG_DATA_HOME/themes/<theme>/ and ~/.config/Kvantum/<theme>/)
 if [[ -x "$SCRIPT_DIR/build-gtk-theme.sh" ]]; then
     "$SCRIPT_DIR/build-gtk-theme.sh" "$THEME_NAME" >/dev/null 2>&1 \
-        && echo "  -> gtk theme (~/.themes/$THEME_NAME/)" \
+        && echo "  -> gtk theme ($XDG_DATA_HOME/themes/$THEME_NAME/)" \
         || echo "  -> gtk theme skipped (no base installed)"
 fi
 if [[ -x "$SCRIPT_DIR/build-kvantum-theme.sh" ]]; then
