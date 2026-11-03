@@ -166,7 +166,6 @@ Documents/
 Downloads/
 Games/
 gpu-watch/
-bookmark-triage-output/
 watch_[0-9]*
 # These have their own repos (legacy and XDG locations).
 .dotfiles/

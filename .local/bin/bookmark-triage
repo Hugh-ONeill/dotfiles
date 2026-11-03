@@ -42,7 +42,11 @@ FIREFOX_DIRS = [
     os.path.expanduser("~/.mozilla/firefox"),
     os.path.join(_XDG_CONFIG, "mozilla", "firefox"),
 ]
-DEFAULT_OUTPUT = os.path.expanduser("~/bookmark-triage.md")
+# Every report and undo file goes here, not loose in ~.
+OUT_DIR = os.path.join(
+    os.environ.get("XDG_DOCUMENTS_DIR", os.path.expanduser("~/Documents")), "bookmark-triage")
+os.makedirs(OUT_DIR, exist_ok=True)
+DEFAULT_OUTPUT = os.path.join(OUT_DIR, "bookmark-triage.md")
 BATCH_SIZE = 80                      # repos per GraphQL request
 LINK_WORKERS = 24                    # global concurrent HTTP checks
 PER_DOMAIN = 3                       # max concurrent checks against one host
@@ -1039,7 +1043,7 @@ def apply_organize(places_path, plan, quiet):
         con.commit()
     finally:
         con.close()
-    undo_path = os.path.expanduser("~/bookmark-triage-organize-undo.json")
+    undo_path = os.path.join(OUT_DIR, "bookmark-triage-organize-undo.json")
     with open(undo_path, "w") as f:
         json.dump(undo, f)
     log(f"  moved {len(plan['moves'])} bookmark(s); undo map -> {undo_path}", quiet)
@@ -1077,8 +1081,8 @@ def run_organize(places_path, gh_meta, do_apply, quiet, report_path,
 # excluded — they're artifacts of the unauthenticated health check, and
 # applying them would replace good bookmarks with login pages.
 
-REDIRECTS_JSON = os.path.expanduser("~/bookmark-triage-redirects.json")
-REDIRECTS_UNDO = os.path.expanduser("~/bookmark-triage-redirects-undo.json")
+REDIRECTS_JSON = os.path.join(OUT_DIR, "bookmark-triage-redirects.json")
+REDIRECTS_UNDO = os.path.join(OUT_DIR, "bookmark-triage-redirects-undo.json")
 
 # Mozilla golden-ratio rolling string hash (mfbt/HashFunctions.h).
 _GR32 = 0x9E3779B9
@@ -1310,8 +1314,8 @@ def run_redirects(places_path, pairs, do_apply, quiet, report_path):
 # integrate/superseded/toy/reference; apply sweeps them into Should Integrate/<v>.
 
 TOOL_FOLDERS = {"CLI", "TUI", "GUI", "Utilities", "Applications"}
-AUDIT_JSON = os.path.expanduser("~/bookmark-triage-audit.json")
-AUDIT_UNDO = os.path.expanduser("~/bookmark-triage-audit-undo.json")
+AUDIT_JSON = os.path.join(OUT_DIR, "bookmark-triage-audit.json")
+AUDIT_UNDO = os.path.join(OUT_DIR, "bookmark-triage-audit-undo.json")
 VERDICT_SUBFOLDER = {
     "integrate": "Worth Integrating", "superseded": "Superseded",
     "toy": "Toys", "reference": "Reference & Plugins", "?": "Review",
