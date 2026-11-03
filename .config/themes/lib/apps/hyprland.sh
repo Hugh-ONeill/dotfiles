@@ -1,7 +1,7 @@
 #!/bin/bash
 # Hyprland theme handler
 
-# Re-export the cursor vars from the freshly applied colors.conf.
+# Re-export the cursor vars from the freshly applied colors.lua.
 #
 # Anything the theme script spawns (waybar) is a child of that script, so it
 # inherits the invoking SHELL's environment -- not the compositor's. Hyprland's
@@ -9,12 +9,12 @@
 # this waybar comes back carrying whatever cursor theme the terminal was
 # started with, and the cursor changes as you move onto the bar.
 export_cursor_env() {
-    local colors="$HOME/.config/hypr/appearance/colors.conf"
+    local colors="$HOME/.config/hypr/appearance/colors.lua"
     [[ -f "$colors" ]] || return 0
 
     local ctheme csize
-    ctheme=$(grep '^\$cursor_theme' "$colors" | sed 's/.*= *//')
-    csize=$(grep '^\$cursor_size' "$colors" | sed 's/.*= *//')
+    ctheme=$(sed -n 's/^M\.cursor_theme *= *"\([^"]*\)".*/\1/p' "$colors")
+    csize=$(sed -n 's/^M\.cursor_size *= *\([0-9]*\).*/\1/p' "$colors")
     [[ -n "$ctheme" ]] || return 0
 
     export XCURSOR_THEME="$ctheme"  HYPRCURSOR_THEME="$ctheme"
@@ -23,23 +23,16 @@ export_cursor_env() {
 
 apply_hyprland() {
     local theme="$1"
-    if copy_to_current "$theme" "hypr-colors.conf"; then
+    if copy_to_current "$theme" "hypr-colors.lua"; then
+        # The reload re-runs the Lua config; a theme that declares M.hyprbars
+        # loads the plugin from there, and one that doesn't drops it again, so
+        # no plugin load/unload is needed here.
         hyprctl reload &>/dev/null || true
         # Set cursor theme
         if [[ -x "$HOME/.config/hypr/scripts/set-cursor.sh" ]]; then
             "$HOME/.config/hypr/scripts/set-cursor.sh" &>/dev/null
         fi
         report_ok "hyprland"
-
-        # Toggle hyprbars plugin based on decoration style
-        local json_palette="$PALETTES_DIR/$theme.json"
-        local decoration=$(jq -r '.style.decoration // "none"' "$json_palette" 2>/dev/null)
-        local hyprbars_so="/var/cache/hyprpm/wiz/hyprland-plugins/hyprbars.so"
-        if [[ "$decoration" == "hyprbars" && -f "$hyprbars_so" ]]; then
-            hyprctl plugin load "$hyprbars_so" &>/dev/null
-        else
-            hyprctl plugin unload "$hyprbars_so" &>/dev/null
-        fi
     else
         report_skip "hyprland (no theme file)"
     fi

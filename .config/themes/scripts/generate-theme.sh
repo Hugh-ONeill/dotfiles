@@ -212,17 +212,18 @@ for i in "${!GRADIENT[@]}"; do
     export "GRADIENT_FG_${i}_RGB=$(hex_to_rgb "$fg_color")"
 done
 
-# Build hyprland active border value from style.border flag
+# Build hyprland active border value from style.border flag, as a Lua value
+# for hypr-colors.lua: a gradient table or a single color string.
 STYLE_BORDER=$(jq -r '.style.border // "solid"' "$PALETTE_FILE")
 if [[ "$STYLE_BORDER" == "gradient" ]]; then
     border_parts=()
     for i in $(seq 0 9); do
         nohash_var="GRADIENT_${i}_NOHASH"
-        border_parts+=("rgb(${!nohash_var})")
+        border_parts+=("\"rgb(${!nohash_var})\"")
     done
-    export HYPR_ACTIVE_BORDER="${border_parts[*]} 45deg"
+    export HYPR_ACTIVE_BORDER="{ colors = { $(IFS=,; echo "${border_parts[*]}" | sed 's/,/, /g') }, angle = 45 }"
 else
-    export HYPR_ACTIVE_BORDER="rgba(${ACCENT_NOHASH}FF)"
+    export HYPR_ACTIVE_BORDER="\"rgba(${ACCENT_NOHASH}FF)\""
 fi
 
 # Build list of variables to substitute
@@ -273,8 +274,8 @@ for template in "$TEMPLATES_DIR"/*.tmpl; do
             # the template later is simply absent here -- and Hyprland only
             # complains at apply time, per missing variable. Flag the drift.
             missing=$(comm -23 \
-                <(grep -oP '^\$\K[a-zA-Z_0-9]+(?=\s*=)' "$template" 2>/dev/null | sort -u) \
-                <(grep -oP '^\$\K[a-zA-Z_0-9]+(?=\s*=)' "$override" 2>/dev/null | sort -u))
+                <(grep -oP '^(?:\$|M\.)\K[a-zA-Z_0-9]+(?=\s*=)' "$template" 2>/dev/null | sort -u) \
+                <(grep -oP '^(?:\$|M\.)\K[a-zA-Z_0-9]+(?=\s*=)' "$override" 2>/dev/null | sort -u))
             if [[ -n "$missing" ]]; then
                 echo "     WARNING: $filename override is missing $(echo "$missing" | wc -l) var(s) the template defines: $(echo $missing | tr '\n' ' ')" >&2
             fi
@@ -288,28 +289,35 @@ for template in "$TEMPLATES_DIR"/*.tmpl; do
     fi
 done
 
-# Append hyprbars plugin config if decoration style requests it (skip if override already includes it)
-if [[ "$STYLE_DECORATION" == "hyprbars" ]] && ! grep -q "hyprbars" "$OUTPUT_DIR/hypr-colors.conf" 2>/dev/null; then
-    cat >> "$OUTPUT_DIR/hypr-colors.conf" <<EOF
+# Append hyprbars plugin config if decoration style requests it (skip if override
+# already includes it). hypr-colors.lua is a Lua module, so the block goes in
+# before its final `return M`.
+HYPR_LUA="$OUTPUT_DIR/hypr-colors.lua"
+if [[ "$STYLE_DECORATION" == "hyprbars" ]] && ! grep -q "hyprbars" "$HYPR_LUA" 2>/dev/null; then
+    sed -i '/^return M$/d' "$HYPR_LUA"
+    cat >> "$HYPR_LUA" <<EOF
 
-# Hyprbars (window title bars)
-plugin {
-    hyprbars {
-        bar_height = 18
-        bar_color = rgb(${ACCENT_NOHASH})
-        bar_text_size = 11
-        bar_text_font = ${FONT_FAMILY}
-        col.text = rgb(ffffff)
-        bar_part_of_window = true
-        bar_precedence_over_border = true
-
-        hyprbars-button = rgb(c0c0c0), 13, 󰖭, hyprctl dispatch killactive
-        hyprbars-button = rgb(c0c0c0), 13, 󰖯, hyprctl dispatch fullscreen 1
-        hyprbars-button = rgb(c0c0c0), 13, 󰖰, hyprctl dispatch movetospecialnamed minimize
-    }
+-- Hyprbars (window title bars)
+M.hyprbars = {
+    config = {
+        bar_height                 = 18,
+        bar_color                  = "rgb(${ACCENT_NOHASH})",
+        bar_text_size              = 11,
+        bar_text_font              = "${FONT_FAMILY}",
+        col                        = { text = "rgb(ffffff)" },
+        bar_part_of_window         = true,
+        bar_precedence_over_border = true,
+    },
+    buttons = {
+        { bg_color = "rgb(c0c0c0)", fg_color = "rgb(ffffff)", size = 13, icon = "󰖭", action = "hyprctl dispatch 'hl.dsp.window.close()'" },
+        { bg_color = "rgb(c0c0c0)", fg_color = "rgb(ffffff)", size = 13, icon = "󰖯", action = [[hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "maximized" })']] },
+        { bg_color = "rgb(c0c0c0)", fg_color = "rgb(ffffff)", size = 13, icon = "󰖰", action = [[hyprctl dispatch 'hl.dsp.window.move({ workspace = "special:minimize", follow = false })']] },
+    },
 }
+
+return M
 EOF
-    echo "  -> hypr-colors.conf (+ hyprbars)"
+    echo "  -> hypr-colors.lua (+ hyprbars)"
 fi
 
 # Generate fsh theme (fast-syntax-highlighting)

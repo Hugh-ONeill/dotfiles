@@ -1,0 +1,124 @@
+-- ${THEME_NAME} palette for Hyprland.
+-- GENERATED from ~/.config/themes/templates/hypr-colors.lua.tmpl (or the
+-- theme's hypr-colors.lua.override) -- edit those, not this file.
+--
+-- Pure data: environment/theme.lua applies it. Colors are Hyprland color
+-- strings ("rgb(hex)" / "rgba(hexAA)"); the *Alpha fields are the bare hex
+-- for building an rgba() with a custom alpha. Optional blocks a theme may
+-- add: M.window_rules (list of hl.window_rule specs) and M.hyprbars
+-- ({ config = <plugin options>, buttons = <add_button specs> }).
+local M = {}
+
+M.name = "${THEME_NAME}"
+
+-- Semantic colors (primary palette)
+M.sem_ok        = "rgb(${SEM_OK_NOHASH})"
+M.sem_warn      = "rgb(${SEM_WARN_NOHASH})"
+M.sem_err       = "rgb(${SEM_ERR_NOHASH})"
+M.sem_info      = "rgb(${SEM_INFO_NOHASH})"
+M.sem_border    = "rgb(${SEM_BORDER_NOHASH})"
+M.sem_selection = "rgb(${SEM_SELECTION_NOHASH})"
+
+-- Accent colors
+M.accent                  = "rgb(${ACCENT_NOHASH})"
+M.accentAlpha             = "${ACCENT_NOHASH}"
+M.accent_secondary        = "rgb(${ACCENT_SECONDARY_NOHASH})"
+M.accent_tertiary         = "rgb(${ACCENT_TERTIARY_NOHASH})"
+M.accent_bright           = "rgb(${ACCENT_BRIGHT_NOHASH})"
+M.accent_secondary_bright = "rgb(${ACCENT_SECONDARY_BRIGHT_NOHASH})"
+M.accent_tertiary_bright  = "rgb(${ACCENT_TERTIARY_BRIGHT_NOHASH})"
+
+-- Text colors
+M.text          = "rgb(${TEXT_NOHASH})"
+M.textAlpha     = "${TEXT_NOHASH}"
+M.subtext1      = "rgb(${SUBTEXT1_NOHASH})"
+M.subtext1Alpha = "${SUBTEXT1_NOHASH}"
+M.subtext0      = "rgb(${SUBTEXT0_NOHASH})"
+M.subtext0Alpha = "${SUBTEXT0_NOHASH}"
+
+-- Surface colors
+M.overlay2      = "rgb(${OVERLAY2_NOHASH})"
+M.overlay2Alpha = "${OVERLAY2_NOHASH}"
+M.overlay1      = "rgb(${OVERLAY1_NOHASH})"
+M.overlay1Alpha = "${OVERLAY1_NOHASH}"
+M.overlay0      = "rgb(${OVERLAY0_NOHASH})"
+M.overlay0Alpha = "${OVERLAY0_NOHASH}"
+M.surface2      = "rgb(${SURFACE2_NOHASH})"
+M.surface2Alpha = "${SURFACE2_NOHASH}"
+M.surface1      = "rgb(${SURFACE1_NOHASH})"
+M.surface1Alpha = "${SURFACE1_NOHASH}"
+M.surface0      = "rgb(${SURFACE0_NOHASH})"
+M.surface0Alpha = "${SURFACE0_NOHASH}"
+M.base          = "rgb(${BASE_NOHASH})"
+M.baseAlpha     = "${BASE_NOHASH}"
+M.mantle        = "rgb(${MANTLE_NOHASH})"
+M.mantleAlpha   = "${MANTLE_NOHASH}"
+M.crust         = "rgb(${CRUST_NOHASH})"
+M.crustAlpha    = "${CRUST_NOHASH}"
+M.bpp1          = "rgb(${BASE_NOHASH})"
+M.bpp1Alpha     = "${BASE_NOHASH}"
+
+-- Gradient colors (for varied UI elements)
+M.g0 = "rgb(${GRADIENT_0_NOHASH})"
+M.g1 = "rgb(${GRADIENT_1_NOHASH})"
+M.g2 = "rgb(${GRADIENT_2_NOHASH})"
+M.g3 = "rgb(${GRADIENT_3_NOHASH})"
+M.g4 = "rgb(${GRADIENT_4_NOHASH})"
+M.g5 = "rgb(${GRADIENT_5_NOHASH})"
+M.g6 = "rgb(${GRADIENT_6_NOHASH})"
+M.g7 = "rgb(${GRADIENT_7_NOHASH})"
+M.g8 = "rgb(${GRADIENT_8_NOHASH})"
+M.g9 = "rgb(${GRADIENT_9_NOHASH})"
+
+-- Cursor theme
+M.cursor_theme = "${CURSOR_THEME}"
+M.cursor_size  = 24
+
+-- Style variables -- Win98
+M.theme_rounding         = ${STYLE_CORNER_RADIUS}
+M.theme_border_size      = 4
+M.theme_gaps_in          = ${STYLE_GAPS_IN}
+M.theme_gaps_out         = ${STYLE_GAPS_OUT}
+M.theme_active_border    = { colors = { "rgb(${BASE_NOHASH})", "rgb(${BASE_NOHASH})", "rgb(${OVERLAY2_NOHASH})", "rgb(${OVERLAY2_NOHASH})" }, angle = 25 }
+M.theme_inactive_border  = { colors = { "rgb(${MANTLE_NOHASH})", "rgb(${MANTLE_NOHASH})", "rgb(${OVERLAY0_NOHASH})", "rgb(${OVERLAY0_NOHASH})" }, angle = 25 }
+M.theme_active_opacity   = 1.0
+M.theme_inactive_opacity = 1.0
+M.theme_dim_inactive     = false
+M.theme_dim_strength     = 0.0
+M.theme_blur_enabled     = false
+M.theme_blur_size        = 1
+M.theme_blur_passes      = 1
+M.theme_shadow_enabled   = false
+M.theme_screen_shader    = "~/.config/hypr/shaders/crt.frag"
+M.theme_add_borders      = 0
+M.theme_bpp_border_size_1 = 0
+M.theme_bpp_border_size_2 = 0
+
+-- Win9x: float all windows by default, half-screen size
+M.window_rules = {
+    { name = "win9x-float-all", match = { class = ".*" }, float = true, size = "960 540", center = true, suppress_event = "maximize" },
+}
+
+-- Hyprbars plugin (Windows 9x title bars). environment/theme.lua loads the
+-- plugin, applies `config` and adds the `buttons` (right to left).
+M.hyprbars = {
+    config = {
+        bar_height                 = 22,
+        bar_color                  = "rgb(${MANTLE_NOHASH})",
+        bar_text_size              = 12,
+        bar_text_font              = "Tahoma, Sans",
+        col                        = { text = "rgb(${TEXT_NOHASH})" },
+        bar_text_align             = "left",
+        bar_part_of_window         = true,
+        bar_precedence_over_border = true,
+        bar_padding                = 4,
+    },
+    -- Win98-style buttons (gray with dark icons): close, maximize, minimize
+    buttons = {
+        { bg_color = "rgb(${SURFACE0_NOHASH})", fg_color = "rgb(${TEXT_NOHASH})", size = 14, icon = "󰖭", action = "hyprctl dispatch 'hl.dsp.window.close()'" },
+        { bg_color = "rgb(${SURFACE0_NOHASH})", fg_color = "rgb(${TEXT_NOHASH})", size = 14, icon = "󰁌", action = [[hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "maximized" })']] },
+        { bg_color = "rgb(${SURFACE0_NOHASH})", fg_color = "rgb(${TEXT_NOHASH})", size = 14, icon = "󰖰", action = [[hyprctl dispatch 'hl.dsp.window.move({ workspace = "special", follow = false })']] },
+    },
+}
+
+return M

@@ -9,7 +9,7 @@ eval "$(hyprctl monitors -j | jq -r '.[] | select(.focused) |
   "MON_X=\(.x) MON_Y=\(.y) MON_W=\(.width) MON_H=\(.height) RSV_TOP=\(.reserved[1]) RSV_BOT=\(.reserved[3])"')"
 
 # Get decoration sizes (only query plugins that are loaded)
-PLUGINS=$(hyprctl plugins list)
+PLUGINS=$(hyprctl plugin list)
 BAR_H=0
 BORDER=$(hyprctl getoption general:border_size -j | jq '.int')
 
@@ -50,5 +50,8 @@ case "$direction" in
   *) exit 1 ;;
 esac
 
-hyprctl dispatch movewindowpixel "exact ${WIN_X} ${WIN_Y},activewindow"
-hyprctl dispatch resizewindowpixel "exact ${WIN_W} ${WIN_H},activewindow"
+# hyprctl dispatch takes a Lua dispatcher expression (0.57+); x/y are absolute
+# unless relative = true. Resize first: a floating resize grows around the
+# window's center, so moving afterwards is what pins the top-left corner.
+hyprctl dispatch "hl.dsp.window.resize({ x = ${WIN_W}, y = ${WIN_H} })"
+hyprctl dispatch "hl.dsp.window.move({ x = ${WIN_X}, y = ${WIN_Y} })"
