@@ -162,7 +162,7 @@ if [[ "$DO_STALE_XDG" == "1" ]]; then
   # Archived first anyway, because it is key material. 96 KB.
   hdr "B5. stale ~/.gnupg (archive, then remove)"
   if [[ -d "$H/.gnupg" ]]; then
-    run tar czf "$H/Documents/gnupg-stale-20260728.tar.gz" -C "$H" .gnupg
+    run tar czf "$H/Documents/archive/gnupg-stale-20260728.tar.gz" -C "$H" .gnupg
     zap "$H/.gnupg"
   fi
 fi
