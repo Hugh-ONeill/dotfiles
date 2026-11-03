@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PostToolUse(Edit|MultiEdit) hook: enforce the TODO/DONE split.
-# ~/TODO.md holds OPEN items only; a completed block MOVES to ~/DONE.md under
+# ~/Documents/TODO.md holds OPEN items only; a completed block MOVES to DONE.md under
 # the mirrored heading. Ticking an item done (- [x]) IN PLACE in TODO.md is the
 # mistake this catches. Fires only when an edit INCREASES the [x] count, so
 # pre-existing done items (e.g. the caster section) and edits that REMOVE
@@ -29,7 +29,7 @@ oldc=$(count "$oldtext")
 newc=$(count "$newtext")
 
 if [ "$newc" -gt "$oldc" ]; then
-  echo "TODO/DONE split: this edit added a completed-item tick (- [x]) to ~/TODO.md, which holds OPEN items only. MOVE the finished block to ~/DONE.md under the mirrored heading and REMOVE it from TODO.md, rather than ticking it in place. (Inline ~~strikethrough~~ roadmap markers and pre-existing [x] items are fine — this only fires on a net-new tick.)" >&2
+  echo "TODO/DONE split: this edit added a completed-item tick (- [x]) to ~/Documents/TODO.md, which holds OPEN items only. MOVE the finished block to ~/Documents/DONE.md under the mirrored heading and REMOVE it from TODO.md, rather than ticking it in place. (Inline ~~strikethrough~~ roadmap markers and pre-existing [x] items are fine — this only fires on a net-new tick.)" >&2
   exit 2
 fi
 exit 0

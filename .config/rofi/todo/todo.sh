@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # vim:ft=bash
 # ══════════════════════════════════════════════════════════════════════════════
-# Rofi Todo Manager  —  front-end for ~/TODO.md (single source of truth)
+# Rofi Todo Manager  —  front-end for ~/Documents/TODO.md (single source of truth)
 #
-# Lists every open item from ~/TODO.md as its own entry. Actions run through
-# todo.py, which edits ~/TODO.md / ~/DONE.md and commits to ~/.todo.git.
-#   Done   → moves the item's whole block to ~/DONE.md (mirrored section)
+# Lists every open item from ~/Documents/TODO.md as its own entry. Actions run through
+# todo.py, which edits ~/Documents/TODO.md / DONE.md and commits to ~/.local/share/todo.git.
+#   Done   → moves the item's whole block to DONE.md (mirrored section)
 #   Delete → removes the block
-#   Open   → opens ~/TODO.md at the item's line for full context
+#   Open   → opens TODO.md at the item's line for full context
 #   Add    → appends a new item under ## Inbox
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -16,7 +16,7 @@ PY="python3 $DIR/todo.py"
 ROFI="rofi -dmenu -i -p Todo -theme ${DIR}/style.rasi"
 EDITOR_CMD="${EDITOR:-nvim}"
 TERMINAL="${TERMINAL:-kitty}"
-TODO_MD="$HOME/TODO.md"
+TODO_MD="$(python3 "$DIR/todo.py" path 2>/dev/null || echo "$HOME/Documents/TODO.md")"
 
 open_at() {                          # open TODO.md at a given line, detached
     local line="$1"

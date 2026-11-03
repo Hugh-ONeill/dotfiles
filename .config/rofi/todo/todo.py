@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Backend for the rofi todo module — operates directly on ~/TODO.md.
+"""Backend for the rofi todo module — operates directly on ~/Documents/TODO.md.
 
-The single source of truth is ~/TODO.md (open items only, checkbox + section
-style); ~/DONE.md is the completed-item archive with mirrored headings. Every
-mutation is committed to the local-only bare repo ~/.todo.git so it is
+The single source of truth is ~/Documents/TODO.md (open items only, checkbox + section
+style); ~/Documents/DONE.md is the completed-item archive with mirrored headings. Every
+mutation is committed to the local-only bare repo ~/.local/share/todo.git so it is
 recoverable and never touches the public dotfiles.
 
 Commands:
@@ -12,6 +12,7 @@ Commands:
   done "<display>"     move the item's whole block to DONE.md (mirrored section)
   delete "<display>"   remove the item's whole block
   line "<display>"     print the TODO.md line number of the item (for the editor)
+  path                 print the resolved TODO.md path (for the editor)
 
 An item is matched by the exact "<section> · <title>" string that `list` emits,
 so selection round-trips without fragile line-number passing.
@@ -26,9 +27,20 @@ from datetime import date
 from pathlib import Path
 
 HOME = Path.home()
-TODO = Path(os.environ.get("TODO_FILE", HOME / "TODO.md"))
-DONE = Path(os.environ.get("DONE_FILE", HOME / "DONE.md"))
-GIT_DIR = os.environ.get("TODO_GIT_DIR", str(HOME / ".todo.git"))
+DOCS = Path(os.environ.get("XDG_DOCUMENTS_DIR", HOME / "Documents"))
+DATA = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local" / "share"))
+
+
+def _pick(env, new, legacy):
+    """Env override, else the XDG path, else the legacy ~ path if only it exists."""
+    if env in os.environ:
+        return Path(os.environ[env])
+    return legacy if not new.exists() and legacy.exists() else new
+
+
+TODO = _pick("TODO_FILE", DOCS / "TODO.md", HOME / "TODO.md")
+DONE = _pick("DONE_FILE", DOCS / "DONE.md", HOME / "DONE.md")
+GIT_DIR = str(_pick("TODO_GIT_DIR", DATA / "todo.git", HOME / ".todo.git"))
 
 OPEN_RE = re.compile(r"^- \[[ ~]\] ")           # top-level open item
 BULLET_RE = re.compile(r"^- ")                    # any top-level bullet (block boundary)
@@ -269,6 +281,7 @@ def main(argv):
         "add": lambda: cmd_add(arg),
         "done": lambda: cmd_done(arg),
         "delete": lambda: cmd_delete(arg),
+        "path": lambda: print(TODO),
     }.get(cmd, cmd_list)()
 
 
