@@ -8,6 +8,36 @@
 
 @import "theme.css";
 
+/* Endcap glyph size, on the inner label of EVERY separator module.
+   Since waybar 0.15.0 a custom module is a box carrying #custom-<name> with
+   the text in a child label; the `*` font-size rule above matches that label
+   directly, which beats the font-size inherited from the id rules below.
+   Without this the half-circles render at 12px and stop meeting the module
+   edges. List generated from the custom/left* and custom/right* modules in
+   config.jsonc; add new separators here too. */
+#custom-left-audio-backlight label,
+#custom-left-backlight-battery label,
+#custom-left-bar-fans label,
+#custom-left-cava-audio label,
+#custom-left-fans-temp label,
+#custom-left-gpu-memory label,
+#custom-left-idle-center label,
+#custom-left-memory-cpu label,
+#custom-left-temp-gpu label,
+#custom-left-ws-workspaces label,
+#custom-leftin-battery-power label,
+#custom-leftin-cpu-idle label,
+#custom-right-bluetooth-wifi label,
+#custom-right-center-clock label,
+#custom-right-date-pomodoro label,
+#custom-right-pomodoro-bluetooth label,
+#custom-right-time-date label,
+#custom-right-wifi-end label,
+#custom-right-workspaces-window label,
+#custom-rightin-clock-time label {
+  font-size: 13pt;
+}
+
 /* Main Background */
 window#waybar {
   background: @main-bg;
@@ -117,7 +147,8 @@ tooltip {
 #custom-left-audio-backlight,
 #custom-left-backlight-battery,
 #custom-left-fans-temp,
-#custom-left-ws-workspaces0 {
+#custom-left-ws-workspaces0,
+#custom-left-ws-workspaces0 label {
   font-size: 13pt;
 }
 
@@ -128,7 +159,8 @@ tooltip {
 #custom-right-date-pomodoro,
 #custom-right-wifi-end,
 #custom-right-pomodoro-bluetooth,
-#custom-right-bluetooth-wifi {
+#custom-right-bluetooth-wifi,
+#custom-right-bluetooth-wifi label {
   font-size: 13pt;
 }
 
