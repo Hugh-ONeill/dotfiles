@@ -217,7 +217,7 @@ fi
 case "$TARGET" in
     gtk)
         if $IS_LIGHT; then BASE_THEME_NAME="catppuccin-latte"; else BASE_THEME_NAME="catppuccin-mocha"; fi
-        OUTPUT_DIR="$HOME/.themes"
+        OUTPUT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/themes"
         BASE_THEME=$(gtk_find_base "$BASE_THEME_NAME")
         [[ -z "$BASE_THEME" ]] && { echo "Error: No catppuccin GTK base theme found. Install catppuccin-gtk first."; exit 1; }
         ;;

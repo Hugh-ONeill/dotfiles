@@ -92,7 +92,7 @@ if [[ "$DO_CACHES" == "1" ]]; then
   # Leftover build temp from the AIRI packaging job on 2026-07-12.
   # AIRI is installed; these are throwaway extract dirs.
   hdr "A2. stale Claude job temp (7.8 GB)"
-  zap "$H/.claude/jobs/b1f0eac6/tmp"
+  zap "${CLAUDE_CONFIG_DIR:-$H/.claude}/jobs/b1f0eac6/tmp"
 
   hdr "A3. language / tool caches (~19 GB)"
   # `uv cache clean` and `pip cache purge` do the same thing; rm avoids

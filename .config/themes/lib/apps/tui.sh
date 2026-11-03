@@ -70,7 +70,7 @@ apply_claude() {
     local theme="$1"
     if copy_to_current "$theme" "statusline.sh"; then
         # Update claude's statusline symlink to point to current theme
-        ln -sf "$CURRENT_DIR/statusline.sh" "$HOME/.claude/statusline-current.sh"
+        ln -sf "$CURRENT_DIR/statusline.sh" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/statusline-current.sh"
         report_ok "claude"
     else
         report_skip "claude (no theme file)"
