@@ -299,7 +299,7 @@ fbm() {
 }
 
 fnotes() {
-  local NOTES_DIR="${NOTES_DIR:-$HOME/Documents/notes}"
+  local NOTES_DIR="${NOTES_DIR:-$HOME/Documents/Notes}"
   local file
   file=$(fd -tf -e md . "$NOTES_DIR" 2>/dev/null | fzf \
     --preview="bat --color=always {}" \
