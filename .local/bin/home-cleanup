@@ -274,10 +274,7 @@ if [[ "$DO_TIDY" == "1" ]]; then
   # so the home copy is a leftover staging file.
   zap "$H/iwd-ordering.conf"
 
-  # Referenced by your Claude memory as ~/gemma-writing-setup.md.
-  # If you move it, say so and the memory pointer gets updated too.
-  echo "  [note] ~/gemma-writing-setup.md left in place (memory references this path)."
-  # run mv "$H/gemma-writing-setup.md" "$H/Documents/gemma-writing-setup.md"
+  # gemma-writing-setup.md moved to ~/Documents/ on 2026-11-03 (memory updated).
 
   # Empty XDG stubs. Desktop is kept -- some apps expect it to exist.
   for d in Public Templates Projects; do
