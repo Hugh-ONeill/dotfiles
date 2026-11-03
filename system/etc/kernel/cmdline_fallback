@@ -1,0 +1,1 @@
+root=PARTUUID=7de6fd77-36e0-45b7-98e0-a11cbf516e34 zswap.enabled=0 rootflags=subvol=@ rw rootfstype=btrfs amdgpu.runpm=0 pcie_aspm=off efi_pstore.pstore_disable=0 drm.edid_firmware=DP-5:edid/va2719-2k.bin video=DP-5:e plymouth.enable=0

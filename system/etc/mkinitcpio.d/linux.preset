@@ -1,0 +1,19 @@
+# mkinitcpio preset for 'linux' (UKIs for systemd-boot), modeled on the laptop's.
+#
+# default:  everything in mkinitcpio.conf except fsck (a no-op on btrfs). Unlike
+#           the laptop, base and kms stay: this box uses the busybox udev hooks
+#           and loads amdgpu (plus the DP-5 EDID) through the kms hook.
+# fallback: no plymouth and no autodetect, so it carries every module and boots
+#           with visible messages; its own cmdline drops quiet/splash. Rebuilt on
+#           every kernel update, so it never goes stale again (the old one was
+#           last built 2026-06-26).
+
+ALL_kver="/boot/vmlinuz-linux"
+
+PRESETS=('default' 'fallback')
+
+default_uki="/boot/EFI/Linux/arch-linux.efi"
+default_options="-S fsck"
+
+fallback_uki="/boot/EFI/Linux/arch-linux-fallback.efi"
+fallback_options="-S plymouth,autodetect --cmdline /etc/kernel/cmdline_fallback"

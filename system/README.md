@@ -11,9 +11,24 @@ system/install.sh --diff    # what differs from /etc (no root needed)
 sudo system/install.sh      # install, reload sysctls, re-exec systemd
 ```
 
-No reboot required for anything currently here.
+The sysctl and watchdog files apply without a reboot. The boot files below are
+baked into the UKIs: `install.sh` rebuilds both images when they change, and
+they take effect on the next boot.
 
 ## What's in it
+
+### `etc/kernel/cmdline`, `etc/kernel/cmdline_fallback`, `etc/mkinitcpio.d/linux.preset`
+
+Boot setup, modeled on the laptop's (2026-11-03). The default UKI boots quietly
+into the catppuccin-mocha Plymouth splash (`splash` plus the laptop's quiet-boot
+flags; the systemd-boot Arch splash bitmap is dropped so it doesn't flash first).
+The fallback UKI is rebuilt on every kernel update (`PRESETS` used to list only
+`default`, so it had not been rebuilt since 2026-06-26). It skips `plymouth` and
+`autodetect` and boots with its own cmdline, so it carries every module and
+prints messages. Both cmdlines keep this box's workarounds (`amdgpu.runpm=0`,
+`pcie_aspm=off`, the DP-5 EDID override). The loader timeout lives in
+`/boot/loader/loader.conf` (not `/etc`), so it is set by hand: `timeout 0`, hold
+Space at boot for the menu.
 
 ### `etc/systemd/system.conf.d/watchdog.conf`
 

@@ -31,11 +31,23 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+rebuild_uki=0
 while IFS= read -r -d '' f; do
     rel="${f#"$SRC"/}"
+    if ! cmp -s "$f" "/etc/$rel"; then
+        case "$rel" in kernel/*|mkinitcpio.d/*|mkinitcpio.conf*) rebuild_uki=1 ;; esac
+    fi
     install -Dm644 "$f" "/etc/$rel"
     echo "installed /etc/$rel"
 done < <(find "$SRC" -type f -print0)
+
+# The kernel cmdline and the presets are baked into the UKIs, so a change to
+# either only takes effect once both images are rebuilt.
+if ((rebuild_uki)); then
+    echo
+    echo "boot config changed: rebuilding the default and fallback UKIs"
+    mkinitcpio -P
+fi
 
 sysctl --system >/dev/null
 systemctl daemon-reexec
