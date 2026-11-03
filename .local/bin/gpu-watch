@@ -3,7 +3,7 @@
 # One CSV row per interval, fsynced immediately so the final row survives a hard lockup.
 set -uo pipefail
 
-LOG="${GPU_WATCH_LOG:-$HOME/gpu-watch/gpu-watch.csv}"
+LOG="${GPU_WATCH_LOG:-${XDG_STATE_HOME:-$HOME/.local/state}/gpu-watch/gpu-watch.csv}"
 INTERVAL="${GPU_WATCH_INTERVAL:-5}"
 PCI="${GPU_WATCH_PCI:-0000:01:00.0}"
 MAXBYTES=$((50 * 1024 * 1024))
