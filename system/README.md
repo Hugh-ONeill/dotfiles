@@ -17,6 +17,12 @@ they take effect on the next boot.
 
 ## What's in it
 
+### `etc/sddm.conf.d/theme.conf`
+
+Login screen theme, `catppuccin-mocha-lavender` from the official Catppuccin SDDM
+package (`paru -S catppuccin-sddm-theme-mocha`, which must be installed first).
+Applies at the next SDDM start (logout or reboot).
+
 ### `etc/kernel/cmdline`, `etc/kernel/cmdline_fallback`, `etc/mkinitcpio.d/linux.preset`
 
 Boot setup, modeled on the laptop's (2026-11-03). The default UKI boots quietly
