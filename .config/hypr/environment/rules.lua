@@ -47,6 +47,9 @@ rule("size:save-as",   { title = "^(Save As).*" },   { size = "800 600" })
 -- System dialogs
 float_classes({ "^(polkit-.*)", "^(pavucontrol)$", "^(pwvucontrol)$", "^(hyprpwcenter)$", "^(nm-connection-editor)$", "^(blueman-manager)$", "^(file-roller)$" })
 
+-- Password prompts: pinentry (gpg, and sudo via ~/.local/bin/sudo-askpass)
+rule("pinentry", { class = "^(pinentry-.*)$" }, { float = true, center = true })
+
 -- Image/media viewers
 float_classes({ "^(imv)$", "^(mpv)$", "^(qView)$" })
 

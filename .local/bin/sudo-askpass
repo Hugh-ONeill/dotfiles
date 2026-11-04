@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+# Graphical sudo password prompt: hyprtoolkit dialog (sudo-askpass-hypr), pinentry-gtk as fallback; used whenever sudo has no terminal
+# Usage: export SUDO_ASKPASS=~/.local/bin/sudo-askpass   (sudo runs it with the prompt as $1, reads the password from stdout)
+
+import os
+import subprocess
+import sys
+from urllib.parse import quote, unquote
+
+PINENTRY = "pinentry-gtk"
+
+
+def esc(text):
+    """Assuan percent-escaping for SETDESC/SETPROMPT arguments."""
+    return quote(text, safe=" !\"#$&'()*+,-./:;<=>?@[\\]^_`{|}~")
+
+
+def sudo_command():
+    """The command line sudo was asked to run (sudo is our parent)."""
+    try:
+        with open(f"/proc/{os.getppid()}/cmdline", "rb") as f:
+            args = f.read().rstrip(b"\0").split(b"\0")
+    except OSError:
+        return ""
+    return " ".join(a.decode(errors="replace") for a in args)
+
+
+def hypr_dialog(prompt):
+    """hyprtoolkit dialog (looks like hyprpolkitagent); None if it could not run."""
+    binary = os.path.expanduser("~/.local/bin/sudo-askpass-hypr")
+    if not (os.environ.get("WAYLAND_DISPLAY") and os.access(binary, os.X_OK)):
+        return None
+    try:
+        res = subprocess.run([binary, prompt], stdout=subprocess.PIPE, timeout=300)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if res.returncode == 0:
+        sys.stdout.buffer.write(res.stdout)
+        sys.exit(0)
+    if res.returncode == 1:
+        sys.exit(1)     # cancelled
+    return None         # backend failure: fall back to pinentry
+
+
+def main():
+    prompt = sys.argv[1] if len(sys.argv) > 1 else "Password:"
+    hypr_dialog(prompt)
+    cmd = sudo_command()
+    if len(cmd) > 300:
+        cmd = cmd[:300] + " …"
+    desc = f"Authentication is needed to run:\n\n{cmd}" if cmd else "Authentication is needed for sudo."
+
+    script = "\n".join([
+        "SETTITLE sudo",
+        f"SETDESC {esc(desc)}",
+        f"SETPROMPT {esc(prompt.strip())}",
+        "SETOK Authenticate",
+        "GETPIN",
+        "BYE",
+    ]) + "\n"
+    try:
+        out = subprocess.run([PINENTRY], input=script, capture_output=True, text=True, timeout=300).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        sys.exit(1)
+
+    for line in out.splitlines():
+        if line.startswith("D "):
+            sys.stdout.write(unquote(line[2:]) + "\n")
+            return
+    sys.exit(1)        # cancelled or closed: sudo reports "no password was provided"
+
+
+if __name__ == "__main__":
+    main()
