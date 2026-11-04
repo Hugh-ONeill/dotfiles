@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Backend for the rofi todo module — operates directly on ~/Documents/TODO.md.
+"""Backend for the rofi todo module — operates directly on ~/Documents/todo/TODO.md.
 
-The single source of truth is ~/Documents/TODO.md (open items only, checkbox + section
-style); ~/Documents/DONE.md is the completed-item archive with mirrored headings. Every
+The single source of truth is ~/Documents/todo/TODO.md (open items only, checkbox + section
+style); ~/Documents/todo/DONE.md is the completed-item archive with mirrored headings. Every
 mutation is committed to the local-only bare repo ~/.local/share/todo.git so it is
 recoverable and never touches the public dotfiles.
 
@@ -31,15 +31,18 @@ DOCS = Path(os.environ.get("XDG_DOCUMENTS_DIR", HOME / "Documents"))
 DATA = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local" / "share"))
 
 
-def _pick(env, new, legacy):
-    """Env override, else the XDG path, else the legacy ~ path if only it exists."""
+def _pick(env, new, *legacy):
+    """Env override, else the current path, else the first legacy path that exists."""
     if env in os.environ:
         return Path(os.environ[env])
-    return legacy if not new.exists() and legacy.exists() else new
+    if new.exists():
+        return new
+    return next((p for p in legacy if p.exists()), new)
 
 
-TODO = _pick("TODO_FILE", DOCS / "TODO.md", HOME / "TODO.md")
-DONE = _pick("DONE_FILE", DOCS / "DONE.md", HOME / "DONE.md")
+TODO_DIR = DOCS / "todo"   # TODO.md, DONE.md, HIATUS.md (since 2026-11-04; was DOCS itself)
+TODO = _pick("TODO_FILE", TODO_DIR / "TODO.md", DOCS / "TODO.md", HOME / "TODO.md")
+DONE = _pick("DONE_FILE", TODO_DIR / "DONE.md", DOCS / "DONE.md", HOME / "DONE.md")
 GIT_DIR = str(_pick("TODO_GIT_DIR", DATA / "todo.git", HOME / ".todo.git"))
 
 OPEN_RE = re.compile(r"^- \[[ ~]\] ")           # top-level open item

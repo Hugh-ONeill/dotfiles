@@ -1,5 +1,5 @@
 [Unit]
-Description=Sync ~/Documents/TODO.md with the other machine
+Description=Sync ~/Documents/todo/TODO.md with the other machine
 
 [Service]
 Type=oneshot

@@ -1,5 +1,5 @@
 [Unit]
-Description=Sync ~/Documents/TODO.md every 2 minutes
+Description=Sync ~/Documents/todo/TODO.md every 2 minutes
 
 [Timer]
 OnBootSec=1min
