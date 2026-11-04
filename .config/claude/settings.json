@@ -13,6 +13,9 @@
     ]
   },
   "model": "opus",
+  "env": {
+    "SUDO_ASKPASS": "/home/wiz/.local/bin/sudo-askpass"
+  },
   "hooks": {
     "PreToolUse": [
       {

@@ -10,6 +10,7 @@ export BROWSER=firefox
 export VISUAL=nvim
 export EDITOR=nvim
 export SUDO_EDITOR=nvim
+export SUDO_ASKPASS="$HOME/.local/bin/sudo-askpass"   # graphical prompt when sudo has no terminal (Claude ! commands)
 export LESS="-Ss~ --ignore-case --LONG-PROMPT --quit-if-one-screen --RAW-CONTROL-CHARS --use-color"
 
 # ══════════════════════════════════════════════════════════════════════════════
