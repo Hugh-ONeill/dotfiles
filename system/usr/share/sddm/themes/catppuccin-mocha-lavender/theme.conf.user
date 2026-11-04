@@ -1,0 +1,6 @@
+# Overrides for the packaged theme.conf (pacman owns that file and replaces it on
+# update; it does not own this one). Noto Sans 9 is unreadably small at 1440p, so
+# use the desktop font, which ttf-firacode-nerd installs system-wide.
+[General]
+Font="FiraCode Nerd Font"
+FontSize=12
