@@ -1,0 +1,6 @@
+[Unit]
+Description=Sync ~/Documents/TODO.md with the other machine
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/rofi/todo/todo-sync
