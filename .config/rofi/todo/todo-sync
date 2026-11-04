@@ -6,8 +6,11 @@ set -u
 
 GIT_DIR="${TODO_GIT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/todo.git}"
 DOCS="${XDG_DOCUMENTS_DIR:-$HOME/Documents}"
-TODO="${TODO_FILE:-$DOCS/TODO.md}"
-DONE="${DONE_FILE:-$DOCS/DONE.md}"
+TDIR="$DOCS/todo"                           # TODO.md, DONE.md, HIATUS.md (was $DOCS until 2026-11-04)
+[[ -d $TDIR ]] || TDIR="$DOCS"
+TODO="${TODO_FILE:-$TDIR/TODO.md}"
+DONE="${DONE_FILE:-$TDIR/DONE.md}"
+HIATUS="${HIATUS_FILE:-$TDIR/HIATUS.md}"
 SETTLE=180                                  # seconds an uncommitted edit must sit before autosave
 LOCK="${XDG_RUNTIME_DIR:-/tmp}/todo-sync.lock"
 export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5"
@@ -25,7 +28,7 @@ flock -w 60 9 || exit 0
 # commit edits made outside todo.py (nvim, Claude sessions) once they have settled
 now=$(date +%s)
 settled=()
-for f in "$TODO" "$DONE"; do
+for f in "$TODO" "$DONE" "$HIATUS"; do
     [[ -f $f ]] || continue
     g diff --quiet -- "$f" 2>/dev/null && continue
     (( now - $(stat -c %Y "$f") >= SETTLE )) && settled+=("$f")
