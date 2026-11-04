@@ -18,6 +18,9 @@ EDITOR_CMD="${EDITOR:-nvim}"
 TERMINAL="${TERMINAL:-kitty}"
 TODO_MD="$(python3 "$DIR/todo.py" path 2>/dev/null || echo "$HOME/Documents/TODO.md")"
 
+# pull the other machine's changes in the background (shows on the next open)
+setsid "$DIR/todo-sync" >/dev/null 2>&1 < /dev/null &
+
 open_at() {                          # open TODO.md at a given line, detached
     local line="$1"
     setsid "$TERMINAL" --class todo-edit -e "$EDITOR_CMD" "+${line}" "$TODO_MD" \

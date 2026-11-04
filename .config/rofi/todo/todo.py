@@ -149,6 +149,15 @@ def commit(msg):
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(base + ["commit", "-m", msg], env=env,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    sync()
+
+
+def sync():
+    """Push/pull with the other machine in the background (todo-sync)."""
+    script = Path(__file__).resolve().with_name("todo-sync")
+    if script.exists():
+        subprocess.Popen([str(script)], stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
 
 
 # ── section placement in DONE.md ──────────────────────────────────────────────

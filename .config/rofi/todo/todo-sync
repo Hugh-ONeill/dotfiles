@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Sync the todo repo with the hub on the desktop: autosave settled edits, merge, push
+# Usage: todo-sync          (run by todo.py after each change, by todo.sh on open, and by todo-sync.timer)
+
+set -u
+
+GIT_DIR="${TODO_GIT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/todo.git}"
+DOCS="${XDG_DOCUMENTS_DIR:-$HOME/Documents}"
+TODO="${TODO_FILE:-$DOCS/TODO.md}"
+DONE="${DONE_FILE:-$DOCS/DONE.md}"
+SETTLE=180                                  # seconds an uncommitted edit must sit before autosave
+LOCK="${XDG_RUNTIME_DIR:-/tmp}/todo-sync.lock"
+export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5"
+
+g()      { git --git-dir="$GIT_DIR" --work-tree="$HOME" "$@"; }
+notify() { notify-send -a todo-sync "Todo sync" "$1" 2>/dev/null; echo "todo-sync: $1" >&2; }
+
+[[ -d $GIT_DIR ]] || exit 0
+g remote get-url hub >/dev/null 2>&1 || exit 0
+exec 9>"$LOCK"
+flock -w 60 9 || exit 0
+
+# -------------------- Autosave --------------------
+
+# commit edits made outside todo.py (nvim, Claude sessions) once they have settled
+now=$(date +%s)
+settled=()
+for f in "$TODO" "$DONE"; do
+    [[ -f $f ]] || continue
+    g diff --quiet -- "$f" 2>/dev/null && continue
+    (( now - $(stat -c %Y "$f") >= SETTLE )) && settled+=("$f")
+done
+if (( ${#settled[@]} )); then
+    g commit -q -m "todo: autosave" -- "${settled[@]}" || exit 1
+fi
+
+# -------------------- Fetch + merge --------------------
+
+timeout 30 git --git-dir="$GIT_DIR" fetch -q hub 2>/dev/null || exit 0   # hub unreachable: next tick
+branch=$(git --git-dir="$GIT_DIR" symbolic-ref --short HEAD)
+remote="hub/$branch"
+
+if git --git-dir="$GIT_DIR" rev-parse -q --verify "$remote" >/dev/null; then
+    if ! g merge-base --is-ancestor "$remote" HEAD; then
+        if ! g merge -q --no-edit "$remote" >/dev/null 2>&1; then
+            if [[ -n $(g ls-files -u) ]]; then
+                g merge --abort
+                notify "Conflict merging the other machine's changes. Nothing was changed; resolve with: todo-git merge hub/$branch"
+                exit 1
+            fi
+            exit 0      # incoming change touches an unsettled local edit: retry next tick
+        fi
+    fi
+    g merge-base --is-ancestor HEAD "$remote" && exit 0     # nothing to push
+fi
+
+# -------------------- Push --------------------
+
+timeout 30 git --git-dir="$GIT_DIR" push -q hub "$branch" 2>/dev/null || exit 0
