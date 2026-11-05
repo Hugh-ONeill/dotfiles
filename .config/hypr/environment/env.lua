@@ -63,15 +63,23 @@ else
     hl.env("AQ_DRM_DEVICES", "/dev/dri/card2:/dev/dri/card1")
 end
 
--- NVIDIA, carried over unchanged from the hyprlang env.conf
-hl.env("GBM_BACKEND", "nvidia-drm")
-hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
-hl.env("__GL_GSYNC_ALLOWED", "1")
-hl.env("__GL_VRR_ALLOWED", "1")
-hl.env("LIBVA_DRIVER_NAME", "vdpau")
-hl.env("LIBVA_DRIVER", "nvidia")
-hl.env("VDPAU_DRIVER", "nvidia")
-hl.env("NVD_BACKEND", "direct")
+-- GPU split: the Intel iGPU renders and presents everything on eDP-1. The
+-- Quadro only scans out the HDMI port (aquamarine handles that, and libgbm
+-- picks the nvidia backend for that device on its own) and runs explicit
+-- offload: __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia <cmd>
+--
+-- Removed, carried over from the hyprlang env.conf when the Quadro still
+-- drove the display:
+--   GBM_BACKEND=nvidia-drm           buffers for eDP-1 are allocated on i915
+--   __GLX_VENDOR_LIBRARY_NAME=nvidia forced every GL app onto the Quadro and
+--                                    across PRIME to the iGPU every frame
+--   __GL_GSYNC_ALLOWED / __GL_VRR_ALLOWED   NVIDIA-display-only, inert here
+--   LIBVA_DRIVER_NAME=vdpau          no vdpau_drv_video.so is installed, so
+--                                    VA-API failed to initialise in every app
+--   LIBVA_DRIVER                     not a real libva variable
+--   NVD_BACKEND                      nvidia-vaapi-driver only
+hl.env("LIBVA_DRIVER_NAME", "iHD")
+hl.env("VDPAU_DRIVER", "va_gl")
 
 end
 
