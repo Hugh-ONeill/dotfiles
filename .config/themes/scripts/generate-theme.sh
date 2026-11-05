@@ -185,6 +185,8 @@ for key in "${!COLORS[@]}"; do
     export "$upper_key=$value"
     export "${upper_key}_NOHASH=${value#\#}"
     export "${upper_key}_RGB=$(hex_to_rgb "$value")"
+    # BBGGRR byte order, for ASS-styled colors (mpv's stats overlay)
+    export "${upper_key}_BGR=${value:5:2}${value:3:2}${value:1:2}"
 done
 
 # Load and resolve gradient
@@ -232,7 +234,7 @@ VARS='$THEME_NAME $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME 
 # Add all color variables (uppercase versions)
 for key in "${!COLORS[@]}"; do
     upper_key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
-    VARS="$VARS \$$upper_key \$${upper_key}_NOHASH \$${upper_key}_RGB"
+    VARS="$VARS \$$upper_key \$${upper_key}_NOHASH \$${upper_key}_RGB \$${upper_key}_BGR"
 done
 
 # Add gradient variables
