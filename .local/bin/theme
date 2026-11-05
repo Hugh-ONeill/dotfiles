@@ -114,6 +114,7 @@ cmd_set() {
     apply_ranger "$theme"
     apply_glow "$theme"
     apply_youtube_tui "$theme"
+    apply_mpv "$theme"
     apply_sptlrx "$theme"
     apply_spotify_player "$theme"
     apply_claude "$theme"
@@ -200,7 +201,7 @@ cmd_validate() {
     echo -e "${CYAN}Validating theme: ${MAGENTA}$theme${NC}\n"
 
     local required=(kitty.conf waybar.css rofi-colors.rasi hypr-colors.lua shell-colors.sh fzf.sh statusline.sh)
-    local optional=(lazygit.yml gitui.ron btop.theme dunst-colors.conf glow.json ranger.py sptlrx.yaml youtube-tui.yml hyprlock-colors.conf hyprtoolkit.conf fzf-tab-flags.zsh dircolors.db bat.conf)
+    local optional=(lazygit.yml gitui.ron btop.theme dunst-colors.conf glow.json ranger.py sptlrx.yaml youtube-tui.yml mpv.conf hyprlock-colors.conf hyprtoolkit.conf fzf-tab-flags.zsh dircolors.db bat.conf)
 
     local missing=0
     echo "Required files:"

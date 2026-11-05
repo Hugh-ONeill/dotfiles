@@ -7,6 +7,7 @@ apply_btop()        { apply_simple "$1" "btop.theme"      "btop"; }
 apply_ranger()      { apply_simple "$1" "ranger.py"       "ranger"; }
 apply_glow()        { apply_simple "$1" "glow.json"       "glow"; }
 apply_youtube_tui() { apply_simple "$1" "youtube-tui.yml" "youtube-tui"; }
+apply_mpv()         { apply_simple "$1" "mpv.conf"        "mpv"; }
 apply_sptlrx() {
     if copy_to_current "$1" "sptlrx.yaml"; then
         # inject persistent cookie from local file
