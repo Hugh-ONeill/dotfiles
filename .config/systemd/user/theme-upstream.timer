@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly Catppuccin upstream check for themed templates
+
+[Timer]
+OnCalendar=Sun 12:00
+Persistent=true
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target
