@@ -131,6 +131,20 @@ apply_spicetify() {
     fi
 }
 
+apply_aseprite() {
+    local theme="$1"
+    local src="$GENERATED_DIR/$theme/aseprite"
+    local ext="$HOME/.config/aseprite/extensions/palette-theme" ini="$HOME/.config/aseprite/aseprite.ini"
+    [[ -d "$HOME/.config/aseprite" ]] || { report_skip "aseprite (not set up)"; return; }
+    [[ -f "$src/theme.xml" ]] || { report_skip "aseprite (no theme)"; return; }
+    mkdir -p "$ext" && cp "$src"/* "$ext/"
+    # Select it; Aseprite rewrites aseprite.ini on exit, so a running one keeps its choice
+    if [[ -f "$ini" ]] && grep -q '^\[theme\]' "$ini"; then
+        sed -i '/^\[theme\]/,/^\[/{s/^selected = .*/selected = palette/}' "$ini"
+    fi
+    report_ok "aseprite (restart Aseprite to apply)"
+}
+
 apply_stylus() {
     local theme="$1"
     local theme_dir="$GENERATED_DIR/$theme"
