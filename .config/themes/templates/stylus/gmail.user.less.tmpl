@@ -174,9 +174,10 @@
     color: @text;
   }
 
-  // search input
-  .gb_Kc .gb_hd {
-    background-color: @surface1;
+  // search input (role=search is stable; Google's gb_ hashes rotate)
+  .gb_Kc .gb_hd,
+  form[role="search"] {
+    background-color: @surface1 !important;
 
     .gb_je,
     .gb_qe,
@@ -188,8 +189,9 @@
   }
 
   // search input focused
-  .gb_hd.gb_id {
-    background-color: @base;
+  .gb_hd.gb_id,
+  form[role="search"]:focus-within {
+    background-color: @base !important;
   }
 
   // ============================================================
