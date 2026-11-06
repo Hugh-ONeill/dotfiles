@@ -1,0 +1,45 @@
+/* Firefox about: page colors - generated from ${THEME_NAME} palette */
+/* Scoped to Firefox's own pages; websites are untouched. */
+
+@-moz-document url-prefix("about:") {
+  :root {
+    /* ---- Design-system tokens (preferences, addons, config, etc) ---- */
+    --background-color-canvas: ${BASE} !important;
+    --background-color-box: ${SURFACE0} !important;
+    --card-background-color: ${SURFACE0} !important;
+    --border-color: ${SURFACE1} !important;
+    --text-color: ${TEXT} !important;
+    --text-color-deemphasized: ${SUBTEXT0} !important;
+    --link-color: ${ACCENT} !important;
+    --link-color-hover: ${ACCENT_BRIGHT} !important;
+    --focus-outline-color: ${ACCENT} !important;
+    --color-accent-primary: ${ACCENT} !important;
+    --color-accent-primary-hover: ${ACCENT_BRIGHT} !important;
+    --color-accent-primary-active: ${ACCENT} !important;
+    --button-background-color: ${SURFACE1} !important;
+    --button-background-color-hover: ${SURFACE2} !important;
+    --button-background-color-primary: ${ACCENT} !important;
+    --button-background-color-primary-hover: ${ACCENT_BRIGHT} !important;
+    --button-text-color: ${TEXT} !important;
+    --button-text-color-primary: ${BASE} !important;
+    --table-row-background-color: ${BASE} !important;
+    --table-row-background-color-alternate: ${MANTLE} !important;
+
+    /* ---- Legacy in-content names some pages still read ---- */
+    --in-content-page-background: ${BASE} !important;
+    --in-content-page-color: ${TEXT} !important;
+    --in-content-box-background: ${SURFACE0} !important;
+    --in-content-text-color: ${TEXT} !important;
+
+    /* ---- New tab / home ---- */
+    --newtab-background-color: ${BASE} !important;
+    --newtab-background-color-secondary: ${SURFACE0} !important;
+    --newtab-text-primary-color: ${TEXT} !important;
+    --newtab-text-secondary-color: ${SUBTEXT0} !important;
+    --newtab-element-hover-color: ${SURFACE1} !important;
+    --newtab-element-secondary-color: ${SURFACE1} !important;
+    --newtab-primary-action-background: ${ACCENT} !important;
+
+    scrollbar-color: ${SURFACE2} ${BASE} !important;
+  }
+}

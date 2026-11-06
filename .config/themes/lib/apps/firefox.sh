@@ -29,6 +29,20 @@ apply_firefox_prefs() {
     done < <(firefox_profiles)
 }
 
+# Prepend @import "<name>" to a userChrome/userContent file unless it's there.
+# @import must come before any other rule, so it always goes first.
+ensure_firefox_import() {
+    local file="$1" name="$2"
+    grep -q "$name" "$file" 2>/dev/null && return
+    if [[ -f "$file" ]]; then
+        local existing
+        existing=$(cat "$file")
+        printf '@import "%s";\n%s\n' "$name" "$existing" > "$file"
+    else
+        printf '@import "%s";\n' "$name" > "$file"
+    fi
+}
+
 apply_firefox() {
     local theme="$1"
     local src="$GENERATED_DIR/$theme/firefox-colors.css"
@@ -41,20 +55,18 @@ apply_firefox() {
         return
     fi
 
+    local content_src="$GENERATED_DIR/$theme/firefox-content.css"
+
     while read -r profile; do
         local chrome_dir="$profile/chrome"
         mkdir -p "$chrome_dir"
         cp "$src" "$chrome_dir/theme-colors.css"
+        ensure_firefox_import "$chrome_dir/userChrome.css" "theme-colors.css"
 
-        # Ensure userChrome.css imports the theme colors
-        local userchrome="$chrome_dir/userChrome.css"
-        if [[ ! -f "$userchrome" ]] || ! grep -q "theme-colors.css" "$userchrome" 2>/dev/null; then
-            if [[ -f "$userchrome" ]]; then
-                local existing=$(cat "$userchrome")
-                echo -e '@import "theme-colors.css";\n'"$existing" > "$userchrome"
-            else
-                echo '@import "theme-colors.css";' > "$userchrome"
-            fi
+        # about: pages (newtab, preferences, addons) via userContent.css
+        if [[ -f "$content_src" ]]; then
+            cp "$content_src" "$chrome_dir/theme-content.css"
+            ensure_firefox_import "$chrome_dir/userContent.css" "theme-content.css"
         fi
 
         ((++applied))
