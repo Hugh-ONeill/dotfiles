@@ -19,7 +19,12 @@ alias nvidia-settings='nvidia-settings --config="$XDG_CONFIG_HOME/nvidia/setting
 # Listing (eza)
 # ══════════════════════════════════════════════════════════════════════════════
 
-alias eza="eza --group-directories-first --color=always --icons=always"
+# no icons on the Linux console, which can't draw Nerd Font glyphs
+if [[ $TERM == linux ]]; then
+  alias eza="eza --group-directories-first --color=always --icons=never"
+else
+  alias eza="eza --group-directories-first --color=always --icons=always"
+fi
 alias l="eza --oneline"
 alias ls="eza --grid"
 alias la="l --all"
