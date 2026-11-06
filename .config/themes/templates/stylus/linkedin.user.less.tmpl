@@ -57,6 +57,19 @@
 
 
 @-moz-document domain("www.linkedin.com") {
+  // ---- Palette as plain vars for palette-tokens.user.js ----
+  // LinkedIn's hashed tokens rotate per load; the userscript maps them
+  // by value onto these.
+  :root {
+    --cp-crust: @crust; --cp-mantle: @mantle; --cp-base: @base;
+    --cp-surface0: @surface0; --cp-surface1: @surface1; --cp-surface2: @surface2;
+    --cp-overlay0: @overlay0; --cp-overlay1: @overlay1; --cp-overlay2: @overlay2;
+    --cp-subtext0: @subtext0; --cp-subtext1: @subtext1; --cp-text: @text;
+    --cp-red: @red; --cp-orange: @peach; --cp-yellow: @yellow; --cp-green: @green;
+    --cp-teal: @teal; --cp-cyan: @sky; --cp-blue: @blue; --cp-purple: @mauve;
+    --cp-pink: @pink;
+  }
+
 
   // apply to all root states (light and dark) so every tab gets themed
   :root,
