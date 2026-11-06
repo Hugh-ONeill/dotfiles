@@ -110,6 +110,13 @@
       "path": "themes/mocha/lavender.conf",
       "synced": "7cb94023a922"
     },
+    "newsboat": {
+      "template": "(~/.config/newsboat/themes/catppuccin)",
+      "repo": "newsboat",
+      "path": "themes/dark",
+      "synced": "9911271517ef",
+      "note": "ANSI-only, follows the palette via terminal colors; verbatim upstream copy"
+    },
     "nvim": {
       "template": "nvim-colors.lua.tmpl",
       "repo": "nvim",
