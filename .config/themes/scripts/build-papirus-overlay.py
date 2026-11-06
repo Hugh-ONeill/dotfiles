@@ -68,11 +68,9 @@ def build(theme: str, inherits: str) -> Path:
             continue
         n = 0
         for link in places.iterdir():
-            target = os.readlink(link) if link.is_symlink() else link.name
-            if not BLUE_LINK.match(Path(target).name) and not BLUE_LINK.match(link.name):
-                continue
-            svg = (places / target).resolve()
-            if not svg.is_file():
+            # Follow the whole link chain: inode-directory -> folder -> folder-blue
+            svg = link.resolve()
+            if not svg.is_file() or not BLUE_LINK.match(svg.name):
                 continue
             dst.mkdir(parents=True, exist_ok=True)
             (dst / link.name).write_text(rx.sub(lambda m: swap[m.group(0).lower()], svg.read_text()))
