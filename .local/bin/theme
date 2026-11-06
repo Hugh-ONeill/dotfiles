@@ -139,6 +139,7 @@ cmd_set() {
     apply_qt "$theme"
     apply_pywal "$theme"
     apply_stylus "$theme"
+    apply_spicetify "$theme"
     apply_firefox "$theme"
     apply_wlogout "$theme"
 

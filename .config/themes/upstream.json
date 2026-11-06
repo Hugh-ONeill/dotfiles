@@ -97,6 +97,13 @@
       "path": "themes-mergable/mocha/lavender.yml",
       "synced": "f50a723711cc"
     },
+    "mc": {
+      "template": "(~/.local/share/mc/skins/catppuccin.ini)",
+      "repo": "mc",
+      "path": "catppuccin.ini",
+      "synced": "235626158188",
+      "note": "ANSI-only skin, follows the palette via terminal colors; verbatim upstream copy"
+    },
     "mpv": {
       "template": "mpv.conf.tmpl",
       "repo": "mpv",
@@ -121,6 +128,27 @@
       "repo": "rofi",
       "path": "themes/catppuccin-mocha.rasi",
       "synced": "71fb15577ccb"
+    },
+    "spicetify": {
+      "template": "spicetify-color.ini.tmpl",
+      "repo": "spicetify",
+      "path": "catppuccin/color.ini",
+      "synced": "1f93de579811",
+      "note": "mocha section only, as [palette]"
+    },
+    "spicetify-theme": {
+      "template": "(~/.config/spicetify/Themes/palette/theme.js)",
+      "repo": "spicetify",
+      "path": "catppuccin/theme.js",
+      "synced": "4294a61f54a0",
+      "note": "verbatim upstream copy; re-copy on change"
+    },
+    "spicetify-user": {
+      "template": "(~/.config/spicetify/Themes/palette/user.css)",
+      "repo": "spicetify",
+      "path": "catppuccin/user.css",
+      "synced": "1ec645c4cf7f",
+      "note": "verbatim upstream copy; re-copy on change"
     },
     "spotify-player": {
       "template": "spotify-player.toml.tmpl",
