@@ -155,6 +155,11 @@ if [[ -z "$GTK_ICON_THEME" ]]; then
     else
         GTK_ICON_THEME="Papirus-Dark"
     fi
+    # Per-palette overlay: Papirus with folders in the accent color
+    if [[ -x "$SCRIPT_DIR/build-papirus-overlay.py" && -d /usr/share/icons/Papirus ]] \
+        && "$SCRIPT_DIR/build-papirus-overlay.py" "$THEME_NAME" "$GTK_ICON_THEME" >/dev/null 2>&1; then
+        GTK_ICON_THEME="Papirus-$THEME_NAME"
+    fi
 fi
 export GTK_ICON_THEME
 
