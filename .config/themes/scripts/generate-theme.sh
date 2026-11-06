@@ -165,9 +165,9 @@ export GTK_ICON_THEME
 
 # dark | light, from the base luminance (for apps with a dark/light switch)
 if [[ $(color_luminance "$(jq -r '.colors.base // "#000000"' "$PALETTE_FILE")") -gt 500 ]]; then
-    export THEME_MODE=light
+    export THEME_MODE=light THEME_IS_DARK=false
 else
-    export THEME_MODE=dark
+    export THEME_MODE=dark THEME_IS_DARK=true
 fi
 
 # Optional, inert metadata: nothing reads these yet, but theme.conf has always
@@ -267,7 +267,7 @@ else
 fi
 
 # Build list of variables to substitute
-VARS='$THEME_NAME $THEME_MODE $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
+VARS='$THEME_NAME $THEME_MODE $THEME_IS_DARK $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
 
 # Add all color variables (uppercase versions)
 for key in "${!COLORS[@]}"; do
