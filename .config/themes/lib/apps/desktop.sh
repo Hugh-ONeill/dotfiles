@@ -124,7 +124,9 @@ apply_stylus() {
     # Copy to current for easy access, incl. the single-file importable bundle
     if copy_to_current "$theme" "stylus"; then
         copy_to_current "$theme" "stylus-bundle.json" >/dev/null 2>&1
-        report_ok "stylus (import $CURRENT_DIR/stylus-bundle.json)"
+        # Palette-agnostic userscripts ride the same local server
+        cp "$THEMES_DIR"/userscripts/*.user.js "$CURRENT_DIR/stylus/" 2>/dev/null
+        report_ok "stylus (served on 127.0.0.1:$STYLUS_PORT; Stylus picks it up on its next update check)"
     else
         report_skip "stylus"
     fi

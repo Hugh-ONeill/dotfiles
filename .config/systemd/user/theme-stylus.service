@@ -1,0 +1,9 @@
+[Unit]
+Description=Serve themed Stylus userstyles on 127.0.0.1:8790 for auto-update
+
+[Service]
+ExecStart=/usr/bin/python3 %h/.config/themes/scripts/stylus-serve.py 8790
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

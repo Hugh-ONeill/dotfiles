@@ -367,6 +367,8 @@ if [[ -d "$STYLUS_TMPL" ]]; then
         if [[ -f "$template" ]]; then
             filename=$(basename "$template" .tmpl)
             envsubst "$VARS" < "$template" > "$STYLUS_OUTPUT/$filename"
+            # Point Stylus at the local server so theme switches auto-update
+            sed -i "/^@updateURL /d; /^@version /a @updateURL http://127.0.0.1:${STYLUS_PORT}/$filename" "$STYLUS_OUTPUT/$filename"
         fi
     done
     # Bundle into importable JSON

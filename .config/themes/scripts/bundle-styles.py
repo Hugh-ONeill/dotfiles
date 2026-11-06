@@ -125,6 +125,7 @@ def bundle_styles(theme_dir: Path) -> list[dict]:
             "description": metadata.get("description", ""),
             "author": metadata.get("author", ""),
             "sourceCode": content,
+            "updateUrl": metadata.get("updateURL", ""),
             "sections": [{"code": ""}],
             "usercssData": {
                 "name": metadata.get("name", name),
