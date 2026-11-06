@@ -11,6 +11,9 @@ SCRIPTS_DIR="$THEMES_DIR/scripts"
 LIB_DIR="$THEMES_DIR/lib"
 APPS_DIR="$LIB_DIR/apps"
 
+# Local server Stylus updates userstyles from (theme-stylus.service)
+STYLUS_PORT=8790
+
 # Luminance threshold for light/dark detection
 LUMINANCE_THRESHOLD=140
 
