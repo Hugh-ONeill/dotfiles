@@ -42,6 +42,13 @@
       "path": "themes/mocha.cava",
       "synced": "6ec25ba688e3"
     },
+    "clipse": {
+      "template": "clipse-theme.json.tmpl",
+      "repo": "clipse",
+      "path": "themes/mocha/catppuccin-mocha-mauve.json",
+      "synced": "1a1e3c25027b",
+      "note": "heavily customized (16 keys differ); upstream for reference"
+    },
     "cursors": {
       "template": "(build-cursors.sh)",
       "repo": "cursors",

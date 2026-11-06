@@ -114,6 +114,7 @@ cmd_set() {
     apply_gitui "$theme"
     apply_delta "$theme"
     apply_tmux "$theme"
+    apply_clipse "$theme"
     apply_btop "$theme"
     apply_ranger "$theme"
     apply_glow "$theme"

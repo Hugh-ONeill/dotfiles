@@ -89,3 +89,11 @@ apply_tmux() {
     fi
     report_ok "tmux"
 }
+
+# clipse reads custom_theme.json, a symlink to current/clipse-theme.json
+apply_clipse() {
+    local theme="$1"
+    copy_to_current "$theme" "clipse-theme.json" || { report_skip "clipse (no theme file)"; return; }
+    [[ -d "$HOME/.config/clipse" ]] && ln -sfn "$CURRENT_DIR/clipse-theme.json" "$HOME/.config/clipse/custom_theme.json"
+    report_ok "clipse"
+}
