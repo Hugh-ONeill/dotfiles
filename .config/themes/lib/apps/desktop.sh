@@ -96,6 +96,10 @@ apply_qt() {
         local icons
         icons=$(grep -oP '^gtk_icon_theme=\K.*' "$GENERATED_DIR/$theme/theme.conf" 2>/dev/null | tr -d '"')
         [[ -f "$qtconf" && -n "$icons" ]] && sed -i "s|^icon_theme=.*|icon_theme=$icons|" "$qtconf" 2>/dev/null
+        # KDE apps (Dolphin) call KIconTheme::initTheme(), which overrides qt6ct
+        # with kdeglobals [Icons] Theme and falls back to Breeze when it's unset
+        [[ -n "$icons" ]] && command -v kwriteconfig6 &>/dev/null \
+            && kwriteconfig6 --file kdeglobals --group Icons --key Theme "$icons"
         applied=true
     done
 
