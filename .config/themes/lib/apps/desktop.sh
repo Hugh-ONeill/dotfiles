@@ -227,6 +227,22 @@ PY
     report_ok "jellyfin (restart the server to apply)"
 }
 
+# OBS: a "Palette" variant of the catppuccin theme (base Catppuccin.obt stays upstream)
+apply_obs() {
+    local theme="$1"
+    local cfg="$HOME/.config/obs-studio" src="$GENERATED_DIR/$theme/obs-palette.ovt"
+    [[ -d "$cfg/themes" ]] || { report_skip "obs (no themes dir)"; return; }
+    [[ -f "$src" ]] || { report_skip "obs (no theme file)"; return; }
+    cp "$src" "$cfg/themes/Catppuccin_Palette.ovt"
+    # OBS writes user.ini on exit, so only switch the selection while it's closed
+    if pgrep -x obs >/dev/null; then
+        report_skip "obs (running; restart it, then pick Palette in Settings > Appearance)"
+        return
+    fi
+    [[ -f "$cfg/user.ini" ]] && sed -i 's/^Theme=.*/Theme=com.obsproject.Catppuccin.Palette/' "$cfg/user.ini"
+    report_ok "obs"
+}
+
 apply_stylus() {
     local theme="$1"
     local theme_dir="$GENERATED_DIR/$theme"
