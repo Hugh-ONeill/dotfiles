@@ -93,6 +93,13 @@
       "path": "themes/catppuccin-mocha.ron",
       "synced": "c7661f043cb6"
     },
+    "godot": {
+      "template": "godot.tet.tmpl",
+      "repo": "godot",
+      "path": "themes/Catppuccin Mocha.tet",
+      "synced": "27eb55df40f7",
+      "note": "--editor mapping; UI base/accent/contrast set by apply_godot (README values)"
+    },
     "hyprland": {
       "template": "hypr-colors.lua.tmpl",
       "repo": "hyprland",
