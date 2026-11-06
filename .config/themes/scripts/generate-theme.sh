@@ -204,8 +204,9 @@ for key in "${!COLORS[@]}"; do
     # BBGGRR byte order, for ASS-styled colors (mpv's stats overlay)
     export "${upper_key}_BGR=${value:5:2}${value:3:2}${value:1:2}"
     # Tints over base (diff/selection backgrounds, as Catppuccin ports use)
-    export "${upper_key}_BG20=$(blend_over_base "$value" 20)"
-    export "${upper_key}_BG35=$(blend_over_base "$value" 35)"
+    for _pct in 10 20 35 50; do
+        export "${upper_key}_BG${_pct}=$(blend_over_base "$value" "$_pct")"
+    done
 done
 
 # Load and resolve gradient
@@ -266,7 +267,7 @@ VARS='$THEME_NAME $THEME_MODE $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK
 # Add all color variables (uppercase versions)
 for key in "${!COLORS[@]}"; do
     upper_key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
-    VARS="$VARS \$$upper_key \$${upper_key}_NOHASH \$${upper_key}_RGB \$${upper_key}_BGR \$${upper_key}_BG20 \$${upper_key}_BG35"
+    VARS="$VARS \$$upper_key \$${upper_key}_NOHASH \$${upper_key}_RGB \$${upper_key}_BGR \$${upper_key}_BG10 \$${upper_key}_BG20 \$${upper_key}_BG35 \$${upper_key}_BG50"
 done
 
 # Add gradient variables
