@@ -158,6 +158,13 @@ if [[ -z "$GTK_ICON_THEME" ]]; then
 fi
 export GTK_ICON_THEME
 
+# dark | light, from the base luminance (for apps with a dark/light switch)
+if [[ $(color_luminance "$(jq -r '.colors.base // "#000000"' "$PALETTE_FILE")") -gt 500 ]]; then
+    export THEME_MODE=light
+else
+    export THEME_MODE=dark
+fi
+
 # Optional, inert metadata: nothing reads these yet, but theme.conf has always
 # carried them and build-catppuccin-retheme.sh expects the file to exist.
 export THEME_SHADER=$(jq -r '.shader // empty' "$PALETTE_FILE")
@@ -178,6 +185,15 @@ get_contrast_fg() {
     fi
 }
 
+# #rrggbb of <color> mixed <pct>% over the palette base
+blend_over_base() {
+    local c="${1#\#}" b="${COLORS[base]#\#}" p="$2" out="#" i
+    for i in 0 2 4; do
+        printf -v out '%s%02x' "$out" $(( (16#${c:$i:2} * p + 16#${b:$i:2} * (100 - p) + 50) / 100 ))
+    done
+    echo "$out"
+}
+
 # Export all colors as environment variables (uppercase)
 for key in "${!COLORS[@]}"; do
     upper_key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
@@ -187,6 +203,9 @@ for key in "${!COLORS[@]}"; do
     export "${upper_key}_RGB=$(hex_to_rgb "$value")"
     # BBGGRR byte order, for ASS-styled colors (mpv's stats overlay)
     export "${upper_key}_BGR=${value:5:2}${value:3:2}${value:1:2}"
+    # Tints over base (diff/selection backgrounds, as Catppuccin ports use)
+    export "${upper_key}_BG20=$(blend_over_base "$value" 20)"
+    export "${upper_key}_BG35=$(blend_over_base "$value" 35)"
 done
 
 # Load and resolve gradient
@@ -242,12 +261,12 @@ else
 fi
 
 # Build list of variables to substitute
-VARS='$THEME_NAME $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
+VARS='$THEME_NAME $THEME_MODE $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
 
 # Add all color variables (uppercase versions)
 for key in "${!COLORS[@]}"; do
     upper_key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
-    VARS="$VARS \$$upper_key \$${upper_key}_NOHASH \$${upper_key}_RGB \$${upper_key}_BGR"
+    VARS="$VARS \$$upper_key \$${upper_key}_NOHASH \$${upper_key}_RGB \$${upper_key}_BGR \$${upper_key}_BG20 \$${upper_key}_BG35"
 done
 
 # Add gradient variables
