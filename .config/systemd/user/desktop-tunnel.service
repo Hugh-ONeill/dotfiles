@@ -1,0 +1,11 @@
+[Unit]
+Description=SSH tunnel to desktop for job-scan (8765) and news-scan (8766) dashboards
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=/usr/bin/ssh -N -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 desktop
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target
