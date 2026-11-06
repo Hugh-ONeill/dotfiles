@@ -125,6 +125,18 @@ apply_pywal() {
 apply_spicetify() {
     local theme="$1"
     command -v spicetify &>/dev/null || { report_skip "spicetify (not installed)"; return; }
+    # spotify-launcher only downloads Spotify on first launch; nothing to patch before that
+    local spath
+    spath=$(grep -oP '^spotify_path\s*=\s*\K.*' "$HOME/.config/spicetify/config-xpui.ini" 2>/dev/null)
+    if [[ -z "$spath" ]]; then
+        if [[ -d "$HOME/.local/share/spotify-launcher/install/usr/share/spotify" ]]; then
+            spicetify -q config spotify_path "$HOME/.local/share/spotify-launcher/install/usr/share/spotify/" \
+                prefs_path "$HOME/.config/spotify/prefs"
+        else
+            report_skip "spicetify (Spotify not downloaded yet; launch it once)"
+            return
+        fi
+    fi
     copy_to_current "$theme" "spicetify-color.ini" || { report_skip "spicetify (no theme file)"; return; }
     # Themes/palette/color.ini is a symlink to current/spicetify-color.ini
     if [[ "$(spicetify config current_theme 2>/dev/null)" != "palette" ]]; then
