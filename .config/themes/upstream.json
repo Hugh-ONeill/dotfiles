@@ -159,6 +159,13 @@
       "synced": "2df7036c5c30",
       "note": "palette only; plugin itself updates via lazy"
     },
+    "obs": {
+      "template": "obs-palette.ovt.tmpl",
+      "repo": "obs",
+      "path": "obs.tera",
+      "synced": "5c2017fb12e6",
+      "note": "Palette flavor from the Mocha .ovt; base Catppuccin.obt in obs-studio/themes is a verbatim release copy"
+    },
     "qt5ct": {
       "template": "qt-colorscheme.conf.tmpl",
       "repo": "qt5ct",

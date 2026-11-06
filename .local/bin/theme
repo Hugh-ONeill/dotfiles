@@ -146,6 +146,7 @@ cmd_set() {
     apply_aseprite "$theme"
     apply_godot "$theme"
     apply_jellyfin "$theme"
+    apply_obs "$theme"
     apply_firefox "$theme"
     apply_wlogout "$theme"
 
