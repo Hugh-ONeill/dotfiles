@@ -145,6 +145,57 @@ apply_aseprite() {
     report_ok "aseprite (restart Aseprite to apply)"
 }
 
+# #rrggbb -> "r, g, b" as 0-1 floats, for Godot's Color(...)
+hex_to_godot() {
+    local h="${1#\#}"
+    awk -v r=$((16#${h:0:2})) -v g=$((16#${h:2:2})) -v b=$((16#${h:4:2})) \
+        'BEGIN { printf "%.3f, %.3f, %.3f", r/255, g/255, b/255 }'
+}
+
+# Set "key = value" in a Godot .tres, appending it when missing
+godot_set() {
+    local file="$1" key="$2" val="$3"
+    if grep -q "^${key} = " "$file"; then
+        sed -i "s|^${key} = .*|${key} = ${val}|" "$file"
+    else
+        printf '%s = %s\n' "$key" "$val" >> "$file"
+    fi
+}
+
+apply_godot() {
+    local theme="$1"
+    local cfg="$HOME/.var/app/org.godotengine.Godot/config/godot"
+    local tet="$GENERATED_DIR/$theme/godot.tet" palette="$PALETTES_DIR/$theme.json"
+    [[ -d "$cfg" ]] || { report_skip "godot (not set up)"; return; }
+    [[ -f "$tet" ]] || { report_skip "godot (no theme file)"; return; }
+    mkdir -p "$cfg/text_editor_themes"
+    cp "$tet" "$cfg/text_editor_themes/Palette.tet"
+    # Godot rewrites editor settings on exit; only edit them while it's closed
+    if flatpak ps --columns=application 2>/dev/null | grep -qx 'org.godotengine.Godot'; then
+        report_skip "godot (running; script theme updated, restart and re-run for the UI colors)"
+        return
+    fi
+    local settings
+    settings=$(ls -1 "$cfg"/editor_settings-*.tres 2>/dev/null | sort -V | tail -1)
+    [[ -n "$settings" ]] || { report_skip "godot (no editor settings yet)"; return; }
+    local base accent mode
+    base=$(resolve_color "base" "$palette")
+    accent=$(resolve_color "accent" "$palette")
+    mode=dark; [[ $(hex_luminance "$base") -gt $LUMINANCE_THRESHOLD ]] && mode=light
+    godot_set "$settings" "text_editor/theme/color_theme" '"Palette"'
+    godot_set "$settings" "interface/theme/base_color" "Color($(hex_to_godot "$base"), 1)"
+    godot_set "$settings" "interface/theme/accent_color" "Color($(hex_to_godot "$accent"), 1)"
+    # Catppuccin's recommended values: contrast 0.2 / icon saturation 0.6 for dark
+    if [[ "$mode" == dark ]]; then
+        godot_set "$settings" "interface/theme/contrast" "0.2"
+        godot_set "$settings" "interface/theme/icon_saturation" "0.6"
+    else
+        godot_set "$settings" "interface/theme/contrast" "0.06"
+        godot_set "$settings" "interface/theme/icon_saturation" "1.0"
+    fi
+    report_ok "godot ($(basename "$settings"))"
+}
+
 apply_stylus() {
     local theme="$1"
     local theme_dir="$GENERATED_DIR/$theme"
