@@ -79,3 +79,13 @@ apply_claude() {
         report_skip "claude (no theme file)"
     fi
 }
+
+apply_tmux() {
+    local theme="$1"
+    copy_to_current "$theme" "tmux-colors.conf" || { report_skip "tmux (no theme file)"; return; }
+    # Re-source in a running server so open sessions recolor
+    if command -v tmux &>/dev/null && tmux list-sessions &>/dev/null; then
+        tmux source-file "$HOME/.config/tmux/tmux.conf" &>/dev/null
+    fi
+    report_ok "tmux"
+}
