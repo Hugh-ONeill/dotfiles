@@ -50,7 +50,8 @@ EDITOR: dict[str, str] = {
     "cba6f7": "ACCENT", "b4befe": "ACCENT_SECONDARY", "f5e0dc": "ACCENT_TERTIARY",
 }
 
-HEX = re.compile(r"(#?)\b([0-9a-fA-F]{6})\b")
+# optional 2-digit alpha suffix (#rrggbbaa, Godot's rrggbbaa) is kept as-is
+HEX = re.compile(r"(#?)\b([0-9a-fA-F]{6})([0-9a-fA-F]{2})?\b")
 
 
 def convert(text: str, mapping: dict[str, str]) -> tuple[str, list[str]]:
@@ -63,7 +64,8 @@ def convert(text: str, mapping: dict[str, str]) -> tuple[str, list[str]]:
             # unhashed hits can be false positives (ids, hashes); still list them
             leftover.append(("#" if hashed else "") + hexv)
             return m.group(0)
-        return f"${{{var}}}" if hashed else f"${{{var}_NOHASH}}"
+        alpha = m.group(3) or ""
+        return (f"${{{var}}}" if hashed else f"${{{var}_NOHASH}}") + alpha
 
     return HEX.sub(sub, text), sorted(set(leftover))
 
