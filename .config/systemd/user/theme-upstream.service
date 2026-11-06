@@ -1,0 +1,7 @@
+[Unit]
+Description=Check Catppuccin upstream for changes to themed templates
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.config/themes/scripts/upstream-check.py --notify
