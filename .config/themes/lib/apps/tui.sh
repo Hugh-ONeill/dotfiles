@@ -3,6 +3,7 @@
 
 apply_lazygit()     { apply_simple "$1" "lazygit.yml"     "lazygit"; }
 apply_gitui()       { apply_simple "$1" "gitui.ron"       "gitui"; }
+apply_delta()       { apply_simple "$1" "delta.gitconfig" "delta"; }
 apply_btop()        { apply_simple "$1" "btop.theme"      "btop"; }
 apply_ranger()      { apply_simple "$1" "ranger.py"       "ranger"; }
 apply_glow()        { apply_simple "$1" "glow.json"       "glow"; }
