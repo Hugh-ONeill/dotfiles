@@ -6,7 +6,10 @@ variable build-catppuccin-retheme.sh maps it to, so new ports match the
 GTK/Kvantum recolor. Hex values that aren't Mocha colors (blends, one-offs)
 are listed on stderr for hand-mapping, e.g. to ${SEM_ERR_BG20}.
 
-Usage: catppuccin-to-tmpl.py <mocha-file> <out.tmpl>
+Usage: catppuccin-to-tmpl.py [--editor] <mocha-file> <out.tmpl>
+
+--editor maps accents like nvim-colors.lua.tmpl does (ANSI-based syntax
+colors), so vim and other editors match nvim instead of the GTK recolor.
 """
 
 from __future__ import annotations
@@ -37,15 +40,25 @@ MOCHA: dict[str, str] = {
     "b4befe": "ACCENT",        # lavender
 }
 
+# Accent overrides matching nvim-colors.lua.tmpl's color_overrides
+EDITOR: dict[str, str] = {
+    "f38ba8": "ANSI_RED", "eba0ac": "ANSI_RED_BRIGHT",
+    "a6e3a1": "ANSI_GREEN", "f9e2af": "ANSI_YELLOW", "fab387": "ANSI_YELLOW_BRIGHT",
+    "89b4fa": "ANSI_BLUE", "74c7ec": "ANSI_BLUE_BRIGHT",
+    "94e2d5": "ANSI_CYAN", "89dceb": "ANSI_CYAN_BRIGHT",
+    "f5c2e7": "ANSI_MAGENTA", "f2cdcd": "ANSI_MAGENTA_BRIGHT",
+    "cba6f7": "ACCENT", "b4befe": "ACCENT_SECONDARY", "f5e0dc": "ACCENT_TERTIARY",
+}
+
 HEX = re.compile(r"(#?)\b([0-9a-fA-F]{6})\b")
 
 
-def convert(text: str) -> tuple[str, list[str]]:
+def convert(text: str, mapping: dict[str, str]) -> tuple[str, list[str]]:
     leftover: list[str] = []
 
     def sub(m: re.Match[str]) -> str:
         hashed, hexv = m.group(1), m.group(2).lower()
-        var = MOCHA.get(hexv)
+        var = mapping.get(hexv)
         if var is None:
             # unhashed hits can be false positives (ids, hashes); still list them
             leftover.append(("#" if hashed else "") + hexv)
@@ -56,10 +69,15 @@ def convert(text: str) -> tuple[str, list[str]]:
 
 
 def main() -> None:
-    if len(sys.argv) != 3:
+    args = sys.argv[1:]
+    mapping = dict(MOCHA)
+    if args and args[0] == "--editor":
+        mapping.update(EDITOR)
+        args = args[1:]
+    if len(args) != 2:
         sys.exit(__doc__)
-    src, out = Path(sys.argv[1]), Path(sys.argv[2])
-    text, leftover = convert(src.read_text())
+    src, out = Path(args[0]), Path(args[1])
+    text, leftover = convert(src.read_text(), mapping)
     out.write_text(text)
     print(f"wrote {out}", file=sys.stderr)
     if leftover:
