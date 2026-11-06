@@ -1,0 +1,65 @@
+# yt-backlog configuration
+# Usage: edited by hand; read on every launch of `ytb`
+
+# ============================================================
+# COOKIES
+# ============================================================
+
+# browser yt-dlp reads YouTube login cookies from
+browser = "firefox"
+# profile name or path; empty = yt-dlp picks the most recently used one
+profile = ""
+# firefox container name, if youtube is logged in inside one
+container = ""
+
+# ============================================================
+# PLAYLISTS
+# ============================================================
+
+include_watch_later = true
+# playlist ids to skip (LL = liked videos, which are watched by definition)
+exclude_playlists = ["LL"]
+# playlist ids to sync that are not in your library (e.g. other people's)
+extra_playlists = []
+# playlists synced more recently than this are skipped (full sync ignores it)
+playlist_max_age_hours = 24
+
+# ============================================================
+# WATCH TRACKING
+# ============================================================
+
+# incremental history sync stops after this many already-known videos in a row
+history_stop_after = 200
+# fraction of a video played through ytb before it counts as watched
+watched_threshold = 0.8
+
+# ============================================================
+# PLAYER
+# ============================================================
+
+# format mpv asks yt-dlp for. HLS first: youtube 403s ffmpeg on plain https streams
+# because it doesn't fetch them in ranged chunks the way yt-dlp does. "" = mpv default
+ytdl_format = ""  # laptop: mpv.conf/local.conf decide (local.conf skips AV1)
+# extra mpv arguments, e.g. ["--fullscreen"]
+mpv_args = []
+
+# ============================================================
+# ACCOUNTS
+# ============================================================
+
+# one block per google account to sync; authuser is the account's
+# index in the browser sign-in list (run `ytb accounts` to see them).
+# no blocks = just the account youtube currently has selected.
+# keep this section last: toml puts later keys inside the block.
+#
+# [[accounts]]
+# name = "main"
+# authuser = 0
+
+[[accounts]]
+name = "grumpyrumpus"
+authuser = 1
+
+[[accounts]]
+name = "hugh-j-oneill-4"
+authuser = 0
