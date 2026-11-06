@@ -1,0 +1,200 @@
+{
+  "noise": [
+    "^chore(\\(.*\\))?: (bump|update generated)",
+    "^style(\\(.*\\))?: (deno )?fmt",
+    "^style: ",
+    "switch std lib imports",
+    "^chore\\(deps\\)",
+    "^ci(\\(.*\\))?:",
+    "^docs(\\(.*\\))?:",
+    "^chore: (sync|update) (readme|templates|issue)"
+  ],
+  "entries": {
+    "bat": {
+      "template": "bat.tmTheme.tmpl",
+      "repo": "bat",
+      "path": "themes/Catppuccin Mocha.tmTheme",
+      "synced": "6810349b2805"
+    },
+    "btop": {
+      "template": "btop.theme.tmpl",
+      "repo": "btop",
+      "path": "themes/catppuccin_mocha.theme",
+      "synced": "cf50077d8d50"
+    },
+    "cava": {
+      "template": "cava-colors.conf.tmpl",
+      "repo": "cava",
+      "path": "themes/mocha.cava",
+      "synced": "6ec25ba688e3"
+    },
+    "cursors": {
+      "template": "(build-cursors.sh)",
+      "repo": "cursors",
+      "path": "src/svgs",
+      "synced": "14605efc8fd7",
+      "note": "rebuild: theme generate-all --cursors"
+    },
+    "dunst": {
+      "template": "dunst-colors.conf.tmpl",
+      "repo": "dunst",
+      "path": "themes/mocha.conf",
+      "synced": "56b6bf5cfb60"
+    },
+    "eza": {
+      "template": "eza-theme.yml.tmpl",
+      "repo": "eza",
+      "path": "themes/mocha/catppuccin-mocha-lavender.yml",
+      "synced": "70f805f6cc27"
+    },
+    "fsh": {
+      "template": "fsh.ini.tmpl",
+      "repo": "zsh-fsh",
+      "path": "themes/catppuccin-mocha.ini",
+      "synced": "dd7baca6e0e9"
+    },
+    "fzf": {
+      "template": "fzf.sh.tmpl",
+      "repo": "fzf",
+      "path": "themes/catppuccin-fzf-mocha.sh",
+      "synced": "6c1280db15a2"
+    },
+    "gitui": {
+      "template": "gitui.ron.tmpl",
+      "repo": "gitui",
+      "path": "themes/catppuccin-mocha.ron",
+      "synced": "c7661f043cb6"
+    },
+    "hyprland": {
+      "template": "hypr-colors.lua.tmpl",
+      "repo": "hyprland",
+      "path": "themes/catppuccin-mocha.lua",
+      "synced": "9f03f26fc10a"
+    },
+    "hyprlock": {
+      "template": "hyprlock-colors.conf.tmpl",
+      "repo": "hyprlock",
+      "path": "themes/mocha.conf",
+      "synced": "ed42b541c007",
+      "note": "layout fixes land in hyprlock.conf, not this file"
+    },
+    "kitty": {
+      "template": "kitty.conf.tmpl",
+      "repo": "kitty",
+      "path": "themes/mocha.conf",
+      "synced": "43098316202b"
+    },
+    "lazygit": {
+      "template": "lazygit.yml.tmpl",
+      "repo": "lazygit",
+      "path": "themes-mergable/mocha/lavender.yml",
+      "synced": "f50a723711cc"
+    },
+    "mpv": {
+      "template": "mpv.conf.tmpl",
+      "repo": "mpv",
+      "path": "themes/mocha/lavender.conf",
+      "synced": "7cb94023a922"
+    },
+    "nvim": {
+      "template": "nvim-colors.lua.tmpl",
+      "repo": "nvim",
+      "path": "lua/catppuccin/palettes/mocha.lua",
+      "synced": "2df7036c5c30",
+      "note": "palette only; plugin itself updates via lazy"
+    },
+    "qt5ct": {
+      "template": "qt-colorscheme.conf.tmpl",
+      "repo": "qt5ct",
+      "path": "themes/catppuccin-mocha-lavender.conf",
+      "synced": "cb585307edeb"
+    },
+    "rofi": {
+      "template": "rofi-colors.rasi.tmpl",
+      "repo": "rofi",
+      "path": "themes/catppuccin-mocha.rasi",
+      "synced": "71fb15577ccb"
+    },
+    "spotify-player": {
+      "template": "spotify-player.toml.tmpl",
+      "repo": "spotify-player",
+      "path": "theme.toml",
+      "synced": "34b3d2380677"
+    },
+    "starship": {
+      "template": "starship/base.toml.tmpl",
+      "repo": "starship",
+      "path": "themes/mocha.toml",
+      "synced": "0cf91419f964"
+    },
+    "stylus-archwiki": {
+      "template": "stylus/archwiki.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/arch-wiki/catppuccin.user.less",
+      "synced": "04413649d48c"
+    },
+    "stylus-github": {
+      "template": "stylus/github.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/github/catppuccin.user.less",
+      "synced": "04413649d48c"
+    },
+    "stylus-gmail": {
+      "template": "stylus/gmail.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/gmail/catppuccin.user.less",
+      "synced": "04413649d48c",
+      "note": "custom (wiz namespace); upstream for reference"
+    },
+    "stylus-google": {
+      "template": "stylus/google.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/google/catppuccin.user.less",
+      "synced": "04413649d48c"
+    },
+    "stylus-linkedin": {
+      "template": "stylus/linkedin.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/linkedin/catppuccin.user.less",
+      "synced": "04413649d48c",
+      "note": "custom (wiz namespace); upstream for reference"
+    },
+    "stylus-reddit": {
+      "template": "stylus/reddit.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/reddit/catppuccin.user.less",
+      "synced": "78caa053c497"
+    },
+    "stylus-stackoverflow": {
+      "template": "stylus/stackoverflow.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/stack-overflow/catppuccin.user.less",
+      "synced": "04413649d48c"
+    },
+    "stylus-stylus": {
+      "template": "stylus/stylus.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/stylus/catppuccin.user.less",
+      "synced": "04413649d48c"
+    },
+    "stylus-youtube": {
+      "template": "stylus/youtube.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/youtube/catppuccin.user.less",
+      "synced": "b11ebae921ab"
+    },
+    "waybar": {
+      "template": "waybar.css.tmpl",
+      "repo": "waybar",
+      "path": "themes/mocha.css",
+      "synced": "0830796af6aa"
+    },
+    "wlogout": {
+      "template": "wlogout.css.tmpl",
+      "repo": "wlogout",
+      "path": "themes/mocha/lavender.css",
+      "synced": "de7da5b64610",
+      "note": "heavily customized (own icons, extra surfaces)"
+    }
+  }
+}

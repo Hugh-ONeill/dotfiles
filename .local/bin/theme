@@ -31,6 +31,8 @@ Commands:
   validate <theme>    Check if theme is complete
   edit <theme>        Edit theme palette
   rofi                Interactive theme picker
+  upstream [--all]    Catppuccin upstream changes since last sync
+  upstream --mark <name>...  Record template(s) as synced to upstream
 
 Shortcuts:
   theme <theme>       Same as 'theme set <theme>'
@@ -295,6 +297,7 @@ case "${1:-}" in
     validate|check) cmd_validate "$2" ;;
     edit)           cmd_edit "$2" ;;
     rofi|picker)    cmd_rofi ;;
+    upstream)       shift; exec python3 "$THEMES_DIR/scripts/upstream-check.py" "$@" ;;
     -h|--help|help) cmd_help ;;
     "")
         command -v rofi &>/dev/null && cmd_rofi || cmd_list
