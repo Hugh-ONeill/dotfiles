@@ -113,6 +113,13 @@
       "synced": "ed42b541c007",
       "note": "layout fixes land in hyprlock.conf, not this file"
     },
+    "jellyfin": {
+      "template": "jellyfin-colors.css.tmpl",
+      "repo": "jellyfin",
+      "path": "jellyfin.tera",
+      "synced": "7a87501233b9",
+      "note": "vars only (from the generated catppuccin-mocha.css); layout theme.css is imported live from jellyfin.catppuccin.com"
+    },
     "kitty": {
       "template": "kitty.conf.tmpl",
       "repo": "kitty",
