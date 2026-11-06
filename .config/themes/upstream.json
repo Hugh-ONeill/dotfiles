@@ -35,6 +35,13 @@
       "synced": "14605efc8fd7",
       "note": "rebuild: theme generate-all --cursors"
     },
+    "delta": {
+      "template": "delta.gitconfig.tmpl",
+      "repo": "delta",
+      "path": "catppuccin.gitconfig",
+      "synced": "74b47a345638",
+      "note": "mocha section only; feature renamed to theme; syntax-theme base16"
+    },
     "dunst": {
       "template": "dunst-colors.conf.tmpl",
       "repo": "dunst",

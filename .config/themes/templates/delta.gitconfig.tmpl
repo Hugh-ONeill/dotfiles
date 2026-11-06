@@ -1,0 +1,31 @@
+# ${THEME_NAME} theme for delta (port of catppuccin/delta mocha)
+# Included from ~/.config/git/config; selected there with features = theme.
+[delta "theme"]
+	blame-palette = "${BASE} ${MANTLE} ${CRUST} ${SURFACE0} ${SURFACE1}"
+	commit-decoration-style = "${OVERLAY0}" bold box ul
+	${THEME_MODE} = true
+	file-decoration-style = "${OVERLAY0}"
+	file-style = "${TEXT}"
+	hunk-header-decoration-style = "${OVERLAY0}" box ul
+	hunk-header-file-style = bold
+	hunk-header-line-number-style = bold "${SUBTEXT0}"
+	hunk-header-style = file line-number syntax
+	line-numbers-left-style = "${OVERLAY0}"
+	line-numbers-minus-style = bold "${SEM_ERR}"
+	line-numbers-plus-style = bold "${SEM_OK}"
+	line-numbers-right-style = "${OVERLAY0}"
+	line-numbers-zero-style = "${OVERLAY0}"
+	# 35% err / 20% err over base
+	minus-emph-style = bold syntax "${SEM_ERR_BG35}"
+	minus-style = syntax "${SEM_ERR_BG20}"
+	# 35% ok / 20% ok over base
+	plus-emph-style = bold syntax "${SEM_OK_BG35}"
+	plus-style = syntax "${SEM_OK_BG20}"
+	map-styles = \
+		bold purple => syntax "${ACCENT_BG35}", \
+		bold blue => syntax "${SEM_LINK_BG35}", \
+		bold cyan => syntax "${SEM_INFO_BG35}", \
+		bold yellow => syntax "${SEM_WARN_BG35}"
+	# base16 draws from the terminal's ANSI colors, so it follows the palette
+	# (same choice as bat.conf)
+	syntax-theme = base16
