@@ -1,92 +1,97 @@
 /* Firefox theme colors - generated from ${THEME_NAME} palette */
+/* Targets the Nova design tokens (Firefox 157+). Tabs, urlbar and the
+   sidebar derive their colors from these, so few element rules are needed. */
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
 
 :root {
-  /* Toolbar and UI backgrounds */
-  --lwt-accent-color: ${BASE} !important;
-  --lwt-accent-color-inactive: ${MANTLE} !important;
-  --toolbar-bgcolor: ${BASE} !important;
-  --toolbar-color: ${TEXT} !important;
-  --tabs-border-color: ${SURFACE0} !important;
+  /* ---- Foundation (Nova tabs/sidebar reference these) ---- */
+  --background-color-canvas: ${BASE} !important;
+  --background-color-box: ${SURFACE0} !important;
+  --text-color: ${TEXT} !important;
+  --text-color-deemphasized: ${SUBTEXT0} !important;
+  --border-color: ${SURFACE1} !important;
+  --focus-outline-color: ${ACCENT} !important;
+  --link-color: ${ACCENT} !important;
+  --link-color-hover: ${ACCENT_BRIGHT} !important;
+
+  /* ---- Window frame and toolbars ---- */
+  --toolbox-background-color: ${MANTLE} !important;
+  --toolbox-background-color-inactive: ${CRUST} !important;
+  --toolbox-text-color: ${TEXT} !important;
+  --toolbox-text-color-inactive: ${SUBTEXT0} !important;
+  --toolbox-background-image: none !important;
+  --toolbar-background-color: ${BASE} !important;
+  --toolbar-text-color: ${TEXT} !important;
   --tabpanel-background-color: ${BASE} !important;
+  --chrome-content-separator-color: ${SURFACE0} !important;
+  --tabs-navbar-separator-color: transparent !important;
 
-  /* Tab colors */
-  --tab-selected-bgcolor: ${SURFACE0} !important;
-  --tab-selected-textcolor: ${TEXT} !important;
-  --lwt-text-color: ${TEXT} !important;
-  --lwt-tab-text: ${TEXT} !important;
+  /* ---- Buttons ---- */
+  --button-background-color: transparent !important;
+  --button-background-color-hover: ${SURFACE1} !important;
+  --toolbarbutton-background-color-hover: ${SURFACE1} !important;
+  --toolbarbutton-background-color-active: ${SURFACE2} !important;
+  --button-background-color-primary: ${ACCENT} !important;
+  --button-background-color-primary-hover: ${ACCENT_BRIGHT} !important;
+  --button-text-color-primary: ${BASE} !important;
 
-  /* Sidebar */
-  --lwt-sidebar-background-color: ${MANTLE} !important;
-  --lwt-sidebar-text-color: ${TEXT} !important;
+  /* ---- Tabs ---- */
+  --tab-background-color-hover: ${SURFACE0} !important;
+  --tab-background-color-selected: ${SURFACE0} !important;
+  --tab-text-color-selected: ${TEXT} !important;
+  /* Nova selected-tab border: palette gradient, matches the Hyprland border */
+  --tab-border-color-accent: ${FIREFOX_TAB_ACCENT} !important;
 
-  /* URL bar */
+  /* ---- URL bar ---- */
   --toolbar-field-background-color: ${SURFACE0} !important;
-  --toolbar-field-color: ${TEXT} !important;
+  --toolbar-field-text-color: ${TEXT} !important;
   --toolbar-field-border-color: ${SURFACE1} !important;
-  --toolbar-field-focus-background-color: ${SURFACE1} !important;
-  --toolbar-field-focus-color: ${TEXT} !important;
-  --toolbar-field-focus-border-color: ${ACCENT} !important;
+  --toolbar-field-background-color-focus: ${SURFACE1} !important;
+  --toolbar-field-text-color-focus: ${TEXT} !important;
+  --toolbar-field-border-color-focus: ${ACCENT} !important;
+  --urlbar-box-background-color: ${SURFACE0} !important;
+  --urlbar-box-background-color-hover: ${SURFACE1} !important;
+  --urlbar-box-text-color: ${TEXT} !important;
   --urlbar-popup-url-color: ${ACCENT} !important;
 
-  /* Popup panels */
+  /* ---- Panels and menus ---- */
+  --panel-background-color: ${SURFACE0} !important;
+  --panel-text-color: ${TEXT} !important;
+  --panel-border-color: ${SURFACE1} !important;
+  --panel-separator-color: ${SURFACE1} !important;
   --arrowpanel-background: ${SURFACE0} !important;
   --arrowpanel-color: ${TEXT} !important;
   --arrowpanel-border-color: ${SURFACE1} !important;
 
-  /* Highlights */
-  --lwt-toolbarbutton-hover-background: ${SURFACE1} !important;
-  --lwt-toolbarbutton-active-background: ${SURFACE2} !important;
-
-  /* Accent colors */
-  --focus-outline-color: ${ACCENT} !important;
-  --button-primary-bgcolor: ${ACCENT} !important;
-  --button-primary-hover-bgcolor: ${ACCENT_BRIGHT} !important;
-  --button-primary-active-bgcolor: ${ACCENT} !important;
-  --button-primary-color: ${BASE} !important;
+  /* ---- Sidebar ---- */
+  --sidebar-background-color: ${MANTLE} !important;
+  --sidebar-text-color: ${TEXT} !important;
+  --sidebar-border-color: ${SURFACE0} !important;
 }
 
-/* Ensure dark scrollbars */
+/* ============================================================
+   ELEMENT RULES
+   ============================================================ */
+
+/* ---- Scrollbars ---- */
 * {
   scrollbar-color: ${SURFACE2} ${BASE} !important;
 }
 
-/* Tab bar background */
-#TabsToolbar {
-  background-color: ${MANTLE} !important;
-}
-
-/* Unselected tabs */
+/* ---- Unselected tab text ---- */
 .tabbrowser-tab:not([selected]) {
-  background-color: ${MANTLE} !important;
   color: ${SUBTEXT0} !important;
 }
 
-/* Selected tab */
-.tabbrowser-tab[selected] {
-  background-color: ${SURFACE0} !important;
-  color: ${TEXT} !important;
-}
-
-/* Tab hover */
-.tabbrowser-tab:not([selected]):hover {
-  background-color: ${SURFACE0} !important;
-}
-
-/* Navigation toolbar */
-#nav-bar {
-  background-color: ${BASE} !important;
-}
-
-/* Context menus */
+/* ---- Context menus (still drawn from system colors) ---- */
 menupopup,
-panel,
-#contentAreaContextMenu,
-#tabContextMenu {
+panel {
   --panel-background: ${SURFACE0} !important;
   --panel-color: ${TEXT} !important;
   --panel-border-color: ${SURFACE1} !important;
-  background-color: ${SURFACE0} !important;
-  color: ${TEXT} !important;
 }
 
 menuitem,
@@ -94,8 +99,6 @@ menu {
   color: ${TEXT} !important;
 }
 
-menuitem:hover,
-menu:hover,
 menuitem[_moz-menuactive="true"],
 menu[_moz-menuactive="true"] {
   background-color: ${SURFACE1} !important;
@@ -104,4 +107,25 @@ menu[_moz-menuactive="true"] {
 
 menuseparator {
   border-color: ${SURFACE1} !important;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+/* ---- Hyprland manages windows; drop min/max/close ---- */
+.titlebar-buttonbox-container,
+.titlebar-spacer[type="post-tabs"] {
+  display: none !important;
+}
+
+/* ---- UI font follows the palette (waybar, rofi, kitty) ---- */
+#navigator-toolbox,
+#navigator-toolbox *,
+menupopup,
+menupopup *,
+panel,
+#sidebar-box,
+#sidebar-main {
+  font-family: "${FONT_FAMILY}", sans-serif !important;
 }

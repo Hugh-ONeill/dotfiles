@@ -228,6 +228,19 @@ else
     export HYPR_ACTIVE_BORDER="\"rgba(${ACCENT_NOHASH}FF)\""
 fi
 
+# Firefox Nova selected-tab border: same gradient (or solid accent) as the
+# Hyprland active border, as a CSS <image> for --tab-border-color-accent.
+if [[ "$STYLE_BORDER" == "gradient" ]]; then
+    ff_stops=()
+    for i in $(seq 0 9); do
+        hex_var="GRADIENT_${i}"
+        ff_stops+=("${!hex_var}")
+    done
+    export FIREFOX_TAB_ACCENT="linear-gradient(90deg, $(IFS=,; echo "${ff_stops[*]}" | sed 's/,/, /g'))"
+else
+    export FIREFOX_TAB_ACCENT="linear-gradient(${ACCENT}, ${ACCENT})"
+fi
+
 # Build list of variables to substitute
 VARS='$THEME_NAME $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
 
@@ -245,7 +258,7 @@ for i in $(seq 0 9); do
 done
 
 # Add style variables
-VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_GAPS_OUT \$STYLE_DECORATION \$STYLE_BAR \$STYLE_WAYBAR \$WAYBAR_SEP_LEFT \$WAYBAR_SEP_RIGHT \$WAYBAR_SEPARATOR_CSS \$HYPR_ACTIVE_BORDER"
+VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_GAPS_OUT \$STYLE_DECORATION \$STYLE_BAR \$STYLE_WAYBAR \$WAYBAR_SEP_LEFT \$WAYBAR_SEP_RIGHT \$WAYBAR_SEPARATOR_CSS \$HYPR_ACTIVE_BORDER \$FIREFOX_TAB_ACCENT"
 
 # Add font variables
 VARS="$VARS \$FONT_FAMILY \$FONT_SIZE"
