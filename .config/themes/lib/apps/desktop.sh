@@ -114,6 +114,23 @@ apply_pywal() {
     fi
 }
 
+apply_spicetify() {
+    local theme="$1"
+    command -v spicetify &>/dev/null || { report_skip "spicetify (not installed)"; return; }
+    copy_to_current "$theme" "spicetify-color.ini" || { report_skip "spicetify (no theme file)"; return; }
+    # Themes/palette/color.ini is a symlink to current/spicetify-color.ini
+    if [[ "$(spicetify config current_theme 2>/dev/null)" != "palette" ]]; then
+        spicetify -q config current_theme palette color_scheme palette
+    fi
+    # Rewrites Spotify's xpui colors; a running Spotify shows them after a restart.
+    # spotify-launcher updates wipe the patch, so fall back to re-applying it.
+    if spicetify -q -n refresh 2>/dev/null || spicetify -q -n backup apply 2>/dev/null; then
+        report_ok "spicetify (restart Spotify to apply)"
+    else
+        report_skip "spicetify (refresh and re-apply failed; run: spicetify backup apply)"
+    fi
+}
+
 apply_stylus() {
     local theme="$1"
     local theme_dir="$GENERATED_DIR/$theme"
