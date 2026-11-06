@@ -225,6 +225,13 @@
       "synced": "efeb9583cec0",
       "note": "set -ogq -> set -gq; plugin itself updates via tpm"
     },
+    "vim": {
+      "template": "vim-colors.vim.tmpl",
+      "repo": "vim",
+      "path": "colors/catppuccin_mocha.vim",
+      "synced": "5c988d5acb47",
+      "note": "--editor mapping; blends hand-mapped to *_BG10/20/35/50"
+    },
     "waybar": {
       "template": "waybar.css.tmpl",
       "repo": "waybar",
