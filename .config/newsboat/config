@@ -1,0 +1,9 @@
+# newsboat config
+
+# ============================================================
+# THEME
+# ============================================================
+
+# catppuccin/newsboat "dark", verbatim. It uses only ANSI color numbers, so
+# it follows the theme-system palette through kitty's terminal colors.
+include ~/.config/newsboat/themes/catppuccin
