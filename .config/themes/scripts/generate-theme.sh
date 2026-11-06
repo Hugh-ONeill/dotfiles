@@ -398,6 +398,12 @@ if [[ -d "$STYLUS_TMPL" ]]; then
     fi
 fi
 
+# Aseprite bakes UI colors into a sprite sheet, so recolor it per palette
+if [[ -x "$SCRIPT_DIR/build-aseprite-theme.py" ]]; then
+    "$SCRIPT_DIR/build-aseprite-theme.py" "$THEME_NAME" >/dev/null 2>&1 \
+        && echo "  -> aseprite/"
+fi
+
 # Build GTK + Kvantum themes (idempotent; required for apply step to find them
 # at $XDG_DATA_HOME/themes/<theme>/ and ~/.config/Kvantum/<theme>/)
 if [[ -x "$SCRIPT_DIR/build-gtk-theme.sh" ]]; then

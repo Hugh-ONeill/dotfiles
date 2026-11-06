@@ -10,6 +10,20 @@
     "^chore: (sync|update) (readme|templates|issue)"
   ],
   "entries": {
+    "aseprite-sheet": {
+      "template": "(build-aseprite-theme.py)",
+      "repo": "aseprite",
+      "path": "themes/mocha/catppuccin-theme-mocha/sheet.png",
+      "synced": "c4c95e3a4125",
+      "note": "recolored per palette; on change: rm -r ~/.cache/theme-sources/aseprite-mocha && theme generate-all"
+    },
+    "aseprite-theme": {
+      "template": "(build-aseprite-theme.py)",
+      "repo": "aseprite",
+      "path": "themes/mocha/catppuccin-theme-mocha/theme.xml",
+      "synced": "c4c95e3a4125",
+      "note": "recolored per palette; on change: rm -r ~/.cache/theme-sources/aseprite-mocha && theme generate-all"
+    },
     "bat": {
       "template": "bat.tmTheme.tmpl",
       "repo": "bat",
