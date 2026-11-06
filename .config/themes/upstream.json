@@ -218,6 +218,13 @@
       "path": "styles/youtube/catppuccin.user.less",
       "synced": "b11ebae921ab"
     },
+    "tmux": {
+      "template": "tmux-colors.conf.tmpl",
+      "repo": "tmux",
+      "path": "themes/catppuccin_mocha_tmux.conf",
+      "synced": "efeb9583cec0",
+      "note": "set -ogq -> set -gq; plugin itself updates via tpm"
+    },
     "waybar": {
       "template": "waybar.css.tmpl",
       "repo": "waybar",
