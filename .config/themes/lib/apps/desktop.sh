@@ -92,6 +92,10 @@ apply_qt() {
         cp "$CURRENT_DIR/qt-colorscheme.conf" "$qtdir/colors/current.conf"
         local qtconf="$qtdir/$(basename "$qtdir").conf"
         [[ -f "$qtconf" ]] && sed -i "s|^color_scheme_path=.*|color_scheme_path=$qtdir/colors/current.conf|" "$qtconf" 2>/dev/null
+        # Icon theme follows GTK's (Papirus-<theme> overlay for Dolphin et al.)
+        local icons
+        icons=$(grep -oP '^gtk_icon_theme=\K.*' "$GENERATED_DIR/$theme/theme.conf" 2>/dev/null | tr -d '"')
+        [[ -f "$qtconf" && -n "$icons" ]] && sed -i "s|^icon_theme=.*|icon_theme=$icons|" "$qtconf" 2>/dev/null
         applied=true
     done
 
