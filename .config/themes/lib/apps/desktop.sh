@@ -196,6 +196,33 @@ apply_godot() {
     report_ok "godot ($(basename "$settings"))"
 }
 
+# Jellyfin: upstream's hosted theme.css for layout + palette vars inlined, in
+# the server's branding.xml CustomCss (so every client gets it, not just here)
+apply_jellyfin() {
+    local theme="$1"
+    local cfg="${JELLYFIN_CONFIG_DIR:-$HOME/.config/jellyfin}"
+    local css="$GENERATED_DIR/$theme/jellyfin-colors.css"
+    [[ -d "$cfg" ]] || { report_skip "jellyfin (no config dir)"; return; }
+    [[ -f "$css" ]] || { report_skip "jellyfin (no theme file)"; return; }
+    python3 - "$cfg/branding.xml" "$css" <<'PY'
+import sys, xml.etree.ElementTree as ET
+from pathlib import Path
+path, css = Path(sys.argv[1]), Path(sys.argv[2]).read_text()
+custom = "@import url('https://jellyfin.catppuccin.com/theme.css');\n" + css
+if path.exists():
+    tree = ET.parse(path); root = tree.getroot()
+else:
+    root = ET.Element("BrandingOptions"); tree = ET.ElementTree(root)
+node = root.find("CustomCss")
+if node is None:
+    node = ET.SubElement(root, "CustomCss")
+node.text = custom
+ET.indent(tree)
+tree.write(path, encoding="utf-8", xml_declaration=True)
+PY
+    report_ok "jellyfin (restart the server to apply)"
+}
+
 apply_stylus() {
     local theme="$1"
     local theme_dir="$GENERATED_DIR/$theme"
