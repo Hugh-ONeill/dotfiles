@@ -533,6 +533,19 @@
       ); // fix unset background on shorts page
     }
 
+    // ---- Hashed-token surfaces (local fix, not upstream) ----
+    // YouTube's 2026 token system paints these from hashed vars
+    // (--t<16 hex>) that change per deploy, so target the elements.
+    ytd-app,
+    #frosted-glass,
+    #frosted-glass.with-chipbar,
+    #frosted-glass.loading-with-chipbar,
+    #guide-content.ytd-app,
+    ytd-feed-filter-chip-bar-renderer,
+    #chips-wrapper.ytd-feed-filter-chip-bar-renderer {
+      background: @base !important;
+    }
+
     #guide-skeleton .guide-ghost-icon,
     #guide-skeleton .guide-ghost-text,
     .masthead-skeleton-icon,
