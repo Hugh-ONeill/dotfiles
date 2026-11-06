@@ -21,10 +21,17 @@ user_pref("browser.aboutConfig.showWarning", false);
 user_pref("browser.bookmarks.editDialog.showForNewBookmarks", false);
 user_pref("browser.toolbars.bookmarks.visibility", "never");
 user_pref("browser.tabs.inTitlebar", 1);
+// compact density (tighter toolbar and tab heights)
+user_pref("browser.compactmode.show", true);
+user_pref("browser.uidensity", 1);
 // dark browser chrome + dark prefers-color-scheme for sites
 user_pref("browser.theme.content-theme", 0);
 user_pref("layout.css.prefers-color-scheme.content-override", 0);
 user_pref("devtools.toolbox.host", "right");
+// dim tabs that were unloaded to save memory
+user_pref("browser.tabs.fadeOutUnloadedTabs", true);
+// tab notes (experimental, off by default)
+user_pref("browser.tabs.notes.enabled", true);
 // sidebar: bitwarden + passwords only
 user_pref("sidebar.main.tools", "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d},passwords");
 
@@ -75,6 +82,8 @@ user_pref("browser.newtabpage.activity-stream.feeds.telemetry", false);
 user_pref("browser.newtabpage.activity-stream.telemetry", false);
 user_pref("app.shield.optoutstudies.enabled", false);
 user_pref("app.normandy.enabled", false);
+// gradual feature rollouts (still enroll with studies off)
+user_pref("nimbus.rollouts.enabled", false);
 // ad "privacy-preserving attribution"
 user_pref("dom.private-attribution.submission.enabled", false);
 
