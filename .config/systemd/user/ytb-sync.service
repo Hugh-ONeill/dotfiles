@@ -1,0 +1,14 @@
+[Unit]
+Description=yt-backlog sync: import phone marks, pull YouTube, write the phone snapshot
+After=network-online.target
+Wants=network-online.target
+OnFailure=ytb-sync-failed.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/ytb sync
+# youtube throttling can stall a sync; a stuck one shouldn't block the next run
+TimeoutStartSec=30min
+Nice=10
+StandardOutput=journal
+StandardError=journal

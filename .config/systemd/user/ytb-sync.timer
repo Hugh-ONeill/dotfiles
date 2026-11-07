@@ -1,0 +1,12 @@
+[Unit]
+Description=Run yt-backlog sync every 4 hours
+
+[Timer]
+# 00/04/08/12/16/20:00 local. Persistent=true catches up after suspend/poweroff.
+OnCalendar=*-*-* 00/4:00:00
+Persistent=true
+RandomizedDelaySec=600
+Unit=ytb-sync.service
+
+[Install]
+WantedBy=timers.target

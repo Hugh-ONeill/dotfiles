@@ -1,0 +1,7 @@
+[Unit]
+Description=notify on yt-backlog sync failure
+
+[Service]
+Type=oneshot
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+ExecStart=/usr/bin/dunstify -u low -a ytb "ytb sync had problems" "usually youtube throttling; the next run retries. journalctl --user -u ytb-sync.service -n 30"
