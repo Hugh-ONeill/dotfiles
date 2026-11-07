@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# Graphical sudo password prompt: hyprtoolkit dialog (sudo-askpass-hypr), pinentry-gtk as fallback; used whenever sudo has no terminal
+# sudo password prompt: terminal reader (sudo-askpass-tty) when there is a tty, else hyprtoolkit dialog (sudo-askpass-hypr),
+# pinentry-gtk as the last fallback. sudo runs it when it has no terminal, or for `sudo -A` (the zsh sudo alias)
 # Usage: export SUDO_ASKPASS=~/.local/bin/sudo-askpass   (sudo runs it with the prompt as $1, reads the password from stdout)
 
 import os
@@ -42,8 +43,26 @@ def hypr_dialog(prompt):
     return None         # backend failure: fall back to pinentry
 
 
+def tty_prompt(prompt):
+    """Masked terminal prompt; None if there is no terminal."""
+    binary = os.path.expanduser("~/.local/bin/sudo-askpass-tty")
+    if not os.access(binary, os.X_OK):
+        return None
+    try:
+        res = subprocess.run([binary, prompt], stdout=subprocess.PIPE)
+    except OSError:
+        return None
+    if res.returncode == 0:
+        sys.stdout.buffer.write(res.stdout)
+        sys.exit(0)
+    if res.returncode == 1:
+        sys.exit(1)     # cancelled
+    return None         # no terminal: use the dialog
+
+
 def main():
     prompt = sys.argv[1] if len(sys.argv) > 1 else "Password:"
+    tty_prompt(prompt)
     hypr_dialog(prompt)
     cmd = sudo_command()
     if len(cmd) > 300:
