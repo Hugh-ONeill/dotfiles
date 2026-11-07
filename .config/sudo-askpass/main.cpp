@@ -17,6 +17,7 @@
 
 #include <xkbcommon/xkbcommon-keysyms.h>
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <cstdlib>
@@ -189,7 +190,7 @@ static std::string maskMarkup(const SMask& mask, size_t count) {
         char         hex[8];
         std::snprintf(hex, sizeof(hex), "#%02x%02x%02x", (int)std::lround((a[0] + (b[0] - a[0]) * t) * 255),
                       (int)std::lround((a[1] + (b[1] - a[1]) * t) * 255), (int)std::lround((a[2] + (b[2] - a[2]) * t) * 255));
-        out += std::string{"<span size=\"large\" foreground=\""} + hex + "\">" + mask.symbols[i % mask.symbols.size()] + "</span>" + (i + 1 < count ? "\u2009" : "");
+        out += std::string{"<span size=\"large\" foreground=\""} + hex + "\">" + mask.symbols[i % mask.symbols.size()] + "</span>" + (i + 1 < count ? "\u202F" : "");
     }
     return out;
 }
@@ -200,6 +201,26 @@ static void popChar(std::string& s) {
         s.pop_back();
     if (!s.empty())
         s.pop_back();
+}
+
+// clipboard text via wl-paste (hyprtoolkit's native backend keeps its clipboard private);
+// only the first line, without control characters, since sudo reads one line
+static std::string clipboardText() {
+    FILE* f = popen("timeout 2 wl-paste --no-newline --type text/plain </dev/null 2>/dev/null", "r");
+    if (!f)
+        return "";
+    std::string out;
+    char        buf[256];
+    for (size_t n; (n = fread(buf, 1, sizeof(buf), f)) > 0 && out.size() < 4096;)
+        out.append(buf, n);
+    pclose(f);
+    out = out.substr(0, out.find_first_of("\r\n"));
+    std::erase_if(out, [](char c) { return (unsigned char)c < 0x20 || c == 0x7F; });
+    return out;
+}
+
+static size_t utf8Length(const std::string& s) {
+    return (size_t)std::count_if(s.begin(), s.end(), [](char c) { return (c & 0xC0) != 0x80; });
 }
 
 static CSharedPointer<IElement> centered(CSharedPointer<IElement> child) {
@@ -288,6 +309,15 @@ int main(int, char*[]) {
                 popChar(g_password);
                 --g_passLen;
             }
+        } else if ((ctrl && (ev.xkbKeysym == XKB_KEY_v || ev.xkbKeysym == XKB_KEY_V)) ||
+                   (ev.xkbKeysym == XKB_KEY_Insert && (ev.modMask & Input::HT_MODIFIER_SHIFT))) {
+            if (ev.repeat)
+                return;
+            const std::string pasted = clipboardText();
+            if (pasted.empty())
+                return;
+            g_password += pasted;
+            g_passLen += utf8Length(pasted);
         } else if (ctrl && (ev.xkbKeysym == XKB_KEY_u || ev.xkbKeysym == XKB_KEY_U)) {
             g_password.clear();
             g_passLen = 0;
@@ -374,6 +404,8 @@ int main(int, char*[]) {
                     ->fontFamily(std::string{palette->m_vars.fontFamilyMonospace})
                     ->align(HT_FONT_ALIGN_LEFT)
                     ->noEllipsize(true)
+                    // fixed width: measured from the "Password" placeholder, live updates wrap one glyph per line
+                    ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {FIELD_W - 18.0, 22.0}})
                     // white once filled, in case the text color tints the rendered spans
                     ->color([] { return g_passLen ? CHyprColor{1.F, 1.F, 1.F, 1.F} : g_backend->getPalette()->m_colors.text.darken(0.5); })
                     ->commence();
