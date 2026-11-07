@@ -396,6 +396,10 @@ if [[ -d "$STYLUS_TMPL" ]]; then
             sed -i "/^@updateURL /d; /^@version /a @updateURL http://127.0.0.1:${STYLUS_PORT}/$filename" "$STYLUS_OUTPUT/$filename"
         fi
     done
+    # Plain stylesheets that local pages <link> from the same server
+    for template in "$STYLUS_TMPL"/*.css.tmpl; do
+        [[ -f "$template" ]] && envsubst "$VARS" < "$template" > "$STYLUS_OUTPUT/$(basename "$template" .tmpl)"
+    done
     # Bundle into importable JSON
     if [[ -x "$SCRIPTS_DIR/bundle-styles.py" ]]; then
         echo "  -> stylus-bundle.json"
