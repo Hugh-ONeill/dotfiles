@@ -45,6 +45,7 @@ constexpr size_t MAX_LINES  = 8;
 static CSharedPointer<IBackend> g_backend;
 static std::string              g_password;
 static size_t                   g_passLen = 0;    // characters (not bytes) in g_password
+static bool                     g_reveal  = false; // eye toggle: show the typed text instead of symbols
 static int                      g_outFd = -1;     // the real stdout, reserved for the password
 
 // -------------------- Helpers --------------------
@@ -138,6 +139,8 @@ struct SMask {
 };
 
 constexpr double MASK_STEP = 0.5;   // gradient stops advanced per typed character
+constexpr size_t REVEAL_MAX = 30;   // plain characters shown when revealed; older ones scroll off the left
+constexpr double EYE_W     = 36;
 constexpr size_t MASK_MAX  = 20;    // symbols that fit the field; older ones scroll off the left
 
 static std::vector<std::string> splitWords(const std::string& s) {
@@ -191,6 +194,26 @@ static std::string maskMarkup(const SMask& mask, size_t count) {
         std::snprintf(hex, sizeof(hex), "#%02x%02x%02x", (int)std::lround((a[0] + (b[0] - a[0]) * t) * 255),
                       (int)std::lround((a[1] + (b[1] - a[1]) * t) * 255), (int)std::lround((a[2] + (b[2] - a[2]) * t) * 255));
         out += std::string{"<span size=\"large\" foreground=\""} + hex + "\">" + mask.symbols[i % mask.symbols.size()] + "</span>" + (i + 1 < count ? "\u202F" : "");
+    }
+    return out;
+}
+
+// the last REVEAL_MAX characters of the password, escaped for Pango markup
+static std::string revealMarkup() {
+    size_t start = g_password.size(), seen = 0;
+    while (start > 0 && seen < REVEAL_MAX) {
+        --start;
+        if ((g_password[start] & 0xC0) != 0x80)
+            ++seen;
+    }
+    std::string out;
+    for (char c : g_password.substr(start)) {
+        switch (c) {
+            case '&': out += "&amp;"; break;
+            case '<': out += "&lt;"; break;
+            case '>': out += "&gt;"; break;
+            default: out += c;
+        }
     }
     return out;
 }
@@ -405,16 +428,41 @@ int main(int, char*[]) {
                     ->align(HT_FONT_ALIGN_LEFT)
                     ->noEllipsize(true)
                     // fixed width: measured from the "Password" placeholder, live updates wrap one glyph per line
-                    ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {FIELD_W - 18.0, 22.0}})
+                    ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {FIELD_W - 18.0 - EYE_W, 22.0}})
                     // white once filled, in case the text color tints the rendered spans
-                    ->color([] { return g_passLen ? CHyprColor{1.F, 1.F, 1.F, 1.F} : g_backend->getPalette()->m_colors.text.darken(0.5); })
+                    ->color([] {
+                        if (!g_passLen)
+                            return g_backend->getPalette()->m_colors.text.darken(0.5);
+                        return g_reveal ? g_backend->getPalette()->m_colors.text : CHyprColor{1.F, 1.F, 1.F, 1.F};
+                    })
                     ->commence();
     fieldRow->addChild(fieldText);
     fieldBox->addChild(fieldRow);
+
+    // eye toggle at the field's right edge: nf-fa-eye / nf-fa-eye_slash, padded with a
+    // no-break space because the Nerd Font glyph draws wider than its measured width
+    CSharedPointer<CButtonElement> eyeButton = CButtonBuilder::begin()
+                                                   ->label(std::string{"\uF06E\u00A0"})
+                                                   ->noBorder(true)
+                                                   ->noBg(true)
+                                                   ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {EYE_W, 30.0}})
+                                                   ->onMainClick([&](CSharedPointer<CButtonElement> self) {
+                                                       g_reveal = !g_reveal;
+                                                       self->setLabel(g_reveal ? "\uF070\u00A0" : "\uF06E\u00A0");
+                                                       updateField();
+                                                   })
+                                                   ->commence();
+    auto eyeWrap = CRowLayoutBuilder::begin()->commence();
+    eyeWrap->setMargin(3);    // keep clear of the border and rounding
+    eyeWrap->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
+    eyeWrap->setPositionFlag(IElement::HT_POSITION_FLAG_RIGHT, true);
+    eyeWrap->setPositionFlag(IElement::HT_POSITION_FLAG_VCENTER, true);
+    eyeWrap->addChild(eyeButton);
+    fieldBox->addChild(eyeWrap);
     outer->addChild(centered(fieldBox));
 
     updateField = [&] {
-        fieldText->setText(g_passLen ? maskMarkup(mask, g_passLen) : std::string{"Password"});
+        fieldText->setText(!g_passLen ? std::string{"Password"} : g_reveal ? revealMarkup() : maskMarkup(mask, g_passLen));
         if (authButton)
             authButton->setEnabled(g_passLen > 0);
     };
