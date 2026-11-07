@@ -1,0 +1,36 @@
+/* job-scan (:8765) and news-scan (:8766) dashboards, from the active palette.
+ *
+ * Each dashboard links http://127.0.0.1:8790/scan-dashboards.css after its own
+ * stylesheet. The browser fetches it, so it reaches the style server on the
+ * machine doing the viewing: the laptop shows its theme over the tunnel, the
+ * desktop its own. Server down or file missing: the page keeps its built-in
+ * Catppuccin values.
+ *
+ * Both pages take every color from these vars (color-mix tints included).
+ * Only keys every palette has: semantic, ANSI, accent, and the surface ramp.
+ * Peach (score 60, the HN tag) is a warn/err blend; most palettes have no peach.
+ */
+:root {
+  color-scheme: ${THEME_MODE};
+  --bg: ${MANTLE};
+  --panel: ${BASE};
+  --panel-2: ${SURFACE0};
+  --border: ${SURFACE1};
+  --border-field: ${OVERLAY1};
+  --text: ${TEXT};
+  --muted: ${OVERLAY2};
+  --subtext: ${SUBTEXT1};
+  --on-accent: ${CRUST};
+  --accent: ${ACCENT};
+  --good: ${SEM_OK};
+  --warn: ${SEM_WARN};
+  --bad: ${SEM_ERR};
+  --star: ${SEM_WARN};
+  --peach: color-mix(in srgb, ${SEM_WARN}, ${SEM_ERR});
+  --breakout: ${ACCENT_TERTIARY};
+  --score-90: ${SEM_OK};
+  --score-80: ${ANSI_CYAN};
+  --score-70: ${SEM_WARN};
+  --score-60: color-mix(in srgb, ${SEM_WARN}, ${SEM_ERR});
+  --score-lo: ${OVERLAY0};
+}

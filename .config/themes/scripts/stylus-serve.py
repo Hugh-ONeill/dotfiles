@@ -5,6 +5,8 @@ Stylus installs a .user.less URL only when it's served as text/*, and it
 re-downloads a localhost style whenever its code changes (no @version bump),
 so a theme switch reaches the browser on the next update check.
 The directory listing at / doubles as the one-time install page.
+Plain .css files here are <link>ed by local pages (job-scan, news-scan), so
+the viewing machine's theme applies without Stylus.
 """
 
 from __future__ import annotations
