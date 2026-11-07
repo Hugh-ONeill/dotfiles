@@ -1,4 +1,4 @@
-set viminfofile='$XDG_DATA_HOME/viminfo'
+set viminfofile=$XDG_DATA_HOME/viminfo
 
 set history=500
 
