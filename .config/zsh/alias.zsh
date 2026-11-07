@@ -11,7 +11,7 @@ alias rf="refreshenv && c"
 alias e=$EDITOR
 # edit root-owned files as yourself; sudoedit writes the result back as root
 # (running nvim under sudo leaves root-owned files in ~/.local/share/nvim)
-alias svim='sudoedit'
+alias svim='sudoedit -A'
 # nvidia-settings hardcodes ~/.nvidia-settings-rc otherwise
 alias nvidia-settings='nvidia-settings --config="$XDG_CONFIG_HOME/nvidia/settings"'
 
@@ -125,3 +125,7 @@ alias rcolorscripts='find ~/.local/bin/ascii/color-scripts -type f | shuf -n 1 |
 
 alias phone='systemctl --user start phone-mount.service'      # mount   -> ~/phone
 alias phone-off='systemctl --user stop phone-mount.service'   # unmount ~/phone
+
+# sudo through the askpass helper so the password echoes as theme symbols
+# (~/.local/bin/sudo-askpass-tty in a terminal, the hyprtoolkit dialog otherwise)
+alias sudo='sudo -A '
