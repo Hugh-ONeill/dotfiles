@@ -527,6 +527,20 @@ rofi_menu() {
             exit 0
             ;;
     esac
+
+    wait_for_rofi_gone
+}
+
+wait_for_rofi_gone() {
+    # rofi's layer keeps fading out after the process exits (layersOut /
+    # fadeLayersOut in animations.conf); freezing or grabbing before that
+    # finishes bakes the menu into the shot
+    local i
+    for i in {1..20}; do
+        hyprctl layers -j | jq -e '[.. | .namespace? // empty] | index("rofi")' &>/dev/null || break
+        sleep 0.05
+    done
+    sleep 0.35
 }
 
 # ============================================================
