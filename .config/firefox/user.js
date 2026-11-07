@@ -32,6 +32,9 @@ user_pref("devtools.toolbox.host", "right");
 user_pref("browser.tabs.fadeOutUnloadedTabs", true);
 // tab notes (experimental, off by default)
 user_pref("browser.tabs.notes.enabled", true);
+// no auto tab groups (drag-to-group, smart AI grouping)
+user_pref("browser.tabs.dragDrop.createGroup.enabled", false);
+user_pref("browser.tabs.groups.smart.userEnabled", false);
 // sidebar: bitwarden + passwords only
 user_pref("sidebar.main.tools", "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d},passwords");
 
@@ -51,12 +54,18 @@ user_pref("browser.urlbar.suggest.topsites", false);
 user_pref("browser.urlbar.suggest.quicksuggest.all", false);
 user_pref("browser.urlbar.suggest.quicksuggest.nonsponsored", false);
 user_pref("browser.urlbar.suggest.quicksuggest.sponsored", false);
+user_pref("browser.urlbar.suggest.quickactions", false);
+// show the URL, not the search terms, on result pages
+user_pref("browser.urlbar.showSearchTerms.enabled", false);
 
 // -------------------- New Tab --------------------
 user_pref("browser.newtabpage.activity-stream.showSearch", false);
+user_pref("browser.newtabpage.activity-stream.hideLogo", true);
 user_pref("browser.newtabpage.activity-stream.showSponsored", false);
 user_pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+user_pref("browser.newtabpage.activity-stream.showSponsoredCheckboxes", false);
 user_pref("browser.newtabpage.activity-stream.showWeather", false);
+user_pref("browser.newtabpage.activity-stream.widgets.enabled", false);
 user_pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
 user_pref("browser.newtabpage.activity-stream.widgets.clocks.enabled", false);
 user_pref("browser.newtabpage.activity-stream.widgets.crossword.enabled", false);
