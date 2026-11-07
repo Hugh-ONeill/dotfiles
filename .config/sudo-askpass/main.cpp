@@ -10,7 +10,6 @@
 #include <hyprtoolkit/element/Rectangle.hpp>
 #include <hyprtoolkit/element/RowLayout.hpp>
 #include <hyprtoolkit/element/Text.hpp>
-#include <hyprtoolkit/element/Textbox.hpp>
 #include <hyprtoolkit/palette/Color.hpp>
 #include <hyprtoolkit/types/FontTypes.hpp>
 #include <hyprtoolkit/types/SizeType.hpp>
@@ -18,8 +17,13 @@
 
 #include <xkbcommon/xkbcommon-keysyms.h>
 
+#include <array>
 #include <cstdio>
+#include <cstdlib>
+#include <sstream>
+#include <vector>
 #include <fcntl.h>
+#include <cmath>
 #include <fstream>
 #include <pwd.h>
 #include <string>
@@ -39,6 +43,7 @@ constexpr size_t MAX_LINES  = 8;
 
 static CSharedPointer<IBackend> g_backend;
 static std::string              g_password;
+static size_t                   g_passLen = 0;    // characters (not bytes) in g_password
 static int                      g_outFd = -1;     // the real stdout, reserved for the password
 
 // -------------------- Helpers --------------------
@@ -123,6 +128,80 @@ static std::vector<std::string> wrapCommand(const std::string& cmd) {
     return lines;
 }
 
+// -------------------- Password mask --------------------
+
+// symbols and gradient stops from the theme (~/.config/themes/current/password-mask.conf)
+struct SMask {
+    std::vector<std::string>                  symbols  = {"\u25CF"};
+    std::vector<std::array<double, 3>>        gradient = {{1.0, 1.0, 1.0}};
+};
+
+constexpr double MASK_STEP = 0.5;   // gradient stops advanced per typed character
+constexpr size_t MASK_MAX  = 20;    // symbols that fit the field; older ones scroll off the left
+
+static std::vector<std::string> splitWords(const std::string& s) {
+    std::vector<std::string> out;
+    std::istringstream       in(s);
+    for (std::string w; in >> w;)
+        out.push_back(w);
+    return out;
+}
+
+static SMask loadMask() {
+    SMask         mask;
+    std::ifstream f(std::string{getenv("HOME") ? getenv("HOME") : ""} + "/.config/themes/current/password-mask.conf");
+    for (std::string line; std::getline(f, line);) {
+        const auto eq = line.find('=');
+        if (eq == std::string::npos || line.starts_with("#"))
+            continue;
+        std::string key = line.substr(0, eq);
+        key.erase(key.find_last_not_of(' ') + 1);
+        auto words = splitWords(line.substr(eq + 1));
+        if (words.empty())
+            continue;
+        if (key == "symbols")
+            mask.symbols = words;
+        else if (key == "gradient") {
+            mask.gradient.clear();
+            for (const auto& h : words) {
+                if (h.size() != 7 || h[0] != '#')
+                    continue;
+                const unsigned v = std::stoul(h.substr(1), nullptr, 16);
+                mask.gradient.push_back({((v >> 16) & 0xFF) / 255.0, ((v >> 8) & 0xFF) / 255.0, (v & 0xFF) / 255.0});
+            }
+            if (mask.gradient.empty())
+                mask.gradient = {{1.0, 1.0, 1.0}};
+        }
+    }
+    return mask;
+}
+
+// Pango markup for the mask: one symbol per typed character, colored along the wrapping gradient
+static std::string maskMarkup(const SMask& mask, size_t count) {
+    std::string  out;
+    const size_t n = mask.gradient.size();
+    for (size_t i = count > MASK_MAX ? count - MASK_MAX : 0; i < count; ++i) {
+        const double pos = std::fmod((double)i * MASK_STEP, (double)n);
+        const size_t lo  = (size_t)pos;
+        const double t   = pos - (double)lo;
+        const auto&  a   = mask.gradient[lo];
+        const auto&  b   = mask.gradient[(lo + 1) % n];
+        char         hex[8];
+        std::snprintf(hex, sizeof(hex), "#%02x%02x%02x", (int)std::lround((a[0] + (b[0] - a[0]) * t) * 255),
+                      (int)std::lround((a[1] + (b[1] - a[1]) * t) * 255), (int)std::lround((a[2] + (b[2] - a[2]) * t) * 255));
+        out += std::string{"<span size=\"large\" foreground=\""} + hex + "\">" + mask.symbols[i % mask.symbols.size()] + "</span>" + (i + 1 < count ? "\u2009" : "");
+    }
+    return out;
+}
+
+// drop the last UTF-8 character
+static void popChar(std::string& s) {
+    while (!s.empty() && (s.back() & 0xC0) == 0x80)
+        s.pop_back();
+    if (!s.empty())
+        s.pop_back();
+}
+
 static CSharedPointer<IElement> centered(CSharedPointer<IElement> child) {
     auto wrap = CRowLayoutBuilder::begin()->commence();
     wrap->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
@@ -165,6 +244,10 @@ int main(int, char*[]) {
                       ->appClass("sudo-askpass")
                       ->commence();
 
+    const SMask                     mask = loadMask();
+    CSharedPointer<CTextElement>    fieldText;
+    CSharedPointer<IElement>        fieldBox;
+    std::function<void()>           updateField;
     CSharedPointer<CButtonElement>  authButton;
     CSharedPointer<CTextElement>    capsLabel;
     CSharedPointer<IElement>        capsWrap, statusCol;
@@ -184,12 +267,37 @@ int main(int, char*[]) {
                 capsShown = false;
             }
         }
-        if (!ev.down || ev.repeat)
+        if (!ev.down)
             return;
-        if ((ev.xkbKeysym == XKB_KEY_Return || ev.xkbKeysym == XKB_KEY_KP_Enter) && !g_password.empty())
-            finish(true);
-        else if (ev.xkbKeysym == XKB_KEY_Escape)
-            finish(false);
+        const bool ctrl = ev.modMask & Input::HT_MODIFIER_CTRL;
+        if (ev.xkbKeysym == XKB_KEY_Return || ev.xkbKeysym == XKB_KEY_KP_Enter) {
+            if (!ev.repeat && !g_password.empty())
+                finish(true);
+            return;
+        }
+        if (ev.xkbKeysym == XKB_KEY_Escape) {
+            if (!ev.repeat)
+                finish(false);
+            return;
+        }
+        if (ev.xkbKeysym == XKB_KEY_BackSpace) {
+            if (ctrl) {
+                g_password.clear();
+                g_passLen = 0;
+            } else if (g_passLen) {
+                popChar(g_password);
+                --g_passLen;
+            }
+        } else if (ctrl && (ev.xkbKeysym == XKB_KEY_u || ev.xkbKeysym == XKB_KEY_U)) {
+            g_password.clear();
+            g_passLen = 0;
+        } else if (!ctrl && !(ev.modMask & Input::HT_MODIFIER_ALT) && !ev.utf8.empty() && (unsigned char)ev.utf8[0] >= 0x20 &&
+                   ev.utf8[0] != 0x7F) {
+            g_password += ev.utf8;
+            ++g_passLen;
+        } else
+            return;
+        updateField();
     });
 
     window->m_rootElement->addChild(CRectangleBuilder::begin()->color([] { return g_backend->getPalette()->m_colors.background; })->commence());
@@ -249,19 +357,35 @@ int main(int, char*[]) {
         outer->addChild(centered(box));
     }
 
-    auto field = CTextboxBuilder::begin()
-                     ->placeholder(std::string{"Password"})
-                     ->password(true)
-                     ->eyeIcon(true)
-                     ->multiline(false)
-                     ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {FIELD_W, 36.0}})
-                     ->onTextEdited([&](CSharedPointer<CTextboxElement>, const std::string& s) {
-                         g_password = s;
-                         if (authButton)
-                             authButton->setEnabled(!s.empty());
-                     })
-                     ->commence();
-    outer->addChild(centered(field));
+    // the password field: drawn here rather than a password Textbox so the mask can be theme symbols
+    fieldBox = CRectangleBuilder::begin()
+                   ->color([] { return g_backend->getPalette()->m_colors.base; })
+                   ->borderColor([] { return g_backend->getPalette()->m_colors.accent; })
+                   ->borderThickness(1)
+                   ->rounding(palette->m_vars.smallRounding)
+                   ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {FIELD_W, 36.0}})
+                   ->commence();
+    auto fieldRow = CRowLayoutBuilder::begin()->commence();
+    fieldRow->setMargin(9);
+    fieldRow->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
+    fieldRow->setPositionFlag(IElement::HT_POSITION_FLAG_VCENTER, true);
+    fieldText = CTextBuilder::begin()
+                    ->text(std::string{"Password"})
+                    ->fontFamily(std::string{palette->m_vars.fontFamilyMonospace})
+                    ->align(HT_FONT_ALIGN_LEFT)
+                    ->noEllipsize(true)
+                    // white once filled, in case the text color tints the rendered spans
+                    ->color([] { return g_passLen ? CHyprColor{1.F, 1.F, 1.F, 1.F} : g_backend->getPalette()->m_colors.text.darken(0.5); })
+                    ->commence();
+    fieldRow->addChild(fieldText);
+    fieldBox->addChild(fieldRow);
+    outer->addChild(centered(fieldBox));
+
+    updateField = [&] {
+        fieldText->setText(g_passLen ? maskMarkup(mask, g_passLen) : std::string{"Password"});
+        if (authButton)
+            authButton->setEnabled(g_passLen > 0);
+    };
 
     statusCol = CColumnLayoutBuilder::begin()->gap(4)->commence();
     statusCol->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
@@ -296,7 +420,6 @@ int main(int, char*[]) {
     outer->addChild(btnRow);
 
     window->open();
-    field->focus();
     g_backend->enterLoop();
     return 1;
 }
