@@ -110,6 +110,7 @@ cmd_set() {
     apply_waybar "$theme" "$palette_path"
     apply_hyprlock "$theme"
     apply_hyprtoolkit "$theme"
+    apply_password_mask "$theme"
     apply_lazygit "$theme"
     apply_gitui "$theme"
     apply_delta "$theme"

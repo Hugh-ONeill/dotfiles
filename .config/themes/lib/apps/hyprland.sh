@@ -40,4 +40,5 @@ apply_hyprland() {
 
 apply_hyprlock()    { apply_simple "$1" "hyprlock-colors.conf" "hyprlock"; }
 apply_hyprtoolkit() { apply_simple "$1" "hyprtoolkit.conf"     "hyprtoolkit"; }
+apply_password_mask() { apply_simple "$1" "password-mask.conf" "password-mask"; }
 
