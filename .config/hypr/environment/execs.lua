@@ -40,6 +40,7 @@ local once = {
 
     -- Utilities
     "clipse -listen",
+    "pypr",
     "udiskie",
 }
 
