@@ -36,6 +36,14 @@ hl.env("HYPRCURSOR_SIZE",  tostring(c.cursor_size))
 --- APPEARANCE ---
 ------------------
 
+local rainbow_border = {
+    colors = {
+        "rgb(ff0000)", "rgb(ff8000)", "rgb(ffff00)", "rgb(00ff00)",
+        "rgb(00ffff)", "rgb(0080ff)", "rgb(8000ff)", "rgb(ff00ff)",
+    },
+    angle = 45,
+}
+
 hl.config({
     general = {
         border_size     = c.theme_border_size,
@@ -45,6 +53,10 @@ hl.config({
         col = {
             active_border   = c.theme_active_border,
             inactive_border = c.theme_inactive_border,
+            -- Windows that refuse grouping use these instead; in practice
+            -- that is only the pyprland scratchpads. Fixed across themes.
+            nogroup_border        = rainbow_border,
+            nogroup_border_active = rainbow_border,
         },
     },
 
