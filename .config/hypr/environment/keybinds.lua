@@ -207,6 +207,7 @@ bind("CTRL + Print",   exec("~/.local/bin/screenshot window"))
 -- Utilities
 -- ═══════════════════════════════════════════════════════════════════════════
 
-bind(mod .. " + M",             exec("~/.local/bin/music"))
+bind(mod .. " + M",             exec("pypr toggle music"))
+bind(mod .. " + Z",             exec("pypr toggle term"))
 bind(mod .. " + SHIFT + P",     exec("hyprpicker -a"))
 bind(mod .. " + SHIFT + slash", rofi(keybinds))

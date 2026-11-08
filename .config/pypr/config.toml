@@ -1,0 +1,26 @@
+# ============================================================
+# PYPRLAND
+# ============================================================
+# Toggled by SUPER+Z and SUPER+M in hypr/environment/keybinds.lua.
+# The daemon is started from hypr/environment/execs.lua.
+
+[pyprland]
+plugins = ["scratchpads"]
+
+# ============================================================
+# SCRATCHPADS
+# ============================================================
+
+[scratchpads.term]
+command = "kitty --class scratch-term"
+class = "scratch-term"
+animation = "fromTop"
+size = "75% 60%"
+multi = false
+
+[scratchpads.music]
+command = "kitty --class scratch-music --title music --session ~/.config/kitty/sessions/music.conf"
+class = "scratch-music"
+animation = "fromBottom"
+size = "75% 75%"
+multi = false
