@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+# Trippy fullscreen lava-lamp metaball visualizer.
+# Usage: lavalamp [theme-name]   (defaults to current theme)
+
+import json
+import math
+import os
+import random
+import shutil
+import signal
+import sys
+import time
+from pathlib import Path
+
+THEMES_DIR = Path.home() / ".config/themes"
+PALETTES = THEMES_DIR / "palettes"
+CURRENT_FILE = THEMES_DIR / ".current"
+
+STRUCTURAL = {
+    "crust", "mantle", "base",
+    "surface0", "surface1", "surface2",
+    "overlay0", "overlay1", "overlay2",
+    "text", "subtext0", "subtext1",
+    "module_fg", "module_fg_light",
+}
+PREFIX_SKIP = ("accent", "ansi_", "sem_", "ft_")
+
+
+def hex_to_rgb(h):
+    h = h.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+def load_palette(name):
+    data = json.loads((PALETTES / f"{name}.json").read_text())
+    colors = data["colors"]
+    gradient = []
+    for key, val in colors.items():
+        if key in STRUCTURAL:
+            continue
+        if key.endswith("_bright"):
+            continue
+        if any(key.startswith(p) for p in PREFIX_SKIP):
+            continue
+        gradient.append(hex_to_rgb(val))
+    bg = hex_to_rgb(colors.get("crust", colors.get("base", "#000000")))
+    return bg, gradient
+
+
+def lerp(a, b, t):
+    return a + (b - a) * t
+
+
+def build_ramp(stops, n=256):
+    if len(stops) < 2:
+        stops = stops + stops
+    ramp = []
+    segs = len(stops) - 1
+    for i in range(n):
+        t = i / (n - 1) * segs
+        idx = min(int(t), segs - 1)
+        f = t - idx
+        a, b = stops[idx], stops[idx + 1]
+        ramp.append((
+            int(lerp(a[0], b[0], f)),
+            int(lerp(a[1], b[1], f)),
+            int(lerp(a[2], b[2], f)),
+        ))
+    return ramp
+
+
+class Blob:
+    def __init__(self, w, h):
+        self.x = random.uniform(0, w)
+        self.y = random.uniform(0, h)
+        angle = random.uniform(0, 2 * math.pi)
+        speed = random.uniform(0.15, 0.45)
+        self.vx = math.cos(angle) * speed
+        self.vy = math.sin(angle) * speed * 0.6
+        self.r = random.uniform(4.0, 9.0)
+        self.phase = random.uniform(0, 2 * math.pi)
+        self.wobble = random.uniform(0.4, 1.2)
+
+    def step(self, w, h, t):
+        self.x += self.vx + math.sin(t * 0.7 + self.phase) * 0.08
+        self.y += self.vy + math.cos(t * 0.5 + self.phase) * 0.05
+        if self.x < self.r:
+            self.x = self.r; self.vx = abs(self.vx)
+        if self.x > w - self.r:
+            self.x = w - self.r; self.vx = -abs(self.vx)
+        if self.y < self.r:
+            self.y = self.r; self.vy = abs(self.vy)
+        if self.y > h - self.r:
+            self.y = h - self.r; self.vy = -abs(self.vy)
+
+
+def hide_cursor(): sys.stdout.write("\x1b[?25l\x1b[?1049h")
+def show_cursor(): sys.stdout.write("\x1b[?25h\x1b[?1049l")
+
+
+def main():
+    theme = sys.argv[1] if len(sys.argv) > 1 else CURRENT_FILE.read_text().strip()
+    try:
+        bg, gradient = load_palette(theme)
+    except FileNotFoundError:
+        sys.exit(f"palette not found: {theme}")
+    if not gradient:
+        sys.exit("palette has no gradient colors")
+
+    random.shuffle(gradient)
+    ramp = build_ramp(gradient + [bg], n=256)
+
+    cols, rows = shutil.get_terminal_size()
+    w, h = cols * 2, rows * 2  # half-block vertical doubling
+    blobs = [Blob(w, h) for _ in range(random.randint(5, 7))]
+
+    stop = {"flag": False}
+    signal.signal(signal.SIGINT, lambda *_: stop.__setitem__("flag", True))
+    signal.signal(signal.SIGTERM, lambda *_: stop.__setitem__("flag", True))
+
+    hide_cursor()
+    sys.stdout.write("\x1b[2J")
+    sys.stdout.flush()
+
+    frame_dt = 1.0 / 30.0
+    t0 = time.time()
+    last_size = (cols, rows)
+    try:
+        while not stop["flag"]:
+            frame_start = time.time()
+            t = frame_start - t0
+
+            size = shutil.get_terminal_size()
+            if size != last_size:
+                cols, rows = size
+                w, h = cols * 2, rows * 2
+                last_size = size
+                sys.stdout.write("\x1b[2J")
+
+            for b in blobs:
+                b.step(w, h, t)
+
+            out = ["\x1b[H"]
+            prev_fg = prev_bg = None
+            for row in range(rows):
+                is_last = row == rows - 1
+                y_top = row * 2
+                y_bot = row * 2 + 1
+                for col in range(cols):
+                    x = col * 2  # cells are ~half as wide visually; *2 keeps blobs round
+                    ft = 0.0
+                    fb = 0.0
+                    for b in blobs:
+                        rr = b.r * b.r * 4.0
+                        dx = x - b.x
+                        dyt = y_top - b.y
+                        dyb = y_bot - b.y
+                        ft += rr / (dx * dx + dyt * dyt + 1.0)
+                        fb += rr / (dx * dx + dyb * dyb + 1.0)
+
+                    def to_color(f):
+                        # threshold ~1.0 for metaball surface; ramp across the "inside"
+                        v = (f - 0.6) * 1.1
+                        if v <= 0:
+                            return bg
+                        if v >= 1:
+                            v = 1.0
+                        return ramp[int(v * 255)]
+
+                    top = to_color(ft)
+                    bot = to_color(fb)
+
+                    if top != prev_fg:
+                        out.append(f"\x1b[38;2;{top[0]};{top[1]};{top[2]}m")
+                        prev_fg = top
+                    if bot != prev_bg:
+                        out.append(f"\x1b[48;2;{bot[0]};{bot[1]};{bot[2]}m")
+                        prev_bg = bot
+                    out.append("▀")
+                out.append("\x1b[0m")
+                if not is_last:
+                    out.append("\n")
+                prev_fg = prev_bg = None
+
+            sys.stdout.write("".join(out))
+            sys.stdout.flush()
+
+            elapsed = time.time() - frame_start
+            if elapsed < frame_dt:
+                time.sleep(frame_dt - elapsed)
+    finally:
+        sys.stdout.write("\x1b[0m\x1b[2J\x1b[H")
+        show_cursor()
+        sys.stdout.flush()
+
+
+if __name__ == "__main__":
+    main()
