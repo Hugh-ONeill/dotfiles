@@ -1,0 +1,12 @@
+[Unit]
+Description=job-scan midday picks: today's best open postings not yet applied to
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Developer/job-scan
+# A DB read and one notify-send; no network, no LLM.
+ExecStart=%h/Developer/job-scan/.venv/bin/python -m job_scan picks --notify
+Environment=DISPLAY=:0
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+StandardOutput=journal
+StandardError=journal

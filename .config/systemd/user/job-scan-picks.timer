@@ -1,0 +1,12 @@
+[Unit]
+Description=job-scan midday picks at 14:00
+
+[Timer]
+# 14:00, after the morning scan and the 10:00/12:00 watches. A nudge missed
+# while asleep still matters on wake the same day: Persistent=true.
+OnCalendar=*-*-* 14:00:00
+Persistent=true
+Unit=job-scan-picks.service
+
+[Install]
+WantedBy=timers.target
