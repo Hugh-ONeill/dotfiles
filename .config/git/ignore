@@ -35,6 +35,9 @@
 # pokeagent.env and friends.
 *.env
 .config/crystal-battle/
+# Spotify session cookie and API key; neither has a name the patterns above catch.
+.config/sptlrx/cookie
+.config/soloistd/config.json
 # Whole dir: config leaks host aliases and LAN IPs, known_hosts.old the rest.
 .ssh/
 
