@@ -1,0 +1,4 @@
+export AQ_DRM_DERVICES="/dev/dri/card2:/dev/dri/card1"
+
+export HYPRCURSOR_THEME="catppuccin-mocha-dark"
+export HYPRCURSOR_SIZE=24
