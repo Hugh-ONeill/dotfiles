@@ -1,0 +1,339 @@
+#!/bin/bash
+# Terminal screensaver that fills the screen with theme gradient patterns
+# Usage: gradfill [char]
+
+set -u
+
+# ============================================================
+# CONFIGURATION
+# ============================================================
+BATCH=8
+DELAY=0.004
+DISSOLVE_BATCH=32
+DISSOLVE_DELAY=0.002
+PAUSE_FULL=3
+FILL="${1:- }"
+# bg-colored space (default) vs fg-colored glyph
+if [[ "$FILL" == " " ]]; then
+    COLOR_ATTR=48
+else
+    COLOR_ATTR=38
+fi
+
+# ============================================================
+# COLORS
+# ============================================================
+declare -a GRAD_R=() GRAD_G=() GRAD_B=()
+
+CURRENT_THEME=$(cat "$HOME/.config/themes/.current" 2>/dev/null)
+PALETTE="$HOME/.config/themes/palettes/${CURRENT_THEME:-none}.json"
+
+load_gradient() {
+    if [[ -f "$PALETTE" ]] && command -v jq &>/dev/null; then
+        while IFS= read -r hex; do
+            hex="${hex#\#}"
+            [[ ${#hex} -eq 6 ]] || continue
+            GRAD_R+=("$((16#${hex:0:2}))")
+            GRAD_G+=("$((16#${hex:2:2}))")
+            GRAD_B+=("$((16#${hex:4:2}))")
+        done < <(jq -r '
+            .gradient[] as $name |
+            if .colors[$name] then
+                if (.colors[$name] | startswith("#")) then .colors[$name]
+                else .colors[.colors[$name]] // .colors[$name]
+                end
+            else $name end
+        ' "$PALETTE" 2>/dev/null)
+    fi
+
+    if [[ ${#GRAD_R[@]} -eq 0 ]]; then
+        GRAD_R=(255 255 220 82  39  63  129 213)
+        GRAD_G=(69  165 20  255 170 81  30  85)
+        GRAD_B=(0   0   60  82  225 181 220 157)
+    fi
+}
+
+# ============================================================
+# POSITION GENERATORS
+# ============================================================
+gen_diagonal() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        for (d = 0; d <= rows + cols - 2; d++) {
+            lo = d - cols + 1; if (lo < 0) lo = 0
+            hi = d; if (hi >= rows) hi = rows - 1
+            for (r = lo; r <= hi; r++) {
+                c = d - r
+                if (c >= 0 && c < cols) print (r+1) " " (c+1)
+            }
+        }
+    }'
+}
+
+gen_reverse_diagonal() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        maxd = rows + cols - 2
+        for (d = maxd; d >= 0; d--) {
+            lo = d - cols + 1; if (lo < 0) lo = 0
+            hi = d; if (hi >= rows) hi = rows - 1
+            for (r = hi; r >= lo; r--) {
+                c = d - r
+                if (c >= 0 && c < cols) print (r+1) " " (c+1)
+            }
+        }
+    }'
+}
+
+gen_scatter() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        for (r = 1; r <= rows; r++)
+            for (c = 1; c <= cols; c++)
+                print r " " c
+    }' | shuf
+}
+
+gen_cascade() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        srand()
+        for (r = 1; r <= rows; r++) {
+            n = cols
+            for (i = 1; i <= n; i++) a[i] = i
+            for (i = n; i > 1; i--) {
+                j = int(rand() * i) + 1
+                tmp = a[i]; a[i] = a[j]; a[j] = tmp
+            }
+            for (i = 1; i <= n; i++) print r " " a[i]
+        }
+    }'
+}
+
+gen_spiral() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        top = 0; bot = rows - 1; left = 0; right = cols - 1
+        while (top <= bot && left <= right) {
+            for (c = left; c <= right; c++) print (top+1) " " (c+1)
+            top++
+            for (r = top; r <= bot; r++) print (r+1) " " (right+1)
+            right--
+            if (top <= bot) {
+                for (c = right; c >= left; c--) print (bot+1) " " (c+1)
+                bot--
+            }
+            if (left <= right) {
+                for (r = bot; r >= top; r--) print (r+1) " " (left+1)
+                left++
+            }
+        }
+    }'
+}
+
+gen_wave() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        pi = 3.14159265
+        for (c = 0; c < cols; c++) {
+            offset = int(sin(c * pi * 4 / cols) * rows / 4)
+            for (r = 0; r < rows; r++) {
+                rr = ((r + offset) % rows + rows) % rows
+                print (rr+1) " " (c+1)
+            }
+        }
+    }'
+}
+
+gen_center_burst() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        cr = (rows + 1) / 2.0; cc = (cols + 1) / 2.0
+        for (r = 1; r <= rows; r++)
+            for (c = 1; c <= cols; c++) {
+                dr = r - cr; dc = c - cc
+                printf "%.4f %d %d\n", sqrt(dr*dr + dc*dc), r, c
+            }
+    }' | sort -n | cut -d' ' -f2-
+}
+
+gen_blinds() {
+    awk -v rows="$ROWS" -v cols="$COLS" 'BEGIN {
+        srand()
+        slats = 8; h = int(rows / slats)
+        if (h < 1) h = 1
+        for (step = 0; step < h; step++)
+            for (s = 0; s < slats; s++) {
+                r = s * h + step + 1
+                if (r > rows) continue
+                n = cols
+                for (i = 1; i <= n; i++) a[i] = i
+                for (i = n; i > 1; i--) {
+                    j = int(rand() * i) + 1
+                    tmp = a[i]; a[i] = a[j]; a[j] = tmp
+                }
+                for (i = 1; i <= n; i++) print r " " a[i]
+            }
+        for (r = slats * h + 1; r <= rows; r++)
+            for (c = 1; c <= cols; c++) print r " " c
+    }'
+}
+
+# ============================================================
+# COLOR PIPELINE
+# ============================================================
+# awk script that reads "row col" positions, computes interpolated
+# gradient bg color per cell, and outputs batched escape sequences
+# (one line per batch, ready to printf)
+colorize() {
+    local mode=$1 total_pos=$2 mirror=$3 batch=$4
+    awk -v mode="$mode" -v total_pos="$total_pos" -v mirror="$mirror" \
+        -v rlist="${GRAD_R[*]}" -v glist="${GRAD_G[*]}" -v blist="${GRAD_B[*]}" \
+        -v batch="$batch" -v t_rows="$ROWS" -v t_cols="$COLS" \
+        -v attr="$COLOR_ATTR" -v fill="$FILL" '
+    BEGIN {
+        n = split(rlist, R, " ")
+        split(glist, G, " ")
+        split(blist, B, " ")
+        count = 0; buf = ""
+    }
+    function interp(p,    scaled, idx, frac, cr, cg, cb, half) {
+        if (p < 0) p = 0
+        if (p >= total_pos) p = total_pos - 1
+        if (mirror && total_pos > 1) {
+            half = (total_pos - 1) / 2.0
+            if (p > half) p = total_pos - 1 - p
+            p = int(p * (total_pos - 1) / half)
+            if (p >= total_pos) p = total_pos - 1
+        }
+        if (total_pos <= 1 || n <= 1)
+            return sprintf("\033[%d;2;%d;%d;%dm", attr, R[1], G[1], B[1])
+        scaled = int(p * (n-1) * 1000 / (total_pos - 1))
+        idx = int(scaled / 1000)
+        frac = scaled % 1000
+        if (idx >= n-1) { idx = n-2; frac = 1000 }
+        cr = int((R[idx+1]*(1000-frac) + R[idx+2]*frac) / 1000)
+        cg = int((G[idx+1]*(1000-frac) + G[idx+2]*frac) / 1000)
+        cb = int((B[idx+1]*(1000-frac) + B[idx+2]*frac) / 1000)
+        return sprintf("\033[%d;2;%d;%d;%dm", attr, cr, cg, cb)
+    }
+    {
+        pr = $1; pc = $2
+        if      (mode == "horizontal") p = pc - 1
+        else if (mode == "vertical")   p = pr - 1
+        else if (mode == "diagonal")   p = pr + pc - 2
+        else if (mode == "radial") {
+            dr = pr - (t_rows+1)/2.0; dc = pc - (t_cols+1)/2.0
+            p = int(sqrt(dr*dr + dc*dc))
+        }
+        buf = buf sprintf("\033[%d;%dH%s%s", pr, pc, interp(p), fill)
+        count++
+        if (count % batch == 0) { print buf; buf = "" }
+    }
+    END { if (buf != "") print buf }'
+}
+
+# ============================================================
+# FILL ENGINE
+# ============================================================
+RESIZED=0
+handle_resize() { RESIZED=1; }
+trap handle_resize WINCH
+
+# no-fork sleep using read timeout on tty, falls back to sleep(1)
+if [[ -c /dev/tty ]]; then
+    nsleep() { read -r -s -t "$1" <> /dev/tty 2>/dev/null || true; }
+else
+    nsleep() { sleep "$1"; }
+fi
+
+fill_screen() {
+    local pattern=$1 grad_mode=$2 mirror=${3:-0}
+    (( ROWS < 1 || COLS < 1 )) && return
+
+    local total_positions
+    case $grad_mode in
+        horizontal) total_positions=$COLS ;;
+        vertical)   total_positions=$ROWS ;;
+        diagonal)   total_positions=$(( ROWS + COLS - 1 )) ;;
+        radial)     total_positions=$(awk -v r="$ROWS" -v c="$COLS" \
+                        'BEGIN { print int(sqrt((r/2)^2 + (c/2)^2)) + 1 }') ;;
+    esac
+
+    while IFS= read -r frame; do
+        (( RESIZED )) && return
+        printf '%s' "$frame"
+        nsleep "$DELAY"
+    done < <("gen_${pattern}" | colorize "$grad_mode" "$total_positions" "$mirror" "$BATCH")
+}
+
+dissolve_screen() {
+    (( ROWS < 1 || COLS < 1 )) && return
+    while IFS= read -r frame; do
+        (( RESIZED )) && return
+        printf '%s' "$frame"
+        nsleep "$DISSOLVE_DELAY"
+    done < <(gen_scatter | awk -v batch="$DISSOLVE_BATCH" '
+        BEGIN { count = 0; buf = "" }
+        { buf = buf sprintf("\033[%d;%dH\033[0m ", $1, $2); count++
+          if (count % batch == 0) { print buf; buf = "" } }
+        END { if (buf != "") print buf }')
+}
+
+# ============================================================
+# TERMINAL SETUP
+# ============================================================
+RST=$'\033[0m'
+cleanup() {
+    tput cnorm 2>/dev/null
+    printf '%s' "$RST"
+    clear
+    exit 0
+}
+trap cleanup EXIT INT TERM
+
+tput civis
+ROWS=$(tput lines)
+COLS=$(tput cols)
+
+# ============================================================
+# MAIN LOOP
+# ============================================================
+load_gradient
+
+# pattern:gradient:mirror
+declare -a PATTERNS=(
+    "diagonal:diagonal:0"
+    "scatter:horizontal:0"
+    "cascade:vertical:0"
+    "spiral:diagonal:0"
+    "wave:horizontal:1"
+    "center_burst:radial:0"
+    "reverse_diagonal:diagonal:0"
+    "blinds:vertical:0"
+)
+
+shuffle_patterns() {
+    local i j tmp
+    for (( i=${#PATTERNS[@]}-1; i>0; i-- )); do
+        j=$(( RANDOM % (i+1) ))
+        tmp="${PATTERNS[$i]}"
+        PATTERNS[$i]="${PATTERNS[$j]}"
+        PATTERNS[$j]="$tmp"
+    done
+}
+
+pidx=0
+shuffle_patterns
+
+while true; do
+    ROWS=$(tput lines)
+    COLS=$(tput cols)
+    RESIZED=0
+    clear
+
+    IFS=':' read -r pattern grad_mode mirror <<< "${PATTERNS[pidx]}"
+    fill_screen "$pattern" "$grad_mode" "$mirror"
+
+    if (( ! RESIZED )); then
+        printf '%s' "$RST"
+        nsleep "$PAUSE_FULL"
+        dissolve_screen
+    fi
+
+    pidx=$(( (pidx + 1) % ${#PATTERNS[@]} ))
+    (( pidx == 0 )) && shuffle_patterns
+done

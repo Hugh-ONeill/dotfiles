@@ -1,0 +1,107 @@
+#!/usr/bin/env zsh
+# Fullwidth Unicode text scroller with theme gradient colors
+# Usage: aesthetic [phrase...]
+
+setopt NO_BANG_HIST 2>/dev/null
+phrase="${*:-aesthetic}"
+
+# ===========================================================
+#                   FULLWIDTH CONVERSION
+# ===========================================================
+
+converted=""
+for (( i=1; i<=${#phrase}; i++ )); do
+    char="${phrase[$i]}"
+    ord=$(( #char ))
+    if (( ord >= 33 && ord <= 126 )); then
+        converted+="${(#)$(( ord + 0xFEE0 ))}"
+    elif [[ "$char" != " " ]]; then
+        converted+="$char"
+    fi
+done
+
+# ===========================================================
+#                     SCROLLING DISPLAY
+# ===========================================================
+
+cleanup() { printf '\033[0m'; tput rmcup; tput cnorm; exit 0; }
+trap cleanup INT TERM
+
+tput civis
+
+# ---- color palette from current theme gradient ----
+colors=()
+current_theme=$(cat "$HOME/.config/themes/.current" 2>/dev/null)
+palette="$HOME/.config/themes/palettes/${current_theme:-none}.json"
+
+if [[ -f "$palette" ]] && command -v jq &>/dev/null; then
+    while IFS= read -r hex; do
+        [[ -n "$hex" ]] || continue
+        hex="${hex#\#}"
+        colors+=("$((16#${hex:0:2}));$((16#${hex:2:2}));$((16#${hex:4:2}))")
+    done < <(jq -r '
+        .gradient[] as $name |
+        if .colors[$name] then
+            if (.colors[$name] | startswith("#")) then .colors[$name]
+            else .colors[.colors[$name]] // .colors[$name]
+            end
+        else $name end
+    ' "$palette" 2>/dev/null)
+
+    # bounce: forward then reverse for smooth cycling
+    if (( ${#colors[@]} > 1 )); then
+        local n=${#colors[@]}
+        for (( i=n-1; i>=2; i-- )); do
+            colors+=("${colors[$i]}")
+        done
+    fi
+fi
+
+# fallback
+if (( ${#colors[@]} == 0 )); then
+    colors=('204;96;80' '160;152;104' '216;192;120' '144;136;176' '184;120;168' '128;160;144')
+fi
+
+phrase_len=${#converted}
+cols=$(tput cols)
+rows=$(tput lines)
+chars_per_line=$(( cols / 2 ))
+num_colors=${#colors[@]}
+
+# ---- pre-build screen buffer ----
+lines=()
+pos=1
+for (( r=0; r<rows; r++ )); do
+    line=""
+    for (( j=0; j<chars_per_line; j++ )); do
+        line+="${converted[$pos]}"
+        pos=$(( pos % phrase_len + 1 ))
+    done
+    lines+=("$line")
+done
+
+tput smcup
+printf '\033[2J'
+
+# ---- animate: shift lines upward each frame ----
+color_offset=0
+while true; do
+    buf=""
+    for (( r=1; r<=${#lines[@]}; r++ )); do
+        cidx=$(( (r - 1 + color_offset) % num_colors + 1 ))
+        buf+="\033[${r};1H\033[38;2;${colors[$cidx]}m${lines[$r]}"
+    done
+    printf '%b\033[0m' "$buf"
+
+    # drop top line, append new one at bottom
+    lines=("${lines[@]:1}")
+    line=""
+    for (( j=0; j<chars_per_line; j++ )); do
+        line+="${converted[$pos]}"
+        pos=$(( pos % phrase_len + 1 ))
+    done
+    lines+=("$line")
+    (( color_offset++ ))
+
+    sleep 0.15
+done
