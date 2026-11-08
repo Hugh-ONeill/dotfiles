@@ -1,0 +1,11 @@
+[Unit]
+Description=Local Pokemon Showdown server for bench sparring
+
+[Service]
+WorkingDirectory=%h/Developer/grimoire/pokemon-showdown
+ExecStart=/usr/bin/node pokemon-showdown start 8000 --no-security
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
