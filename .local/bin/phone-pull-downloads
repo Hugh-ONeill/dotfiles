@@ -12,7 +12,7 @@ set -euo pipefail
 # ── config (override via env or flags) ─────────────────────────────────────────
 MOUNT="${PHONE_MOUNT:-$HOME/phone}"
 SRC_SUB="${PHONE_SRC:-Internal storage/Download}"
-DEST="${PHONE_DEST:-$HOME/Downloads/phone}"
+DEST="${PHONE_DEST:-$HOME/Documents/Pictures/Import}"
 DO_UNMOUNT=0
 DO_MOVE=0
 
