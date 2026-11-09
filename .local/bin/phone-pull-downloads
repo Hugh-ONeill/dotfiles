@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# phone-pull-downloads — copy everything from the phone's Download folder to this machine.
+# phone-pull-downloads — copy images (jpg, jpeg, png, gif) from the phone's Download folder to the hydrus import folder.
 #
 # Mounts the phone via jmtpfs if needed, verifies the mount is actually live (MTP
-# sessions go stale silently), copies the Download folder's contents, and prints a
-# summary. Safe to re-run: already-copied files are skipped. Use -m to move instead
+# sessions go stale silently), copies the Download folder's images, and prints a
+# summary. Non-image files are ignored and stay on the phone. Safe to re-run: already-copied files are skipped. Use -m to move instead
 # of copy (deletes from the phone only after a size-verified copy).
 #
 # Works on any machine/user — paths derive from $HOME, jmtpfs mounts as the caller.
@@ -74,28 +74,32 @@ fi
 mkdir -p "$DEST"
 
 # ── copy ──────────────────────────────────────────────────────────────────────
-echo "Copying from:  $SRC"
-echo "          to:  $DEST"
+echo "Copying images from:  $SRC"
+echo "                 to:  $DEST"
 echo
 
-before=$(find "$DEST" -type f 2>/dev/null | wc -l)
+IMAGE_MATCH=(-iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.gif')
+copied=0 skipped=0 failed=0
 
-# cp is far more reliable than rsync over MTP. -n: never clobber (safe re-runs),
-# -r: recurse, -v: show each item as it lands.
-shopt -s dotglob nullglob
-for item in "$SRC"/*; do
-  name="$(basename "$item")"
-  if cp -rnv "$item" "$DEST/" >/dev/null 2>&1; then
-    echo "  + $name"
+# cp is far more reliable than rsync over MTP. Existing files are never
+# clobbered (safe re-runs), and a failed copy leaves no partial file behind.
+while IFS= read -r -d '' f; do
+  rel="${f#"$SRC"/}"
+  dst="$DEST/$rel"
+  if [ -e "$dst" ]; then
+    skipped=$((skipped + 1))
+  elif mkdir -p "$(dirname "$dst")" && cp "$f" "$dst" 2>/dev/null; then
+    echo "  + $rel"
+    copied=$((copied + 1))
   else
-    echo "  ! failed: $name" >&2
+    rm -f "$dst"
+    echo "  ! failed: $rel" >&2
+    failed=$((failed + 1))
   fi
-done
-shopt -u dotglob nullglob
+done < <(find "$SRC" -type f \( "${IMAGE_MATCH[@]}" \) -print0)
 
-after=$(find "$DEST" -type f 2>/dev/null | wc -l)
 echo
-echo "Copied. Files in destination: $before -> $after  (new: $((after - before)))"
+echo "Done. Copied $copied, already present $skipped, failed $failed."
 
 # ── optional move: delete from phone only after verifying the copy by size ──────
 if [ "$DO_MOVE" -eq 1 ]; then
@@ -111,7 +115,7 @@ if [ "$DO_MOVE" -eq 1 ]; then
       echo "  keep (unverified): $rel" >&2
       kept=$((kept + 1))
     fi
-  done < <(find "$SRC" -type f -print0)
+  done < <(find "$SRC" -type f \( "${IMAGE_MATCH[@]}" \) -print0)
   # prune emptied directories on the phone
   find "$SRC" -mindepth 1 -type d -empty -delete 2>/dev/null || true
   echo "Removed $removed verified file(s) from phone; kept $kept unverified."
