@@ -1,0 +1,231 @@
+#!/usr/bin/env python3
+# pinentry for gpg-agent that shows the themed sudo dialog (~/.local/bin/sudo-askpass-hypr).
+# Speaks the Assuan pinentry protocol on stdin/stdout. Plain GETPIN goes to the dialog; anything
+# it can't do (new-passphrase confirmation, CONFIRM/MESSAGE boxes, or the dialog failing to start,
+# e.g. no Wayland over ssh) is handed to the stock pinentry with the session's settings replayed.
+# Usage: pinentry-program /home/wiz/.local/bin/pinentry-hypr   (in $GNUPGHOME/gpg-agent.conf)
+
+from __future__ import annotations
+
+import os
+import pwd
+import subprocess
+import sys
+from typing import IO
+
+DIALOG = os.environ.get("PINENTRY_HYPR_DIALOG", os.path.expanduser("~/.local/bin/sudo-askpass-hypr"))
+FALLBACK = os.environ.get("PINENTRY_HYPR_FALLBACK", "/usr/bin/pinentry")
+
+# gpg error codes as (source << 24) | code
+ERR_CANCELED = "ERR 83886179 Operation cancelled <Pinentry>"
+ERR_TIMEOUT = "ERR 83886142 Timeout <Pinentry>"
+ERR_GENERAL = "ERR 83886081 General error <Pinentry>"
+ERR_UNKNOWN = "ERR 536871187 Unknown IPC command <User defined source 1>"
+
+out: IO[str] = sys.stdout
+
+
+def send(line: str) -> None:
+    out.write(line + "\n")
+    out.flush()
+
+
+def unescape(s: str) -> str:
+    """Assuan %XX decoding (SETDESC etc. arrive escaped)."""
+    b = bytearray()
+    i = 0
+    raw = s.encode()
+    while i < len(raw):
+        if raw[i] == 0x25 and i + 2 < len(raw):
+            try:
+                b.append(int(raw[i + 1 : i + 3], 16))
+                i += 3
+                continue
+            except ValueError:
+                pass
+        b.append(raw[i])
+        i += 1
+    return b.decode(errors="replace")
+
+
+def escape(s: str) -> str:
+    """Escape a data line: %, CR and LF must not appear raw."""
+    return s.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+class Session:
+    def __init__(self) -> None:
+        self.settings: dict[str, str] = {}  # SET* command -> raw argument, latest wins
+        self.options: list[str] = []  # raw OPTION lines, in order
+
+    def history(self) -> list[str]:
+        """The setup commands to replay into a fallback pinentry."""
+        return self.options + [f"{k} {v}".rstrip() for k, v in self.settings.items()]
+
+    def get(self, key: str) -> str:
+        return unescape(self.settings.get(key, ""))
+
+
+# ---- fallback -----------------------------------------------------------
+
+
+def read_reply(child: subprocess.Popen[str], relay: bool) -> bool:
+    """Read lines from the child until OK/ERR. With relay, pass them (and any INQUIRE) through."""
+    assert child.stdout and child.stdin
+    while True:
+        line = child.stdout.readline()
+        if not line:
+            if relay:
+                send(ERR_GENERAL)
+            return False
+        line = line.rstrip("\n")
+        if relay:
+            send(line)
+        if line.startswith("INQUIRE") and relay:
+            # gpg-agent answers with D lines then END/CAN; forward them to the child
+            for answer in sys.stdin:
+                child.stdin.write(answer)
+                child.stdin.flush()
+                if answer.startswith(("END", "CAN")):
+                    break
+            continue
+        if line == "OK" or line.startswith(("OK ", "ERR")):
+            return line.startswith("OK")
+
+
+def delegate(session: Session, command: str) -> None:
+    """Run one command through the stock pinentry, after replaying the session's settings."""
+    try:
+        child = subprocess.Popen(
+            [FALLBACK, *sys.argv[1:]],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+    except OSError:
+        send(ERR_GENERAL)
+        return
+    assert child.stdin
+    try:
+        if not read_reply(child, relay=False):  # greeting
+            send(ERR_GENERAL)
+            return
+        for line in session.history():
+            child.stdin.write(line + "\n")
+            child.stdin.flush()
+            read_reply(child, relay=False)
+        child.stdin.write(command + "\n")
+        child.stdin.flush()
+        read_reply(child, relay=True)
+        child.stdin.write("BYE\n")
+        child.stdin.flush()
+    except (BrokenPipeError, OSError):
+        send(ERR_GENERAL)
+    finally:
+        try:
+            child.stdin.close()
+        except OSError:
+            pass
+        child.wait(timeout=5)
+
+
+# ---- the themed dialog --------------------------------------------------
+
+
+def getpin(session: Session, command: str) -> None:
+    # a new passphrase wants a second "repeat" field the dialog doesn't have
+    if "SETREPEAT" in session.settings or not os.access(DIALOG, os.X_OK):
+        delegate(session, command)
+        return
+
+    user = pwd.getpwuid(os.getuid()).pw_name
+    prompt = session.get("SETPROMPT").strip().rstrip(":") or "Passphrase"
+    args = [
+        DIALOG,
+        "--class", "pinentry-hypr",
+        "--title", session.get("SETTITLE") or "Passphrase Required",
+        "--subtitle", f"GnuPG for {user}",
+        "--heading", "Enter your passphrase",
+        "--placeholder", prompt,
+    ]
+    desc = session.get("SETDESC").strip()
+    if desc:
+        args += ["--body", desc]
+    error = session.get("SETERROR").strip()
+    if error:
+        args += ["--error", error]
+
+    timeout_s = int(session.settings.get("SETTIMEOUT", "0") or 0) or None
+    try:
+        res = subprocess.run(args, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, timeout=timeout_s)
+    except subprocess.TimeoutExpired:
+        send(ERR_TIMEOUT)
+        return
+    except OSError:
+        delegate(session, command)  # still carries SETERROR, so the stock prompt shows it
+        return
+    finally:
+        # an error message is for one attempt only; delegate() above has already replayed it
+        session.settings.pop("SETERROR", None)
+
+    if res.returncode not in (0, 1):
+        # backend failed (no Wayland etc.): hand over with the error message restored
+        if error:
+            session.settings["SETERROR"] = escape(error)
+        delegate(session, command)
+        return
+    if res.returncode == 0:
+        pin = res.stdout.decode(errors="replace").rstrip("\n")
+        if pin:
+            send("D " + escape(pin))
+        send("OK")
+    else:
+        send(ERR_CANCELED)
+
+
+# ---- main loop ----------------------------------------------------------
+
+
+def main() -> int:
+    session = Session()
+    send("OK Pleased to meet you")
+    for raw in sys.stdin:
+        line = raw.rstrip("\n")
+        if not line or line.startswith("#"):
+            continue
+        cmd, _, arg = line.partition(" ")
+        cmd = cmd.upper()
+
+        if cmd == "OPTION":
+            session.options.append(line)
+            send("OK")
+        elif cmd.startswith("SET"):
+            session.settings[cmd] = arg
+            send("OK")
+        elif cmd == "GETPIN":
+            getpin(session, line)
+        elif cmd in ("CONFIRM", "MESSAGE"):
+            delegate(session, line)
+        elif cmd == "GETINFO":
+            if arg == "flavor":
+                send("D hypr")
+            elif arg == "version":
+                send("D 1.0.0")
+            elif arg == "pid":
+                send(f"D {os.getpid()}")
+            send("OK")
+        elif cmd == "RESET":
+            session = Session()
+            send("OK")
+        elif cmd in ("NOP", "CLEARPASSPHRASE"):
+            send("OK")
+        elif cmd == "BYE":
+            send("OK closing connection")
+            return 0
+        else:
+            send(ERR_UNKNOWN)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
