@@ -1,0 +1,12 @@
+[Unit]
+Description=Back up the Hydrus database to the hard drive (skips while Hydrus is open)
+RequiresMountsFor=/data/storage
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/hydrus-db-backup --timer
+# a background copy of 160 GiB should not slow the desktop down
+Nice=19
+IOSchedulingClass=idle
+StandardOutput=journal
+StandardError=journal

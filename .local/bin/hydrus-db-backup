@@ -1,0 +1,123 @@
+#!/bin/bash
+# Back up the Hydrus database (not the media) from the NVMe to the hard drive
+# Usage: hydrus-db-backup [--timer]
+# Copies the client*.db files into /data/storage/hydrus/db-backup/current and
+# keeps the backup before it in previous/. Only runs while Hydrus is closed,
+# since a copy taken mid-write is not a usable database.
+# --timer: for the systemd timer. Skips quietly when Hydrus is open and sends
+# a desktop notification once the newest good backup is older than STALE_DAYS.
+# Restore: close Hydrus, copy current/* (or previous/*) over ~/.local/share/hydrus/db/
+
+set -euo pipefail
+
+SRC="${HYDRUS_DB_DIR:-$HOME/.local/share/hydrus/db}"
+DEST="${HYDRUS_DB_BACKUP_DIR:-/data/storage/hydrus/db-backup}"
+STALE_DAYS=14
+STAMP=".complete"
+
+timer_mode=false
+[[ "${1:-}" == "--timer" ]] && timer_mode=true
+
+# ============================================================
+# HELPERS
+# ============================================================
+
+hydrus_running() {
+    pgrep -u "$USER" -f 'hydrus_client\.py' > /dev/null
+}
+
+# days since the newest finished backup, or nothing when there is none
+backup_age_days() {
+    local stamp
+    for stamp in "$DEST/current/$STAMP" "$DEST/previous/$STAMP"; do
+        if [[ -f "$stamp" ]]; then
+            echo $(( ($(date +%s) - $(stat -c %Y "$stamp")) / 86400 ))
+            return
+        fi
+    done
+}
+
+# names, sizes and mtimes of the database files, to spot a change mid-copy
+source_state() {
+    find "$SRC" -maxdepth 1 -name 'client*.db*' -printf '%f %s %T@\n' | sort
+}
+
+warn_if_stale() {
+    local age
+    age="$(backup_age_days)"
+    if [[ -z "$age" ]]; then
+        notify-send -u normal "Hydrus backup" "No database backup exists yet. Close Hydrus and run hydrus-db-backup."
+    elif (( age >= STALE_DAYS )); then
+        notify-send -u normal "Hydrus backup" "Last database backup is $age days old. Close Hydrus and run hydrus-db-backup."
+    fi
+}
+
+# ============================================================
+# CHECKS
+# ============================================================
+
+if [[ ! -f "$SRC/client.db" ]]; then
+    echo "no Hydrus database at $SRC" >&2
+    exit 1
+fi
+if [[ ! -d "$(dirname "$DEST")" ]]; then
+    echo "backup drive is not mounted: $(dirname "$DEST") is missing" >&2
+    exit 1
+fi
+
+if hydrus_running; then
+    if $timer_mode; then
+        echo "Hydrus is open, skipping"
+        warn_if_stale
+        exit 0
+    fi
+    echo "Hydrus is open. Close it first, then run this again." >&2
+    exit 1
+fi
+
+# keep the laptop awake for the copy; the first run moves about 160 GiB
+if [[ -z "${HYDRUS_BACKUP_INHIBITED:-}" ]]; then
+    export HYDRUS_BACKUP_INHIBITED=1
+    exec systemd-inhibit --what=sleep --mode=block --who="hydrus-db-backup" \
+        --why="copying the Hydrus database to the hard drive" "$0" "$@"
+fi
+
+mkdir -p "$DEST/current"
+exec 9> "$DEST/.lock"
+if ! flock -n 9; then
+    echo "another backup is already running" >&2
+    exit 1
+fi
+
+# ============================================================
+# BACKUP
+# ============================================================
+
+# the last good backup becomes previous/. on btrfs this shares the data with
+# current/, so it only costs what the new run changes
+if [[ -f "$DEST/current/$STAMP" ]]; then
+    rm -rf "$DEST/previous"
+    cp -a --reflink=auto "$DEST/current" "$DEST/previous"
+fi
+rm -f "$DEST/current/$STAMP"
+
+before="$(source_state)"
+started=$(date +%s)
+
+# in place and block by block, so an unchanged 100 GiB file is read but not
+# rewritten. the -wal files only exist after an unclean exit and belong with
+# their database; --delete clears old ones out of the backup
+rsync -a --inplace --no-whole-file --delete --info=stats1 \
+    --include='client*.db' --include='client*.db-wal' \
+    --include='client.crt' --include='client.key' \
+    --exclude='*' \
+    "$SRC/" "$DEST/current/"
+
+if hydrus_running || [[ "$(source_state)" != "$before" ]]; then
+    echo "the database changed during the copy, so current/ is not usable." >&2
+    echo "previous/ still holds the last good backup. Run this again with Hydrus closed." >&2
+    exit 1
+fi
+
+date --iso-8601=seconds > "$DEST/current/$STAMP"
+echo "backup finished in $(( ($(date +%s) - started) / 60 )) min: $DEST/current"

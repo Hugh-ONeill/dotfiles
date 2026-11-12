@@ -1,0 +1,12 @@
+[Unit]
+Description=Try a Hydrus database backup every night
+
+[Timer]
+# 04:30 local. Persistent=true catches up after suspend/poweroff.
+OnCalendar=*-*-* 04:30:00
+Persistent=true
+RandomizedDelaySec=600
+Unit=hydrus-db-backup.service
+
+[Install]
+WantedBy=timers.target
