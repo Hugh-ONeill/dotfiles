@@ -1,5 +1,9 @@
 // sudo password prompt drawn with hyprtoolkit, laid out like hyprpolkitagent's dialog
 // Usage: sudo-askpass-hypr "<prompt>"   (run by ~/.local/bin/sudo-askpass; prints the password on stdout, exit 1 on cancel)
+//        sudo-askpass-hypr [--title T] [--subtitle S] [--heading H] [--body B] [--error E]
+//                          [--placeholder P] [--class C] ["<prompt>"]
+//   The flags reuse the dialog for other prompts (~/.local/bin/pinentry-hypr for gpg). --body replaces
+//   the sudo command box with free text (newlines kept); with no flags it behaves exactly as for sudo.
 //
 // Layout and sizes follow hyprpolkitagent v0.2.0 src/ui/Dialog.cpp (BSD-3-Clause, Hypr Development).
 
@@ -41,6 +45,39 @@ constexpr double LINE_H     = 21;      // extra height per additional command li
 constexpr double FIELD_W    = 340;
 constexpr size_t WRAP_COLS  = 40;      // monospace columns per command line
 constexpr size_t MAX_LINES  = 8;
+constexpr size_t MAX_BODY_LINES = 10;
+
+// overrides from the command line; empty means "use the sudo default"
+struct SOptions {
+    std::string title, subtitle, heading, body, error, placeholder, appClass;
+};
+
+static SOptions parseArgs(int argc, char* argv[]) {
+    SOptions o;
+    for (int i = 1; i < argc; ++i) {
+        const std::string a = argv[i];
+        auto              next = [&](std::string& dst) {
+            if (i + 1 < argc)
+                dst = argv[++i];
+        };
+        if (a == "--title")
+            next(o.title);
+        else if (a == "--subtitle")
+            next(o.subtitle);
+        else if (a == "--heading")
+            next(o.heading);
+        else if (a == "--body")
+            next(o.body);
+        else if (a == "--error")
+            next(o.error);
+        else if (a == "--placeholder")
+            next(o.placeholder);
+        else if (a == "--class")
+            next(o.appClass);
+        // anything else is the prompt sudo passes; the dialog doesn't show it
+    }
+    return o;
+}
 
 static CSharedPointer<IBackend> g_backend;
 static std::string              g_password;
@@ -125,6 +162,29 @@ static std::vector<std::string> wrapCommand(const std::string& cmd) {
         lines.push_back(cur);
     if (lines.size() > MAX_LINES) {
         lines.resize(MAX_LINES);
+        lines.back() = lines.back().substr(0, WRAP_COLS - 3) + "...";
+    }
+    return lines;
+}
+
+// wrap free text paragraph by paragraph (newlines kept), capped at MAX_BODY_LINES
+static std::vector<std::string> wrapBody(const std::string& body) {
+    std::vector<std::string> lines;
+    std::stringstream        ss(body);
+    std::string              para;
+    while (std::getline(ss, para)) {
+        if (para.empty()) {
+            if (!lines.empty() && !lines.back().empty())
+                lines.emplace_back();
+            continue;
+        }
+        for (auto& l : wrapCommand(para))
+            lines.push_back(l);
+    }
+    while (!lines.empty() && lines.back().empty())
+        lines.pop_back();
+    if (lines.size() > MAX_BODY_LINES) {
+        lines.resize(MAX_BODY_LINES);
         lines.back() = lines.back().substr(0, WRAP_COLS - 3) + "...";
     }
     return lines;
@@ -256,7 +316,9 @@ static CSharedPointer<IElement> centered(CSharedPointer<IElement> child) {
 
 // -------------------- Dialog --------------------
 
-int main(int, char*[]) {
+int main(int argc, char* argv[]) {
+    const SOptions opts = parseArgs(argc, argv);
+
     // sudo reads the first stdout line as the password, and hyprtoolkit logs to stdout:
     // keep the real stdout for the password only and point fd 1 at /dev/null
     g_outFd       = dup(STDOUT_FILENO);
@@ -276,16 +338,19 @@ int main(int, char*[]) {
     const passwd* pw   = getpwuid(getuid());
     const std::string user = pw ? pw->pw_name : "you";
 
-    const std::string cmd      = sudoCommand();
-    const auto        cmdLines = wrapCommand(cmd);
-    const double      height   = WINDOW_H + (cmdLines.size() > 1 ? (double)(cmdLines.size() - 1) * LINE_H : 0.0);
+    const bool        bodyMode = !opts.body.empty();
+    const std::string cmd      = bodyMode ? opts.body : sudoCommand();
+    const auto        cmdLines = bodyMode ? wrapBody(cmd) : wrapCommand(cmd);
+    const double      height   = WINDOW_H + (cmdLines.size() > 1 ? (double)(cmdLines.size() - 1) * LINE_H : 0.0) +
+        (opts.error.empty() ? 0.0 : LINE_H);
+    const std::string title = opts.title.empty() ? std::string{"Authentication Required"} : opts.title;
 
     auto window = CWindowBuilder::begin()
                       ->preferredSize({WINDOW_W, height})
                       ->minSize({460.0, height})
                       ->maxSize({600.0, height})
-                      ->appTitle("Authentication Required")
-                      ->appClass("sudo-askpass")
+                      ->appTitle(std::string{title})
+                      ->appClass(std::string{opts.appClass.empty() ? std::string{"sudo-askpass"} : opts.appClass})
                       ->commence();
 
     const SMask                     mask = loadMask();
@@ -362,19 +427,21 @@ int main(int, char*[]) {
     window->m_rootElement->addChild(outer);
 
     outer->addChild(centered(CTextBuilder::begin()
-                                 ->text(std::string{"Authentication Required"})
+                                 ->text(std::string{title})
                                  ->fontSize({CFontSize::HT_FONT_H2})
                                  ->color([] { return g_backend->getPalette()->m_colors.text; })
                                  ->commence()));
 
     outer->addChild(centered(CTextBuilder::begin()
-                                 ->text("sudo for " + user)
+                                 ->text(std::string{opts.subtitle.empty() ? "sudo for " + user : opts.subtitle})
                                  ->fontSize({CFontSize::HT_FONT_SMALL})
                                  ->color([] { return g_backend->getPalette()->m_colors.text.darken(0.3); })
                                  ->commence()));
 
     outer->addChild(centered(CTextBuilder::begin()
-                                 ->text(std::string{cmd.empty() ? "Authentication is needed for sudo." : "Allow this command?"})
+                                 ->text(std::string{!opts.heading.empty() ? opts.heading
+                                                       : cmd.empty()       ? std::string{"Authentication is needed for sudo."}
+                                                                           : std::string{"Allow this command?"}})
                                  ->fontSize({CFontSize::HT_FONT_H3})
                                  ->color([] { return g_backend->getPalette()->m_colors.text; })
                                  ->commence()));
@@ -394,7 +461,8 @@ int main(int, char*[]) {
         }
         auto inner = CRowLayoutBuilder::begin()->gap(8)->commence();
         inner->setMargin(12);
-        inner->addChild(CTextBuilder::begin()
+        if (!bodyMode)
+            inner->addChild(CTextBuilder::begin()
                             ->text(std::string{gutter})
                             ->fontFamily(std::string{palette->m_vars.fontFamilyMonospace})
                             ->align(HT_FONT_ALIGN_LEFT)
@@ -423,7 +491,7 @@ int main(int, char*[]) {
     fieldRow->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
     fieldRow->setPositionFlag(IElement::HT_POSITION_FLAG_VCENTER, true);
     fieldText = CTextBuilder::begin()
-                    ->text(std::string{"Password"})
+                    ->text(std::string{opts.placeholder.empty() ? std::string{"Password"} : opts.placeholder})
                     ->fontFamily(std::string{palette->m_vars.fontFamilyMonospace})
                     ->align(HT_FONT_ALIGN_LEFT)
                     ->noEllipsize(true)
@@ -462,7 +530,7 @@ int main(int, char*[]) {
     outer->addChild(centered(fieldBox));
 
     updateField = [&] {
-        fieldText->setText(!g_passLen ? std::string{"Password"} : g_reveal ? revealMarkup() : maskMarkup(mask, g_passLen));
+        fieldText->setText(!g_passLen ? (opts.placeholder.empty() ? std::string{"Password"} : opts.placeholder) : g_reveal ? revealMarkup() : maskMarkup(mask, g_passLen));
         if (authButton)
             authButton->setEnabled(g_passLen > 0);
     };
@@ -477,6 +545,13 @@ int main(int, char*[]) {
                     ->color([] { return CHyprColor{1.0F, 0.75F, 0.2F, 1.F}; })
                     ->commence();
     capsWrap = centered(capsLabel);
+    // e.g. gpg's "Bad Passphrase (try 2 of 3)"
+    if (!opts.error.empty())
+        statusCol->addChild(centered(CTextBuilder::begin()
+                                         ->text(std::string{opts.error})
+                                         ->fontSize({CFontSize::HT_FONT_SMALL})
+                                         ->color([] { return CHyprColor{1.0F, 0.42F, 0.42F, 1.F}; })
+                                         ->commence()));
 
     auto btnRow = CRowLayoutBuilder::begin()->gap(10)->commence();
     btnRow->setMargin(8);
