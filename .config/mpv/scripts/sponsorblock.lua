@@ -1,5 +1,6 @@
--- SponsorBlock segment skipping for YouTube videos; segments also show up as
--- chapter marks on the seekbar
+-- SponsorBlock segment skipping for YouTube videos. Segments are published in
+-- user-data/sponsorblock/segments, which scripts/osc.lua draws as colored
+-- regions on the seekbar; skips are announced through scripts/feedback.lua
 -- Usage: auto-loaded by mpv; options in script-opts/sponsorblock.conf, B toggles skipping
 
 local mp = require "mp"
@@ -12,8 +13,8 @@ local o = {
     server = "https://sponsor.ajay.app",
     -- ignore segments shorter than this many seconds
     min_length = 1,
-    -- add a chapter at each segment so the seekbar and chapter list show them
-    chapters = true,
+    -- also add a chapter at each segment, for control bars that only mark chapters
+    chapters = false,
 }
 options.read_options(o, "sponsorblock")
 
@@ -48,7 +49,7 @@ end
 
 -- ---------------------- Seekbar marks ----------------------
 
--- the stock OSC marks nothing but chapters, so each segment becomes one: a chapter
+-- for the stock OSC, which marks nothing but chapters: each segment becomes a chapter
 -- at its start, and one at its end that picks the interrupted real chapter back up
 local function mark_chapters()
     if not o.chapters or #segments == 0 then return end
@@ -87,6 +88,14 @@ local function mark_chapters()
     mp.set_property_native("chapter-list", list)
 end
 
+local function publish()
+    local list = {}
+    for _, seg in ipairs(segments) do
+        list[#list + 1] = { start = seg.s, ["end"] = seg.e, category = seg.cat }
+    end
+    mp.set_property_native("user-data/sponsorblock/segments", list)
+end
+
 -- ---------------------- Fetch ----------------------
 
 -- k-anonymity lookup: only the first 4 hex chars of sha256(video id) leave the machine
@@ -119,6 +128,7 @@ local function fetch(id)
         end
         if #segments > 0 then
             mp.msg.info(string.format("%d segment(s) to skip", #segments))
+            publish()
             mark_chapters()
         end
     end)
@@ -146,8 +156,9 @@ local function on_time(_, t)
                 end
             end
             mp.set_property_number("time-pos", target)
-            mp.osd_message(string.format("▷ skipped %s (%s)", table.concat(cats, " + "),
-                                         fmt_secs(target - t)), 2)
+            mp.commandv("script-message-to", "feedback", "toast",
+                        string.format("▷  skipped %s · %s", table.concat(cats, " + "),
+                                      fmt_secs(target - t)))
             mp.msg.info(string.format("skipped %s %.1f-%.1f", table.concat(cats, "+"), t, target))
             return
         end
@@ -156,6 +167,7 @@ end
 
 mp.register_event("file-loaded", function()
     segments, skipped = {}, {}
+    publish()
     local id = youtube_id(mp.get_property("path"))
     if id then fetch(id) end
 end)
@@ -164,5 +176,6 @@ mp.observe_property("time-pos", "number", on_time)
 
 mp.add_key_binding("B", "toggle", function()
     enabled = not enabled
-    mp.osd_message("SponsorBlock " .. (enabled and "on" or "off"), 1.5)
+    mp.commandv("script-message-to", "feedback", "toast",
+                "SponsorBlock " .. (enabled and "on" or "off"), "1.5")
 end)
