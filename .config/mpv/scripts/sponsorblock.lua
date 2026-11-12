@@ -1,4 +1,5 @@
--- SponsorBlock segment skipping for YouTube videos
+-- SponsorBlock segment skipping for YouTube videos; segments also show up as
+-- chapter marks on the seekbar
 -- Usage: auto-loaded by mpv; options in script-opts/sponsorblock.conf, B toggles skipping
 
 local mp = require "mp"
@@ -11,6 +12,8 @@ local o = {
     server = "https://sponsor.ajay.app",
     -- ignore segments shorter than this many seconds
     min_length = 1,
+    -- add a chapter at each segment so the seekbar and chapter list show them
+    chapters = true,
 }
 options.read_options(o, "sponsorblock")
 
@@ -41,6 +44,47 @@ local function fmt_secs(s)
     s = math.floor(s + 0.5)
     if s >= 60 then return string.format("%d:%02d", math.floor(s / 60), s % 60) end
     return s .. "s"
+end
+
+-- ---------------------- Seekbar marks ----------------------
+
+-- the stock OSC marks nothing but chapters, so each segment becomes one: a chapter
+-- at its start, and one at its end that picks the interrupted real chapter back up
+local function mark_chapters()
+    if not o.chapters or #segments == 0 then return end
+    local orig = mp.get_property_native("chapter-list") or {}
+    local duration = mp.get_property_number("duration")
+    local list = {}
+    for _, c in ipairs(orig) do list[#list + 1] = { time = c.time, title = c.title } end
+
+    local function title_at(t)
+        local title
+        for _, c in ipairs(orig) do
+            if c.time <= t then title = c.title end
+        end
+        return title  -- nil leaves the chapter untitled
+    end
+    -- an end mark is redundant next to a real chapter, inside another segment, or
+    -- at the very end of the file
+    local function needs_end(seg)
+        if duration and seg.e >= duration - 1 then return false end
+        for _, c in ipairs(orig) do
+            if math.abs(c.time - seg.e) < 1 then return false end
+        end
+        for _, other in ipairs(segments) do
+            if other ~= seg and other.s <= seg.e and other.e > seg.e then return false end
+        end
+        return true
+    end
+
+    for _, seg in ipairs(segments) do
+        list[#list + 1] = { time = seg.s, title = "▷ " .. seg.cat:gsub("_", " ") }
+        if needs_end(seg) then
+            list[#list + 1] = { time = seg.e, title = title_at(seg.e) }
+        end
+    end
+    table.sort(list, function(a, b) return a.time < b.time end)
+    mp.set_property_native("chapter-list", list)
 end
 
 -- ---------------------- Fetch ----------------------
@@ -75,6 +119,7 @@ local function fetch(id)
         end
         if #segments > 0 then
             mp.msg.info(string.format("%d segment(s) to skip", #segments))
+            mark_chapters()
         end
     end)
 end
