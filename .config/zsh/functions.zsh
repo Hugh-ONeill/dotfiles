@@ -546,16 +546,19 @@ tls() {
 # Phone (MTP)
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Recover a stale/dead jmtpfs MTP session without unplugging: stop -> fresh start -> verify
+# Recover a stale/dead jmtpfs MTP session without unplugging: stop -> fresh start -> verify.
+# The service waits (phone-wait-grant, up to 60s) for the phone's access prompt to be accepted
+# before it starts jmtpfs, so one run is enough even when the phone has to ask.
 phone-remount() {
   systemctl --user stop phone-mount.service
-  sleep 2
+  sleep 1
+  echo "Mounting. If the phone asks, unlock it and tap 'Allow access to phone data' (waiting up to 60s)."
   systemctl --user start phone-mount.service
-  sleep 6
+  sleep 1
   if ls "$HOME/phone/Internal storage/" >/dev/null 2>&1; then
     echo "~/phone is live."
   else
-    echo "Still unreadable — unlock the phone + tap 'Allow access to phone data', then rerun." >&2
+    echo "Still unreadable. Check the phone is unlocked and in File Transfer mode, then rerun." >&2
     return 1
   fi
 }
