@@ -44,6 +44,14 @@ ytdl_format = ""  # laptop: mpv.conf/local.conf decide (local.conf skips AV1)
 mpv_args = []
 
 # ============================================================
+# MOBILE
+# ============================================================
+
+# folder shared with the phone app (e.g. by Syncthing). every sync imports the
+# phone's watch marks from it and writes a fresh snapshot.db.gz. "" = off
+mobile_dir = "~/.local/share/yt-backlog/mobile"
+
+# ============================================================
 # ACCOUNTS
 # ============================================================
 
