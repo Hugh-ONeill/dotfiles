@@ -1,0 +1,262 @@
+--- a/osc.lua
++++ b/osc.lua
+@@ -1,3 +1,12 @@
++-- mpv's on-screen controller with a themed seekbar: a gradient progress fill,
++-- the track split at chapter boundaries, and SponsorBlock segments as colored
++-- regions.
++-- Usage: loaded from ~~/scripts in place of the built-in one (osc=no in
++-- mpv.conf); options keep the osc- prefix.
++-- This is player/lua/osc.lua from mpv v0.41.0 plus the changes marked
++-- [themed seekbar]; ~~/patches/osc-themed-seekbar.patch holds them as a diff
++-- for re-applying to a newer upstream copy.
++
+ local assdraw = require 'mp.assdraw'
+ local msg = require 'mp.msg'
+ local opt = require 'mp.options'
+@@ -55,6 +64,15 @@
+     chapter_fmt = "Chapter: %s", -- chapter print format for seekbar-hover. "no" to disable
+     unicodeminus = false,       -- whether to use the Unicode minus sign character
+ 
++    -- [themed seekbar]
++    seekbar_themed = true,            -- gradient fill, chapter pieces and segment regions
++                                      -- (bar layouts with seekbarstyle=bar)
++    seekbar_gradient = "",            -- space-separated #RRGGBB list for the played part;
++                                      -- empty = timecode_color
++    seekbar_chapter_gap = 3,          -- gap between chapter pieces, 0 = one solid track
++    segment_colors = "",              -- SponsorBlock colors, "category=#RRGGBB,..."
++    segment_color = "#00D400",        -- for categories not listed above
++
+     background_color = "#000000",     -- background color of the osc
+     timecode_color = "#FFFFFF",       -- color of the progress bar and time color
+     title_color = "#FFFFFF",          -- color of the title
+@@ -115,8 +133,9 @@
+     volume_mbtn_left_command = "no-osd cycle mute",
+     volume_mbtn_mid_command = "",
+     volume_mbtn_right_command = "script-binding select/select-audio-device; script-message-to osc osc-hide",
+-    volume_wheel_down_command = "add volume -5",
+-    volume_wheel_up_command = "add volume 5",
++    -- [themed seekbar] no-osd: scripts/feedback.lua shows volume changes
++    volume_wheel_down_command = "no-osd add volume -5",
++    volume_wheel_up_command = "no-osd add volume 5",
+ 
+     fullscreen_mbtn_left_command = "cycle fullscreen",
+     fullscreen_mbtn_mid_command = "",
+@@ -195,6 +214,41 @@
+     return color:sub(6,7) .. color:sub(4,5) ..  color:sub(2,3)
+ end
+ 
++-- [themed seekbar] parsed copies of the color options, rebuilt with the styles
++local seekbar_colors = { gradient = {}, segments = {}, segment = "00D400" }
++
++local function set_seekbar_colors()
++    local gradient = {}
++    for hex in user_opts.seekbar_gradient:gmatch("#(%x%x%x%x%x%x)") do
++        gradient[#gradient + 1] = {
++            tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16),
++        }
++    end
++    local segments = {}
++    for category, color in user_opts.segment_colors:gmatch("([%w_]+)=(#%x%x%x%x%x%x)") do
++        segments[category] = osc_color_convert(color)
++    end
++    seekbar_colors = {
++        gradient = gradient,
++        segments = segments,
++        segment = osc_color_convert(user_opts.segment_color),
++    }
++end
++
++-- [themed seekbar] position 0..1 along the gradient as ASS BBGGRR
++local function seekbar_gradient_at(pos)
++    local cols = seekbar_colors.gradient
++    if #cols == 0 then return osc_color_convert(user_opts.timecode_color) end
++    if #cols == 1 then
++        return string.format("%02X%02X%02X", cols[1][3], cols[1][2], cols[1][1])
++    end
++    pos = math.max(0, math.min(1, pos)) * (#cols - 1)
++    local i = math.min(math.floor(pos), #cols - 2)
++    local a, b, f = cols[i + 1], cols[i + 2], pos - i
++    local function mix(k) return math.floor(a[k] + (b[k] - a[k]) * f + 0.5) end
++    return string.format("%02X%02X%02X", mix(3), mix(2), mix(1))
++end
++
+ -- luacheck: push ignore
+ -- luacheck: max line length
+ local osc_styles
+@@ -222,10 +276,12 @@
+         wcTitle = "{\\1c&H" .. osc_color_convert(user_opts.title_color) .. "\\fs24\\q2}",
+         wcBar = "{\\1c&H" .. osc_color_convert(user_opts.background_color) .. "}",
+     }
++    set_seekbar_colors()  -- [themed seekbar]
+ end
+ 
+ -- internal states, do not touch
+ local state = {
++    sb_segments = {},                       -- [themed seekbar] SponsorBlock segments, in seconds
+     showtime = nil,                         -- time of last invocation (last mouse move)
+     touchtime = nil,                        -- time of last invocation (last touch event)
+     touchpoints = {},                       -- current touch points
+@@ -814,6 +870,106 @@
+     end
+ end
+ 
++-- [themed seekbar] draws the whole seekbar in place of the stock slider: a dim
++-- track cut into chapter pieces, the buffered range a little brighter, the
++-- played part in the gradient, SponsorBlock segments on top and a round handle.
++-- Each color is its own ASS event, positioned at the element's top-left corner.
++local function draw_themed_seekbar(master_ass, element)
++    local geo = element.layout.geometry
++    local x0, y0 = element.hitbox.x1, element.hitbox.y1
++    local left, right = element.slider.min.ele_pos, element.slider.max.ele_pos
++    local width = right - left
++    if width <= 0 then return end
++
++    local hover = mouse_hit(element) or elements[state.active_element] == element
++    local th = geo.h * (hover and 0.42 or 0.28)  -- track thickness
++    local top = (geo.h - th) / 2
++    local duration = mp.get_property_number("duration", 0)
++    local pos = element.slider.posF()
++    local xp = pos and get_slider_ele_pos_for(element, pos) or left
++    local fg = osc_color_convert(user_opts.timecode_color)
++
++    -- the track as x intervals, with a gap at every chapter start
++    local pieces, from, gap = {}, left, user_opts.seekbar_chapter_gap
++    if duration > 0 and gap > 0 then
++        for _, chapter in ipairs(state.chapter_list) do
++            local x = left + width * chapter.time / duration
++            if x - gap / 2 > from + 2 and x + gap / 2 < right - 2 then
++                pieces[#pieces + 1] = { from, x - gap / 2 }
++                from = x + gap / 2
++            end
++        end
++    end
++    pieces[#pieces + 1] = { from, right }
++
++    -- the parts of the track between two x positions, appended to `out`
++    local function span(a, b, out)
++        out = out or {}
++        for _, piece in ipairs(pieces) do
++            local s, e = math.max(piece[1], a), math.min(piece[2], b)
++            if e > s then out[#out + 1] = { s, e } end
++        end
++        return out
++    end
++
++    local function event(color, alpha)
++        master_ass:new_event()
++        master_ass:pos(x0, y0)
++        master_ass:an(7)
++        master_ass:append("{\\blur0\\bord0\\shad0\\1c&H" .. color .. "&}")
++        ass_append_alpha(master_ass, { [1] = alpha, [2] = 255, [3] = 255, [4] = 255 }, 0)
++    end
++
++    local function fill(color, alpha, spans)
++        if #spans == 0 then return end
++        event(color, alpha)
++        master_ass:draw_start()
++        for _, s in ipairs(spans) do
++            master_ass:rect_cw(s[1], top, s[2], top + th)
++        end
++        master_ass:draw_stop()
++    end
++
++    fill(fg, 200, span(left, right))
++
++    -- buffered ahead of the playhead
++    local buffered = {}
++    for _, range in pairs(element.slider.seekRangesF() or {}) do
++        local a = math.max(get_slider_ele_pos_for(element, range["start"]), xp)
++        local b = get_slider_ele_pos_for(element, range["end"])
++        if b > a then span(a, b, buffered) end
++    end
++    fill(fg, 150, buffered)
++
++    -- played part: slices of the gradient, each color fixed to its place on the bar
++    local slices = 48
++    local sw = width / slices
++    for i = 0, slices - 1 do
++        local a = left + i * sw
++        if a >= xp then break end
++        -- half a pixel of overlap hides the seams between slices
++        fill(seekbar_gradient_at((i + 0.5) / slices), 0,
++             span(a, math.min(a + sw + 0.5, xp)))
++    end
++
++    if duration > 0 then
++        for _, seg in ipairs(state.sb_segments) do
++            local a = left + width * math.max(0, math.min(1, seg.start / duration))
++            local b = left + width * math.max(0, math.min(1, seg["end"] / duration))
++            fill(seekbar_colors.segments[seg.category] or seekbar_colors.segment, 0,
++                 span(a, math.max(b, a + 2)))
++        end
++    end
++
++    if pos then
++        local r = geo.h * (hover and 0.3 or 0.2)
++        event(fg, 0)
++        master_ass:draw_start()
++        master_ass:round_rect_cw(xp - r, geo.h / 2 - r, xp + r, geo.h / 2 + r, r)
++        master_ass:draw_stop()
++    end
++end
++
+ local function render_elements(master_ass)
+     -- when the slider is dragged or hovered and we have a target chapter name
+     -- then we use it instead of the normal title. we calculate it before the
+@@ -865,7 +1021,8 @@
+ 
+         elem_ass:merge(style_ass)
+ 
+-        if element.type ~= "button" then
++        -- [themed seekbar] its track and marks are drawn by draw_themed_seekbar
++        if element.type ~= "button" and not element.themed then
+             elem_ass:merge(element.static_ass)
+         end
+ 
+@@ -890,6 +1047,11 @@
+                 foH = slider_lo.border + slider_lo.gap
+             end
+ 
++            -- [themed seekbar] replaces the stock drawing up to the tooltip
++            if element.themed then
++                draw_themed_seekbar(master_ass, element)
++            else
++
+             if pos then
+                 xp = get_slider_ele_pos_for(element, pos)
+ 
+@@ -990,6 +1152,8 @@
+                 end
+             end
+ 
++            end  -- [themed seekbar] not element.themed
++
+             elem_ass:draw_stop()
+ 
+             -- add tooltip
+@@ -1777,6 +1941,12 @@
+     lo.slider.tooltip_an = 5
+     lo.slider.stype = user_opts["seekbarstyle"]
+     lo.slider.rtype = user_opts["seekrangestyle"]
++
++    -- [themed seekbar] it draws its own track, so the stock backing box goes
++    if user_opts.seekbar_themed and user_opts.seekbarstyle == "bar" then
++        elements.seekbar.themed = true
++        elements.bgbar1.layout.alpha[1] = 255
++    end
+ end
+ 
+ layouts["bottombar"] = function()
+@@ -2685,6 +2855,12 @@
+     request_init()
+ end)
+ 
++-- [themed seekbar] published by scripts/sponsorblock.lua
++mp.observe_property("user-data/sponsorblock/segments", "native", function(_, list)
++    state.sb_segments = type(list) == "table" and list or {}
++    request_tick()
++end)
++
+ -- These are for backwards compatibility only.
+ mp.register_script_message("osc-message", function(message, dur)
+     if not state.osc_message_warned then
