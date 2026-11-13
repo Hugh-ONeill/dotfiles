@@ -52,6 +52,52 @@ mpv_args = []
 mobile_dir = "~/.local/share/yt-backlog/mobile"
 
 # ============================================================
+# MORE LIKE THIS
+# ============================================================
+
+# ollama server that embeds video text for "more like this" (`ytb similar`)
+# 11435 is an ssh tunnel to the desktop's ollama
+embed_url = "http://127.0.0.1:11435"
+embed_model = "nomic-embed-text"
+# how hard a video is pulled toward the playlists it sits in. 0 = text only;
+# higher favors playlist-mates over subject
+similar_playlist_weight = 0.5
+
+# ============================================================
+# SUGGESTIONS
+# ============================================================
+
+# `ytb suggest` follows a channel once this many of its videos are in your own
+# playlists or your likes
+suggest_min_saves = 10
+# channels watched at least this often are ones you already keep up with, so
+# their uploads are left out (`ytb suggest --left-out` lists them)
+suggest_skip_watched_over = 50
+# channel names or ids: never suggest from these / follow these whatever the rules say
+# e.g. muted_channels = ["David Pakman"]
+muted_channels = []
+# e.g. follow_channels = ["The Animated Series", "ESOTERICA"]
+follow_channels = []
+# uploads older than this many days are not suggested
+suggest_max_age_days = 30
+# shortest video worth suggesting, in minutes
+suggest_min_minutes = 2
+# most suggestions from one channel, and in total
+suggest_per_channel = 2
+suggest_count = 100
+# ranking: fit to your playlists counts 1.0; these add a little for a channel you
+# kept a lot of, and for a newer upload
+suggest_weight_channel = 0.1
+suggest_weight_fresh = 0.1
+
+# how hard each playlist pulls suggestions toward it, by playlist title.
+# unlisted = 1, 0 = ignore, negative = push away anything that resembles it.
+# after editing: `ytb suggest --rerank` applies it without re-reading any channel.
+# keep this table right above the accounts: toml puts later keys inside it.
+[playlist_weights]
+# "PoliticalReacTube" = -1
+
+# ============================================================
 # ACCOUNTS
 # ============================================================
 
