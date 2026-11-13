@@ -1,0 +1,12 @@
+[Unit]
+Description=Run yt-backlog refresh three times a day
+
+[Timer]
+# half past, so the 08/12/20:00 sync has finished. Persistent=true catches up after suspend/poweroff.
+OnCalendar=*-*-* 08,14,20:30:00
+Persistent=true
+RandomizedDelaySec=600
+Unit=ytb-refresh.service
+
+[Install]
+WantedBy=timers.target

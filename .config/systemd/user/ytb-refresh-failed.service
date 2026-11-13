@@ -1,0 +1,7 @@
+[Unit]
+Description=notify on yt-backlog refresh failure
+
+[Service]
+Type=oneshot
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+ExecStart=/usr/bin/dunstify -u low -a ytb "ytb refresh had problems" "the next run retries. journalctl --user -u ytb-refresh.service -n 30"

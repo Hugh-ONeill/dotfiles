@@ -1,0 +1,15 @@
+[Unit]
+Description=yt-backlog refresh: suggestions, more-like-this neighbors, phone snapshot
+After=network-online.target ytb-sync.service
+Wants=network-online.target
+OnFailure=ytb-refresh-failed.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/ytb refresh
+TimeoutStartSec=30min
+# ranking the neighbors pegs every core for a couple of minutes; stay out of the way
+Nice=19
+IOSchedulingClass=idle
+StandardOutput=journal
+StandardError=journal
