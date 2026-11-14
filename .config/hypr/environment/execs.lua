@@ -23,7 +23,9 @@ local once = {
     -- Services
     "systemctl --user start hyprpolkitagent",
     "systemctl --user restart dunst",
-    "hypridle",
+    -- hypridle runs as a user unit so its log (inhibit events) reaches
+    -- the journal: journalctl --user -u hypridle
+    "systemctl --user start hypridle",
 
     -- UI
     -- waybar runs under waybar.service (supervised, so a wl_output teardown
