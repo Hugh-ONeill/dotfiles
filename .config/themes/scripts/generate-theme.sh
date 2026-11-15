@@ -1,7 +1,8 @@
 #!/bin/bash
 # Theme generator script
-# Usage: ./generate-theme.sh <theme-name>
+# Usage: ./generate-theme.sh <theme-name> [--stylus-only]
 # Generates theme config files from templates using the specified palette
+# --stylus-only renders just the Stylus userstyles (used by stylus-port.py)
 
 set -e
 
@@ -169,6 +170,12 @@ if [[ $(color_luminance "$(jq -r '.colors.base // "#000000"' "$PALETTE_FILE")") 
 else
     export THEME_MODE=dark THEME_IS_DARK=true
 fi
+# Catppuccin flavor name that ported userstyles branch on (latte = light)
+if [[ "$THEME_MODE" == light ]]; then
+    export THEME_FLAVOR=latte
+else
+    export THEME_FLAVOR=mocha
+fi
 
 # Optional, inert metadata: nothing reads these yet, but theme.conf has always
 # carried them and build-catppuccin-retheme.sh expects the file to exist.
@@ -267,7 +274,7 @@ else
 fi
 
 # Build list of variables to substitute
-VARS='$THEME_NAME $THEME_MODE $THEME_IS_DARK $THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
+VARS='$THEME_NAME $THEME_MODE $THEME_IS_DARK $THEME_FLAVOR$THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
 
 # Add all color variables (uppercase versions)
 for key in "${!COLORS[@]}"; do
@@ -287,6 +294,63 @@ VARS="$VARS \$STYLE_CORNER_RADIUS \$STYLE_BORDER_WIDTH \$STYLE_GAPS_IN \$STYLE_G
 
 # Add font variables
 VARS="$VARS \$FONT_FAMILY \$FONT_SIZE"
+
+# ============================================================
+# STYLUS USERSTYLES
+# ============================================================
+
+# Colors the ported Catppuccin lib needs an icon-tint filter chain for
+STYLUS_FILTER_KEYS=(ACCENT ACCENT_SECONDARY ACCENT_TERTIARY ACCENT_BRIGHT
+    SEM_ERR SEM_WARN SEM_OK SEM_INFO SEM_LINK
+    TEXT SUBTEXT1 SUBTEXT0 OVERLAY2 OVERLAY1 OVERLAY0
+    SURFACE2 SURFACE1 SURFACE0 BASE MANTLE CRUST)
+
+generate_stylus() {
+    local STYLUS_TMPL="$TEMPLATES_DIR/stylus"
+    local STYLUS_OUTPUT="$OUTPUT_DIR/stylus"
+    local template filename key
+    [[ -d "$STYLUS_TMPL" ]] || return 0
+
+    # <KEY>_FILTER: CSS filter chain that tints a black icon to that color
+    if [[ -x "$SCRIPT_DIR/css-filter.py" ]]; then
+        local pairs=()
+        for key in "${STYLUS_FILTER_KEYS[@]}"; do
+            if [[ -n "${!key}" ]]; then
+                pairs+=("$key=${!key}")
+                VARS="$VARS \$${key}_FILTER"
+            fi
+        done
+        eval "$("$SCRIPT_DIR/css-filter.py" "${pairs[@]}")"
+    fi
+
+    mkdir -p "$STYLUS_OUTPUT"
+    echo "  -> stylus/"
+    for template in "$STYLUS_TMPL"/*.user.less.tmpl; do
+        if [[ -f "$template" ]]; then
+            filename=$(basename "$template" .tmpl)
+            envsubst "$VARS" < "$template" > "$STYLUS_OUTPUT/$filename"
+            # Point Stylus at the local server so theme switches auto-update
+            sed -i "/^@updateURL /d; /^@version /a @updateURL http://127.0.0.1:${STYLUS_PORT}/$filename" "$STYLUS_OUTPUT/$filename"
+        fi
+    done
+    # Plain stylesheets that local pages <link> from the same server
+    for template in "$STYLUS_TMPL"/*.css.tmpl; do
+        if [[ -f "$template" ]]; then
+            envsubst "$VARS" < "$template" > "$STYLUS_OUTPUT/$(basename "$template" .tmpl)"
+        fi
+    done
+    # Bundle into importable JSON
+    if [[ -x "$SCRIPTS_DIR/bundle-styles.py" ]]; then
+        echo "  -> stylus-bundle.json"
+        "$SCRIPTS_DIR/bundle-styles.py" "$THEME_NAME" > /dev/null
+    fi
+}
+
+if [[ "$2" == "--stylus-only" ]]; then
+    echo "Generating $THEME_NAME stylus..."
+    generate_stylus
+    exit 0
+fi
 
 # Generate each config file from template
 echo "Generating $THEME_NAME theme..."
@@ -383,29 +447,7 @@ if [[ -d "$DUNST_ICONS_TMPL" ]]; then
 fi
 
 # Generate Stylus userstyles
-STYLUS_TMPL="$TEMPLATES_DIR/stylus"
-if [[ -d "$STYLUS_TMPL" ]]; then
-    STYLUS_OUTPUT="$OUTPUT_DIR/stylus"
-    mkdir -p "$STYLUS_OUTPUT"
-    echo "  -> stylus/"
-    for template in "$STYLUS_TMPL"/*.user.less.tmpl; do
-        if [[ -f "$template" ]]; then
-            filename=$(basename "$template" .tmpl)
-            envsubst "$VARS" < "$template" > "$STYLUS_OUTPUT/$filename"
-            # Point Stylus at the local server so theme switches auto-update
-            sed -i "/^@updateURL /d; /^@version /a @updateURL http://127.0.0.1:${STYLUS_PORT}/$filename" "$STYLUS_OUTPUT/$filename"
-        fi
-    done
-    # Plain stylesheets that local pages <link> from the same server
-    for template in "$STYLUS_TMPL"/*.css.tmpl; do
-        [[ -f "$template" ]] && envsubst "$VARS" < "$template" > "$STYLUS_OUTPUT/$(basename "$template" .tmpl)"
-    done
-    # Bundle into importable JSON
-    if [[ -x "$SCRIPTS_DIR/bundle-styles.py" ]]; then
-        echo "  -> stylus-bundle.json"
-        "$SCRIPTS_DIR/bundle-styles.py" "$THEME_NAME" > /dev/null
-    fi
-fi
+generate_stylus
 
 # Aseprite bakes UI colors into a sprite sheet, so recolor it per palette
 if [[ -x "$SCRIPT_DIR/build-aseprite-theme.py" ]]; then
