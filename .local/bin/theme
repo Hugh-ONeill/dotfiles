@@ -33,6 +33,10 @@ Commands:
   rofi                Interactive theme picker
   upstream [--all]    Catppuccin upstream changes since last sync
   upstream --mark <name>...  Record template(s) as synced to upstream
+  stylus list         Catppuccin userstyles and which are ported
+  stylus add <name>...|--all  Auto-port userstyles to the theme system
+  stylus rm <name>... Drop auto-ported userstyles
+  stylus sync         Pull upstream and re-port what changed (daily timer)
 
 Shortcuts:
   theme <theme>       Same as 'theme set <theme>'
@@ -308,6 +312,7 @@ case "${1:-}" in
     edit)           cmd_edit "$2" ;;
     rofi|picker)    cmd_rofi ;;
     upstream)       shift; exec python3 "$THEMES_DIR/scripts/upstream-check.py" "$@" ;;
+    stylus)         shift; exec python3 "$THEMES_DIR/scripts/stylus-port.py" "$@" ;;
     -h|--help|help) cmd_help ;;
     "")
         command -v rofi &>/dev/null && cmd_rofi || cmd_list
