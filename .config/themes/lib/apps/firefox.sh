@@ -72,6 +72,11 @@ apply_firefox() {
         ((++applied))
     done < <(firefox_profiles)
 
+    # Dark Reader keeps its settings inside the extension and has no outside
+    # hook, so the palette goes in by hand: its Settings -> Advanced ->
+    # Import Settings, pointed at this file.
+    copy_to_current "$theme" "darkreader.json" >/dev/null 2>&1
+
     if [[ $applied -gt 0 ]]; then
         report_ok "firefox (restart to apply)"
     else
