@@ -73,6 +73,11 @@ def load_manifest() -> dict:
     return json.loads(MANIFEST.read_text())
 
 
+def tracked(m: dict) -> dict[str, dict]:
+    """Entries to watch; "auto" ones are re-ported by stylus-port.py sync."""
+    return {n: e for n, e in m["entries"].items() if not e.get("auto")}
+
+
 def save_manifest(m: dict) -> None:
     MANIFEST.write_text(json.dumps(m, indent=2) + "\n")
 
@@ -121,7 +126,7 @@ def compare_url(r: Result) -> str:
 
 def run_report(show_all: bool) -> list[Result]:
     m = load_manifest()
-    results = [check(n, e, m["noise"]) for n, e in m["entries"].items()]
+    results = [check(n, e, m["noise"]) for n, e in tracked(m).items()]
     for r in results:
         if r.error:
             print(f"! {r.name:18} {r.error}")
@@ -146,7 +151,7 @@ def run_notify() -> None:
     if STATE.exists():
         seen = json.loads(STATE.read_text())
     fresh: list[Result] = []
-    for n, e in m["entries"].items():
+    for n, e in tracked(m).items():
         r = check(n, e, m["noise"])
         if r.new and seen.get(n) != r.head:
             fresh.append(r)
