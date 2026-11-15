@@ -211,17 +211,255 @@
       "path": "themes/mocha.toml",
       "synced": "0cf91419f964"
     },
+    "stylus-advent-of-code": {
+      "template": "stylus/advent-of-code.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/advent-of-code/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-alacritty.org": {
+      "template": "stylus/alacritty.org.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/alacritty.org/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-alternativeto": {
+      "template": "stylus/alternativeto.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/alternativeto/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-amplenote": {
+      "template": "stylus/amplenote.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/amplenote/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-anilist": {
+      "template": "stylus/anilist.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/anilist/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-anonymous-overflow": {
+      "template": "stylus/anonymous-overflow.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/anonymous-overflow/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
     "stylus-archwiki": {
       "template": "stylus/archwiki.user.less.tmpl",
       "repo": "userstyles",
       "path": "styles/arch-wiki/catppuccin.user.less",
       "synced": "04413649d48c"
     },
+    "stylus-boringproxy": {
+      "template": "stylus/boringproxy.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/boringproxy/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-brave-search": {
+      "template": "stylus/brave-search.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/brave-search/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-bsky": {
+      "template": "stylus/bsky.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/bsky/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-bstats": {
+      "template": "stylus/bstats.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/bstats/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-canvas-lms": {
+      "template": "stylus/canvas-lms.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/canvas-lms/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-chatgpt": {
+      "template": "stylus/chatgpt.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/chatgpt/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-chatreplay": {
+      "template": "stylus/chatreplay.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/chatreplay/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-chess.com": {
+      "template": "stylus/chess.com.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/chess.com/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-cinny": {
+      "template": "stylus/cinny.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/cinny/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-claude": {
+      "template": "stylus/claude.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/claude/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-cobalt": {
+      "template": "stylus/cobalt.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/cobalt/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-codeberg": {
+      "template": "stylus/codeberg.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/codeberg/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-crates.io": {
+      "template": "stylus/crates.io.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/crates.io/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-crowdin": {
+      "template": "stylus/crowdin.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/crowdin/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-deepl": {
+      "template": "stylus/deepl.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/deepl/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-deepseek": {
+      "template": "stylus/deepseek.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/deepseek/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-desmos": {
+      "template": "stylus/desmos.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/desmos/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-dev.to": {
+      "template": "stylus/dev.to.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/dev.to/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-devdocs": {
+      "template": "stylus/devdocs.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/devdocs/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-docs.deno.com": {
+      "template": "stylus/docs.deno.com.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/docs.deno.com/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-docs.rs": {
+      "template": "stylus/docs.rs.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/docs.rs/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-duckduckgo": {
+      "template": "stylus/duckduckgo.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/duckduckgo/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-ecosia": {
+      "template": "stylus/ecosia.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/ecosia/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-elk": {
+      "template": "stylus/elk.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/elk/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-formative": {
+      "template": "stylus/formative.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/formative/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-freedesktop": {
+      "template": "stylus/freedesktop.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/freedesktop/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-ghostty.org": {
+      "template": "stylus/ghostty.org.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/ghostty.org/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
     "stylus-github": {
       "template": "stylus/github.user.less.tmpl",
       "repo": "userstyles",
       "path": "styles/github/catppuccin.user.less",
       "synced": "04413649d48c"
+    },
+    "stylus-gleam.run": {
+      "template": "stylus/gleam.run.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/gleam.run/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
     },
     "stylus-gmail": {
       "template": "stylus/gmail.user.less.tmpl",
@@ -230,11 +468,221 @@
       "synced": "04413649d48c",
       "note": "custom (wiz namespace); upstream for reference"
     },
+    "stylus-go.dev": {
+      "template": "stylus/go.dev.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/go.dev/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
     "stylus-google": {
       "template": "stylus/google.user.less.tmpl",
       "repo": "userstyles",
       "path": "styles/google/catppuccin.user.less",
       "synced": "04413649d48c"
+    },
+    "stylus-google-drive": {
+      "template": "stylus/google-drive.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/google-drive/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-google-gemini": {
+      "template": "stylus/google-gemini.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/google-gemini/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-google-photos": {
+      "template": "stylus/google-photos.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/google-photos/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-grabify": {
+      "template": "stylus/grabify.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/grabify/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-graphite": {
+      "template": "stylus/graphite.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/graphite/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-hackage": {
+      "template": "stylus/hackage.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/hackage/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-hacker-news": {
+      "template": "stylus/hacker-news.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/hacker-news/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-have-i-been-pwned": {
+      "template": "stylus/have-i-been-pwned.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/have-i-been-pwned/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-holodex": {
+      "template": "stylus/holodex.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/holodex/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-home-manager-options-search": {
+      "template": "stylus/home-manager-options-search.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/home-manager-options-search/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-homepage": {
+      "template": "stylus/homepage.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/homepage/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-hoogle": {
+      "template": "stylus/hoogle.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/hoogle/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-hoppscotch": {
+      "template": "stylus/hoppscotch.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/hoppscotch/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-hyperpipe": {
+      "template": "stylus/hyperpipe.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/hyperpipe/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-ichi.moe": {
+      "template": "stylus/ichi.moe.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/ichi.moe/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-indie-wiki-buddy": {
+      "template": "stylus/indie-wiki-buddy.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/indie-wiki-buddy/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-inoreader": {
+      "template": "stylus/inoreader.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/inoreader/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-instagram": {
+      "template": "stylus/instagram.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/instagram/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-invidious": {
+      "template": "stylus/invidious.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/invidious/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-invokeai": {
+      "template": "stylus/invokeai.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/invokeai/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-jisho": {
+      "template": "stylus/jisho.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/jisho/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-keybr.com": {
+      "template": "stylus/keybr.com.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/keybr.com/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-keyoxide": {
+      "template": "stylus/keyoxide.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/keyoxide/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-lastfm": {
+      "template": "stylus/lastfm.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/lastfm/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-learn-x-in-y-minutes": {
+      "template": "stylus/learn-x-in-y-minutes.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/learn-x-in-y-minutes/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-lemmy": {
+      "template": "stylus/lemmy.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/lemmy/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-libreddit": {
+      "template": "stylus/libreddit.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/libreddit/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-lichess": {
+      "template": "stylus/lichess.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/lichess/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-lingva": {
+      "template": "stylus/lingva.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/lingva/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
     },
     "stylus-linkedin": {
       "template": "stylus/linkedin.user.less.tmpl",
@@ -243,11 +691,326 @@
       "synced": "04413649d48c",
       "note": "custom (wiz namespace); upstream for reference"
     },
+    "stylus-listenbrainz": {
+      "template": "stylus/listenbrainz.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/listenbrainz/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-lobste.rs": {
+      "template": "stylus/lobste.rs.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/lobste.rs/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-mastodon": {
+      "template": "stylus/mastodon.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/mastodon/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-mdbook": {
+      "template": "stylus/mdbook.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/mdbook/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-mdn": {
+      "template": "stylus/mdn.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/mdn/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-microsoft-word": {
+      "template": "stylus/microsoft-word.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/microsoft-word/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-migadu-webmail": {
+      "template": "stylus/migadu-webmail.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/migadu-webmail/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-minesweeper": {
+      "template": "stylus/minesweeper.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/minesweeper/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-modrinth": {
+      "template": "stylus/modrinth.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/modrinth/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-namemc": {
+      "template": "stylus/namemc.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/namemc/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-neovim.io": {
+      "template": "stylus/neovim.io.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/neovim.io/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-nitter": {
+      "template": "stylus/nitter.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/nitter/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-nixos-manual": {
+      "template": "stylus/nixos-manual.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/nixos-manual/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-nixos-search": {
+      "template": "stylus/nixos-search.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/nixos-search/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-npm": {
+      "template": "stylus/npm.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/npm/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-npmx": {
+      "template": "stylus/npmx.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/npmx/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-ollama": {
+      "template": "stylus/ollama.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/ollama/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-openmediavault": {
+      "template": "stylus/openmediavault.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/openmediavault/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-paste.rs": {
+      "template": "stylus/paste.rs.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/paste.rs/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-pcpartpicker": {
+      "template": "stylus/pcpartpicker.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/pcpartpicker/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-perplexity": {
+      "template": "stylus/perplexity.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/perplexity/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-phanpy": {
+      "template": "stylus/phanpy.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/phanpy/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-picrew": {
+      "template": "stylus/picrew.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/picrew/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-pinterest": {
+      "template": "stylus/pinterest.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/pinterest/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-planet-minecraft": {
+      "template": "stylus/planet-minecraft.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/planet-minecraft/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-poe": {
+      "template": "stylus/poe.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/poe/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-porkbun": {
+      "template": "stylus/porkbun.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/porkbun/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-pronouns.cc": {
+      "template": "stylus/pronouns.cc.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/pronouns.cc/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-pronouns.page": {
+      "template": "stylus/pronouns.page.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/pronouns.page/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-proton": {
+      "template": "stylus/proton.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/proton/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-pypi": {
+      "template": "stylus/pypi.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/pypi/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-pythonanywhere": {
+      "template": "stylus/pythonanywhere.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/pythonanywhere/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-quizlet": {
+      "template": "stylus/quizlet.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/quizlet/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-raindrop": {
+      "template": "stylus/raindrop.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/raindrop/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-react.dev": {
+      "template": "stylus/react.dev.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/react.dev/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
     "stylus-reddit": {
       "template": "stylus/reddit.user.less.tmpl",
       "repo": "userstyles",
       "path": "styles/reddit/catppuccin.user.less",
       "synced": "78caa053c497"
+    },
+    "stylus-regex101": {
+      "template": "stylus/regex101.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/regex101/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-rentry.co": {
+      "template": "stylus/rentry.co.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/rentry.co/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-scalar": {
+      "template": "stylus/scalar.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/scalar/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-searchix": {
+      "template": "stylus/searchix.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/searchix/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-searxng": {
+      "template": "stylus/searxng.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/searxng/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-seventv": {
+      "template": "stylus/seventv.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/seventv/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-shinigami-eyes": {
+      "template": "stylus/shinigami-eyes.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/shinigami-eyes/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-snapchat-web": {
+      "template": "stylus/snapchat-web.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/snapchat-web/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-snips-sh": {
+      "template": "stylus/snips-sh.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/snips-sh/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-spotify-web": {
+      "template": "stylus/spotify-web.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/spotify-web/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
     },
     "stylus-stackoverflow": {
       "template": "stylus/stackoverflow.user.less.tmpl",
@@ -255,17 +1018,143 @@
       "path": "styles/stack-overflow/catppuccin.user.less",
       "synced": "04413649d48c"
     },
+    "stylus-startpage": {
+      "template": "stylus/startpage.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/startpage/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-status.cafe": {
+      "template": "stylus/status.cafe.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/status.cafe/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
     "stylus-stylus": {
       "template": "stylus/stylus.user.less.tmpl",
       "repo": "userstyles",
       "path": "styles/stylus/catppuccin.user.less",
       "synced": "04413649d48c"
     },
+    "stylus-substack": {
+      "template": "stylus/substack.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/substack/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-syncthing": {
+      "template": "stylus/syncthing.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/syncthing/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-tabnews": {
+      "template": "stylus/tabnews.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/tabnews/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-tldraw": {
+      "template": "stylus/tldraw.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/tldraw/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-trinket": {
+      "template": "stylus/trinket.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/trinket/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-tuta": {
+      "template": "stylus/tuta.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/tuta/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-twitch": {
+      "template": "stylus/twitch.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/twitch/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-twitter": {
+      "template": "stylus/twitter.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/twitter/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-vercel": {
+      "template": "stylus/vercel.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/vercel/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-vikunja": {
+      "template": "stylus/vikunja.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/vikunja/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-web.dev": {
+      "template": "stylus/web.dev.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/web.dev/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-whatsapp-web": {
+      "template": "stylus/whatsapp-web.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/whatsapp-web/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-wiki.nixos.org": {
+      "template": "stylus/wiki.nixos.org.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/wiki.nixos.org/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-wikipedia": {
+      "template": "stylus/wikipedia.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/wikipedia/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
+    "stylus-wikiwand": {
+      "template": "stylus/wikiwand.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/wikiwand/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
+    },
     "stylus-youtube": {
       "template": "stylus/youtube.user.less.tmpl",
       "repo": "userstyles",
       "path": "styles/youtube/catppuccin.user.less",
       "synced": "b11ebae921ab"
+    },
+    "stylus-zen-browser-docs": {
+      "template": "stylus/zen-browser-docs.user.less.tmpl",
+      "repo": "userstyles",
+      "path": "styles/zen-browser-docs/catppuccin.user.less",
+      "synced": "d0ad2829bf17",
+      "auto": true
     },
     "tmux": {
       "template": "tmux-colors.conf.tmpl",
