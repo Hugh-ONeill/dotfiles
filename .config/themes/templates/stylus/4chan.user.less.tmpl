@@ -583,6 +583,122 @@
   }
 
   // ============================================================
+  // BUILT-IN EXTENSION
+  // ============================================================
+
+  // 4chan's own extension (settings, filters, quick reply, watcher) and
+  // the 4chan Companion userscript, which reuses these panel classes.
+
+  .UIPanel {
+    background-color: fade(@crust, 60%) !important;
+  }
+
+  .extPanel,
+  .extPanel.reply {
+    background: @base !important;
+    color: @text !important;
+    border: 1px solid @surface0 !important;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px fade(@crust, 50%) !important;
+  }
+
+  .UIPanel > .extPanel {
+    padding: 4px 8px 8px;
+  }
+
+  .panelHeader,
+  #twHeader,
+  #qrHeader,
+  #qrepHeader {
+    background: @mantle !important;
+    color: @text !important;
+    border-bottom: 1px solid @surface0 !important;
+  }
+
+  #settingsMenu ul,
+  #watchList li:first-child {
+    border-color: @surface0 !important;
+  }
+
+  .settings-tip,
+  #cc-settings small {
+    color: @subtext0 !important;
+  }
+
+  .UIPanel code,
+  kbd {
+    background: @surface0 !important;
+    color: @text !important;
+    border-color: @surface1 !important;
+    box-shadow: none !important;
+  }
+
+  #threadWatcher a,
+  .extPanel a {
+    color: @accent !important;
+  }
+
+  #quote-preview {
+    background: @base !important;
+    border: 1px solid @surface1 !important;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px fade(@crust, 50%);
+  }
+
+  #quickReply input[type="text"],
+  #quickReply textarea {
+    background: @surface0 !important;
+    color: @text !important;
+    border-color: @surface1 !important;
+  }
+
+  #qrError {
+    background: @err !important;
+    color: @crust !important;
+  }
+
+  .newPostsMarker:not(#quote-preview) {
+    box-shadow: 0 3px @accent !important;
+  }
+
+  // ---- 4chan Companion ----
+
+  :root {
+    --cc-accent: @accent;
+  }
+
+  #cc-gallery {
+    background: fade(@crust, 94%) !important;
+    color: @text !important;
+  }
+
+  .cc-g-bar {
+    background: @mantle;
+    border-bottom: 1px solid @surface0;
+  }
+
+  .cc-g-strip {
+    background: @mantle;
+    border-top: 1px solid @surface0;
+  }
+
+  .cc-ago,
+  .cc-idcount {
+    color: @subtext0;
+    opacity: 1;
+  }
+
+  .cc-hydrus-box,
+  a.cc-hydrus,
+  a.cc-hydrus:visited {
+    color: @accent !important;
+  }
+
+  a.cc-hydrus:hover {
+    color: @text !important;
+  }
+
+  // ============================================================
   // CATALOG
   // ============================================================
 
