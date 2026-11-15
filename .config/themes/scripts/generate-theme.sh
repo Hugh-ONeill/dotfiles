@@ -170,6 +170,12 @@ if [[ $(color_luminance "$(jq -r '.colors.base // "#000000"' "$PALETTE_FILE")") 
 else
     export THEME_MODE=dark THEME_IS_DARK=true
 fi
+# Dark Reader's scheme switch: 1 = dark scheme, 0 = light scheme
+if [[ "$THEME_MODE" == light ]]; then
+    export DARKREADER_MODE=0
+else
+    export DARKREADER_MODE=1
+fi
 # Catppuccin flavor name that ported userstyles branch on (latte = light)
 if [[ "$THEME_MODE" == light ]]; then
     export THEME_FLAVOR=latte
@@ -274,7 +280,7 @@ else
 fi
 
 # Build list of variables to substitute
-VARS='$THEME_NAME $THEME_MODE $THEME_IS_DARK $THEME_FLAVOR$THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
+VARS='$THEME_NAME $THEME_MODE $THEME_IS_DARK $DARKREADER_MODE $THEME_FLAVOR$THEME_DESCRIPTION $CURSOR_THEME $CURSOR_SIZE $GTK_ICON_THEME $THEME_SHADER $QT_COLOR_SCHEME'
 
 # Add all color variables (uppercase versions)
 for key in "${!COLORS[@]}"; do
