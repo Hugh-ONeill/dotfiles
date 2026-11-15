@@ -76,3 +76,7 @@ export TRITON_HOME="$XDG_CACHE_HOME/triton"
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export _ZO_DATA_DIR="$XDG_DATA_HOME/zoxide"
 export CLAUDE_CONFIG_DIR="$XDG_CONFIG_HOME/claude"
+
+# Telemetry Opt-Outs
+# generic name: read by modern-web-guidance and other CLIs that honor it
+export DISABLE_TELEMETRY=1
