@@ -1,0 +1,7 @@
+[Unit]
+Description=Re-port auto-ported Catppuccin userstyles when upstream changes
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.config/themes/scripts/stylus-port.py sync --notify
